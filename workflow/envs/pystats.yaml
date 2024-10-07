@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - polars =0.20
+  - scipy =1.13
+  - pulp =2.8
+  - coincbc =2.10

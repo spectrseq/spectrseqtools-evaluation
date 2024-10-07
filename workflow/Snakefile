@@ -1,0 +1,7 @@
+rule simulate_seqs:
+    output: 
+        "resources/seqs.parquet"
+    conda:
+        "envs/pystats.yaml"
+    notebook:
+        "notebooks/simulate_seqs.py.ipynb"
