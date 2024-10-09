@@ -2,63 +2,18 @@ configfile: "config/config.yaml"
 
 
 include: "rules/common.smk"
+include: "rules/simulation.smk"
+include: "rules/prediction.smk"
 
 
 rule all:
     input:
         collect(
             [
-                #"results/datavzrd/{seq}/{n_fragments}",
-                "results/lionel_mssq/{seq}/{n_fragments}.fasta",
+                "results/datavzrd/{seq}/{n_fragments}",
+                # TODO implement proper integration with dev branch of lionelmssq
+                #"results/lionelmssq/{seq}/{n_fragments}.fasta",
             ],
             seq=lookup(dpath="simulation/seqs", within=config),
             n_fragments=lookup(dpath="simulation/n_fragments", within=config),
         ),
-
-
-rule simulate_measurement:
-    input:
-        workflow.source_path("resources/masses_all.tsv"),
-    output:
-        "results/simulation/{seq}/{n_fragments}.tsv",
-    log:
-        "logs/simulation/{seq}/{n_fragments}.log",
-    conda:
-        "envs/pystats.yaml"
-    script:
-        "scripts/simulate_rna_measurement.py"
-
-
-rule datavzrd:
-    input:
-        config=workflow.source_path("resources/datavzrd/simulation.yaml"),
-        simulation="results/simulation/{seq}/{n_fragments}.tsv",
-    output:
-        report(
-            directory("results/datavzrd/{seq}/{n_fragments}"),
-            htmlindex="index.html",
-            category="Simulation",
-            labels={"seq": "{seq}", "n_fragments": "{n_fragments}"},
-        ),
-    log:
-        "logs/datavzrd/{seq}/{n_fragments}.log",
-    wrapper:
-        "v4.7.0/utils/datavzrd"
-
-
-rule lionelmssq:
-    input:
-        "results/simulation/{seq}/{n_fragments}.tsv",
-    output:
-        fragment_predictions="results/lionel_mssq/{seq}/{n_fragments}.tsv",
-        sequence="results/lionel_mssq/{seq}/{n_fragments}.fasta",
-    params:
-        seq_len=get_seq_len,
-    log:
-        "logs/lionel_mssq/{seq}/{n_fragments}.log",
-    shell:
-        "lionelmssq --fragments {input} --seq-len {params.seq_len} "
-        "--fragment-predictions {output.fragment_predictions} "
-        "--sequence-prediction {output.sequence} "
-        "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
-        "2> {log}"
