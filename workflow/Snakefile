@@ -1,7 +1,43 @@
-rule simulate_seqs:
-    output: 
-        "resources/seqs.parquet"
+configfile: "config/config.yaml"
+
+
+include: "rules/common.smk"
+
+
+rule all:
+    input:
+        collect(
+            "results/datavzrd/{seq}/{n_fragments}",
+            seq=lookup(dpath="simulation/seqs", within=config),
+            n_fragments=lookup(dpath="simulation/n_fragments", within=config),
+        ),
+
+
+rule simulate_measurement:
+    input:
+        workflow.source_path("resources/masses_all.tsv"),
+    output:
+        "results/simulation/{seq}/{n_fragments,[0-9]+}.tsv",
+    log:
+        "logs/simulation/{seq}/{n_fragments}.log",
     conda:
         "envs/pystats.yaml"
-    notebook:
-        "notebooks/simulate_seqs.py.ipynb"
+    script:
+        "scripts/simulate_rna_measurement.py"
+
+
+rule datavzrd:
+    input:
+        config=workflow.source_path("resources/datavzrd/simulation.yaml"),
+        simulation="results/simulation/{seq}/{n_fragments}.tsv",
+    output:
+        report(
+            directory("results/datavzrd/{seq}/{n_fragments}"),
+            htmlindex="index.html",
+            category="Simulation",
+            labels={"seq": "{seq}", "n_fragments": "{n_fragments}"},
+        ),
+    log:
+        "logs/datavzrd/{seq}/{n_fragments}.log",
+    wrapper:
+        "v4.7.0/utils/datavzrd"

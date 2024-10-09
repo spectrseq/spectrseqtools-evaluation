@@ -1,0 +1,7 @@
+simulation:
+  seqs:
+    - CUA104GU1A
+  n_fragments:
+    - 10
+    - 20
+    - 30
