@@ -1,0 +1,40 @@
+__use_yte__: true
+
+datasets:
+  simulation:
+    path: ?input.simulation
+    separator: "\t"
+
+views:
+  simulation:
+    dataset: simulation
+    render-table:
+      columns:
+        left:
+          plot:
+            ticks:
+              scale: linear
+        right:
+          plot:
+            ticks:
+              scale: linear
+        is_start:
+          spell:
+            url: v1.1.1/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+        is_end:
+          spell:
+            url: v1.1.1/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+        true_mass:
+          plot:
+            heatmap:
+              scale: linear
+        observed_mass:
+          plot:
+            heatmap:
+              scale: linear

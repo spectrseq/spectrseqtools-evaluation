@@ -1,7 +1,7 @@
-.snakemake
-results
-logs
-resources
-gurobi.log
-report
-report.zip
+/.snakemake
+/results
+/logs
+/resources
+/gurobi.log
+/report
+/report.zip
