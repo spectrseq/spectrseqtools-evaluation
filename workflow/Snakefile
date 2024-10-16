@@ -4,16 +4,17 @@ configfile: "config/config.yaml"
 include: "rules/common.smk"
 include: "rules/simulation.smk"
 include: "rules/prediction.smk"
+include: "rules/evaluation.smk"
 
 
-rule all:
+rule all_simulations:
     input:
-        collect(
-            [
-                "results/datavzrd/{seq}/{n_fragments}",
-                # TODO implement proper integration with dev branch of lionelmssq
-                #"results/lionelmssq/{seq}/{n_fragments}.fasta",
-            ],
-            seq=lookup(dpath="simulation/seqs", within=config),
-            n_fragments=lookup(dpath="simulation/n_fragments", within=config),
+        collect_simulation_results("results/datavzrd/simulation/{seq}/{n_fragments}"),
+
+
+rule all_predictions:
+    input:
+        collect_simulation_results(
+            "results/lionelmssq/{seq}/{n_fragments}.fasta",
+            "results/plots/lionelmssq_prediction/{seq}/{n_fragments}.html",
         ),

@@ -1,7 +1,13 @@
 simulation:
-  seqs:
-    - CUA104GU1A
-  n_fragments:
-    - 10
-    - 20
-    - 30
+  - seq: CUA104GU1A
+    n_fragments:
+      - 10
+      - 20
+      - 30
+  - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+    n_fragments:
+      - 30
+
+dev:
+  envs:
+    lionelmssq: /home/johannes/micromamba/envs/lionelmssq-dev

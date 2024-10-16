@@ -1,13 +1,13 @@
-# TODO implement script
 rule plot_lionelmssq_prediction:
     input:
-        tsv="results/lionelmssq/{seq}/{n_fragments}.tsv",
-        fasta="results/lionelmssq/{seq}/{n_fragments}.fasta",
+        pred_fragments="results/lionelmssq/{seq}/{n_fragments}.tsv",
+        pred_seq="results/lionelmssq/{seq}/{n_fragments}.fasta",
+        sim="results/simulation/{seq}/{n_fragments}.tsv",
     output:
         "results/plots/lionelmssq_prediction/{seq}/{n_fragments}.html",
     log:
         "logs/plots/lionelmssq_prediction/{seq}/{n_fragments}.log",
     conda:
-        "envs/pystats.yaml"
+        lookup(dpath="dev/envs/lionelmssq", within=config)
     script:
-        "scripts/plot_lionelmssq_prediction.py"
+        "../scripts/plot_lionelmssq_prediction.py"

@@ -17,12 +17,12 @@ rule datavzrd:
         simulation="results/simulation/{seq}/{n_fragments}.tsv",
     output:
         report(
-            directory("results/datavzrd/{seq}/{n_fragments}"),
+            directory("results/datavzrd/simulation/{seq}/{n_fragments}"),
             htmlindex="index.html",
             category="Simulation",
             labels={"seq": "{seq}", "n_fragments": "{n_fragments}"},
         ),
     log:
-        "logs/datavzrd/{seq}/{n_fragments}.log",
+        "logs/datavzrd/simulation/{seq}/{n_fragments}.log",
     wrapper:
         "v4.7.1/utils/datavzrd"
