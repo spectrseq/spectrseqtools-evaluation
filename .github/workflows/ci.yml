@@ -51,7 +51,7 @@ jobs:
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1
       with:
-        directory: .test
+        directory: "."
         snakefile: workflow/Snakefile
         args: "--sdm conda --show-failed-logs -j 10 --conda-cleanup-pkgs cache"
         show-disk-usage-on-error: true
