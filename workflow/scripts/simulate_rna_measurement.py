@@ -13,7 +13,7 @@ nucleoside_re = re.compile(r"\d*[ACGU]")
 true_sequence = nucleoside_re.findall(snakemake.wildcards.seq)
 n_fragments = int(snakemake.wildcards.n_fragments)
 nucleoside_masses = pl.read_csv(snakemake.input[0], separator="\t")
-max_n_parts = int(snakemake.wildcards.parameters.max_n_parts)
+max_n_parts = int(snakemake.config["parameters"][0]["max_n_parts"])
 
 # TODO also simulate different tails:
 phosphorus = 30.973761998
@@ -36,9 +36,10 @@ tail_5prime = [d_ribose, oxygen, 2 * oxygen + phosphorus, oxygen]
 def random_fragment(num_parts = max_n_parts):
     if num_parts == 1: #If it breaks into one part, the entire sequence remains intact.
         breakagepoints = [int(0)]
-    else:
+    elif num_parts <= len(true_sequence): #If the number of parts is less than or equal to the sequence length, then the sequence gets broken into the number of parts.
         breakagepoints = sorted(random.sample(range(1, len(true_sequence)), num_parts - 1))
-        #Implement the condition that the num_parts cannot be greater than the sequence length!
+    elif num_parts > len(true_sequence): #The number of parts cannot be greater than the sequence length.
+        raise ValueError("The number of parts cannot be greater than the sequence length!")
     return breakagepoints
 
 #Select how many parts the sequence gets broken into.
