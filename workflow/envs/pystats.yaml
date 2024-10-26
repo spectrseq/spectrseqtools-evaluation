@@ -3,7 +3,7 @@ channels:
   - nodefaults
 dependencies:
   - polars =1.9
-  - scipy =1.14
+  - scipy = 1.14
   - altair =5.4
   - altair_saver =0.5
   - vegafusion-python-embed =1.6
