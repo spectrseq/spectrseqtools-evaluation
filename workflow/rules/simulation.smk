@@ -1,6 +1,7 @@
 rule simulate_measurement:
     input:
         workflow.source_path("../resources/masses_all.tsv"),
+        workflow.source_path("../resources/Pyramidine_modifications.xlsx"),
     output:
         "results/simulation/{seq}/{n_fragments}.tsv",
     log:
