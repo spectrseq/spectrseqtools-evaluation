@@ -10,12 +10,14 @@ from scipy.stats import norm
 nucleoside_re = re.compile(r"\d*[ACGU]")
 
 # input
-true_sequence = nucleoside_re.findall(snakemake.wildcards.seq)
-n_fragments = int(snakemake.wildcards.n_fragments)
+true_sequence     = nucleoside_re.findall(snakemake.wildcards.seq)
+n_fragments       = int(snakemake.wildcards.n_fragments)
 nucleoside_masses = pl.read_csv(snakemake.input[0], separator="\t")
-max_n_parts = int(snakemake.config["parameters"][0]["max_n_parts"])
-rel_error_rate = snakemake.config["parameters"][0]["rel_error_rate"]
-backbone_masses = snakemake.config["backbone_weights"][0]
+max_n_parts       = int(snakemake.config["parameters"][0]["max_n_parts"])
+rel_error_rate    = snakemake.config["parameters"][1]["rel_error_rate"]
+breakageline      = snakemake.config["parameters"][2]["breakage_line"]
+backbone_masses   = snakemake.config["backbone_weights"]
+backbone_masses   = {k: v for d in backbone_masses for k, v in d.items()} #Convert the list of dictionaries to a single dictionary.
 
 # helper functions
 #def random_fragment():
@@ -65,14 +67,6 @@ fragments = pl.from_records(
     orient="row",
 )
 
-# TODO: Implement breaking at other points
-#Middle -> -H + PO2
-#5'end  -> correct
-#3'end  -> +PO2
-backbone_middle_addition = backbone_masses["phosphorus"] + 2*backbone_masses["oxygen"] - backbone_masses["hydrogen"]
-backbone_start_addition  = 0.
-backbone_end_addition    = backbone_masses["phosphorus"] + 2*backbone_masses["oxygen"]
-
 # calculate true masses based on known nucleoside masses
 true_fragment_masses = [
     sum(
@@ -84,24 +78,44 @@ true_fragment_masses = [
     for fragment in fragments.iter_rows(named=True)
 ]
 
+# Add backbone masses to the fragments, based on the position of the fragment in the sequence!
+def add_backbone_masses(fragment, backbone_masses, fragment_masses ,breakageline='c-y'):
+    
+    if breakageline == 'c-y':
+        # TODO: Implement breaking at other points, this is currently c-y breakgae
+        #Middle -> + PO2 - H
+        #5'end (start)  -> correct
+        #3'end (end) cyclic phosphate -> + PO2  - 2H
+        backbone_middle_addition =   backbone_masses["phosphorous"] + 2*backbone_masses["oxygen"] - backbone_masses["hydrogen"]
+        backbone_start_addition  =  -backbone_masses["hydrogen"]
+        backbone_end_addition    =   backbone_masses["phosphorous"] + 2*backbone_masses["oxygen"] - 2*backbone_masses["hydrogen"] #Cyclic phosphate
+    elif breakageline == 'a-w':
+        raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
+    elif breakageline == 'b-x':
+        raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
+    elif breakageline == 'd-z':
+        raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
+    
+    for iter,fragment in enumerate(fragments.iter_rows(named=True)):    
+        if fragment["left"] == 0:
+            fragment_masses[iter] += backbone_start_addition + backbone_masses["Tag5prime"] #Can add a 5'tag mass if applicable here!
+        else:
+            fragment_masses[iter] += backbone_end_addition
+        
+        if fragment["right"] == len(true_sequence)-1:
+            fragment_masses[iter] += + backbone_masses["Tag3prime"] #Can add a 3'tag mass if applicable here!   
+        
+        fragment_masses[iter] += (
+            backbone_middle_addition*max(fragment["right"]-fragment["left"],0))
+        
+        #Add a terminal Hydrogen 
+        fragment_masses[iter] += backbone_masses["hydrogen"]
+        
+    return fragment_masses
+
 #Copying the fragment masses to a new list to add the backbone masses to the fragments.
 true_fragment_masses_with_backbone = [elem for elem in true_fragment_masses]
-
-# Add backbone masses to the fragments, based on the position of the fragment in the sequence!
-for iter,fragment in enumerate(fragments.iter_rows(named=True)):
-    
-    if fragment["left"] == 0:
-        true_fragment_masses_with_backbone[iter] += backbone_start_addition
-    elif fragment["left"] != len(true_sequence)-1:
-        true_fragment_masses_with_backbone[iter] += backbone_middle_addition
-    
-    if fragment["right"] == len(true_sequence)-1:
-        true_fragment_masses_with_backbone[iter] += backbone_end_addition
-    elif fragment["right"] != 0:
-        true_fragment_masses_with_backbone[iter] += backbone_middle_addition
-    
-    true_fragment_masses_with_backbone[iter] += (
-        backbone_middle_addition*max(fragment["right"]-fragment["left"]+1-2,0))
+true_fragment_masses_with_backbone = add_backbone_masses(fragments, backbone_masses, true_fragment_masses_with_backbone)
     
     
 # simulate observed masses with noise -- we use the relative error rate to simulate the noise!
@@ -115,7 +129,7 @@ observed_fragment_masses = [
 fragments = fragments.with_columns(
     (pl.col("left") == 0).alias("is_start (5')"),
     (pl.col("right") == (len(true_sequence))-1).alias("is_end (3')"),
-    (pl.col("right") == pl.col("left")).alias("single_nucleotide"),
+    (pl.col("right") == pl.col("left")).alias("single_nucleoside"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
     pl.Series(true_fragment_masses_with_backbone).alias("true_mass_with_backbone"),
     pl.Series(observed_fragment_masses).alias("observed_mass"),

@@ -1,23 +1,45 @@
-simulation:
-  - seq: CUA104GU1A # Sequence convention is 5' to 3'
-    n_fragments:
-      - 10
-      - 20
-      - 30
-  - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-    n_fragments:
-      - 30
-  
+simulation: # Sequence convention is 5' to 3'
+  random: #Random sequence geenration
+    seed: 42325345
+    mutation_rate: 0.01 
+    strata:
+      - seq_len: 15
+        n_fragments: 
+        - 30
+      - seq_len: 20
+        n_fragments:
+        - 40
+
+  custom: #Hardcodes the sequences
+    - seq: CUA104GU1A
+      n_fragments:
+        - 10
+        - 20
+        - 30
+    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+      n_fragments:
+        - 30
+
+#Generates sequences with given length which is fragmented "n_fragments" times, the mutation rate for base-pairs is also given
+generate_sequences:
+  - num_sequences: 1
+  - length: 20
+  - n_fragments: 10
+  - mutation_rate: 0.01 
+
 parameters:
   - max_n_parts: 2 # The maximum number of parts a fragment can be split into!
   - rel_error_rate: 0.00001
+  - breakage_line: c-y
 
 backbone_weights:
-  - phosphorous: 30.973762
+  - phosphorous: 30.973762 
   - oxygen: 15.9994
-  - hydrogen: 1.00794
+  - hydrogen: 1.007276 # This is the weight of a proton, (the weight of true H with electron is =  1.00794) 
   - carbon: 12.0107
   - PO2: 62.972562
+  - Tag3prime : 0.
+  - Tag5prime: 0.
   # The following are for the RNA c-y breakage
   - middle: 194.080742
   - end_3prime: 195.088682
