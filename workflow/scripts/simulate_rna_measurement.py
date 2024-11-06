@@ -13,9 +13,9 @@ nucleoside_re = re.compile(r"\d*[ACGU]")
 true_sequence     = nucleoside_re.findall(snakemake.wildcards.seq)
 n_fragments       = int(snakemake.wildcards.n_fragments)
 nucleoside_masses = pl.read_csv(snakemake.input[0], separator="\t")
-max_n_parts       = int(snakemake.config["parameters"][0]["max_n_parts"])
-rel_error_rate    = snakemake.config["parameters"][1]["rel_error_rate"]
-breakageline      = snakemake.config["parameters"][2]["breakage_line"]
+max_n_parts       = int(snakemake.config["fragmentation_parameters"][0]["max_n_parts"])
+rel_error_rate    = snakemake.config["fragmentation_parameters"][1]["rel_error_rate"]
+breakageline      = snakemake.config["fragmentation_parameters"][2]["breakage_line"]
 backbone_masses   = snakemake.config["backbone_weights"]
 backbone_masses   = {k: v for d in backbone_masses for k, v in d.items()} #Convert the list of dictionaries to a single dictionary.
 
@@ -27,16 +27,22 @@ backbone_masses   = {k: v for d in backbone_masses for k, v in d.items()} #Conve
 
 # Divide the sequence into a maximum given number of "max_n_parts". 
 # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
+
 def random_fragment(num_parts = max_n_parts):
+    
     if num_parts == 1: 
         #If it breaks into one part, the entire sequence remains intact.
         breakagepoints = [int(0)]
+    
     elif num_parts <= len(true_sequence): 
         #If the number of parts is less than or equal to the sequence length, then the sequence gets broken into the number of parts.
         breakagepoints = sorted(random.sample(range(1, len(true_sequence)), num_parts - 1))
+        #Change this 1 to 2 if there are not enough statistics for the sequence brekage!
+    
     elif num_parts > len(true_sequence): 
         #The number of parts cannot be greater than the sequence length.
         raise ValueError("The number of parts cannot be greater than the sequence length!")
+    
     return breakagepoints
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 
@@ -49,13 +55,16 @@ breakagepoints = [random_fragment(num_parts = random.randint(1,max_n_parts)) for
 # with both left and right included in the fragment. If left = right, then its a single nucleotide.
 def generate_left_right(breakagepoints):
     left,right = [],[]
+    
     for exp in breakagepoints:
         left.append(0)
+        
         for part in exp:
             if part != 0:
                 right.append(part-1)
                 left.append(part)
         right.append(len(true_sequence)-1)
+    
     return left,right
 
 l_breakage,r_breakage = generate_left_right(breakagepoints) 
@@ -89,10 +98,13 @@ def add_backbone_masses(fragment, backbone_masses, fragment_masses ,breakageline
         backbone_middle_addition =   backbone_masses["phosphorous"] + 2*backbone_masses["oxygen"] - backbone_masses["hydrogen"]
         backbone_start_addition  =  -backbone_masses["hydrogen"]
         backbone_end_addition    =   backbone_masses["phosphorous"] + 2*backbone_masses["oxygen"] - 2*backbone_masses["hydrogen"] #Cyclic phosphate
+    
     elif breakageline == 'a-w':
         raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
+    
     elif breakageline == 'b-x':
         raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
+    
     elif breakageline == 'd-z':
         raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
     
@@ -127,8 +139,8 @@ observed_fragment_masses = [
 
 # compile final dataframe
 fragments = fragments.with_columns(
-    (pl.col("left") == 0).alias("is_start (5')"),
-    (pl.col("right") == (len(true_sequence))-1).alias("is_end (3')"),
+    (pl.col("left") == 0).alias("is_start(5')"),
+    (pl.col("right") == (len(true_sequence))-1).alias("is_end(3')"),
     (pl.col("right") == pl.col("left")).alias("single_nucleoside"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
     pl.Series(true_fragment_masses_with_backbone).alias("true_mass_with_backbone"),
