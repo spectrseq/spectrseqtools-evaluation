@@ -25,4 +25,5 @@ rule datavzrd:
     log:
         "logs/datavzrd/simulation/{seq}/{n_fragments}.log",
     wrapper:
-        "v5.0.1-1-g34a454a/utils/datavzrd"
+        "v5.0.2/utils/datavzrd"
+        #"v5.0.1-1-g34a454a/utils/datavzrd"

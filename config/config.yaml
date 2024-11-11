@@ -24,6 +24,7 @@ fragmentation_parameters:
   - max_n_parts: 2 # The maximum number of parts a fragment can be split into!
   - rel_error_rate: 0.00001
   - breakage_line: c-y
+  - fragmentation_process: 'exact' #'random' or 'exact': In 'random', the fragment is split into (1,max_n_parts) randomly, while in 'exact', the fragment is always split into 'max_n_parts' parts 
 
 backbone_weights:
   - phosphorous: 30.973762 

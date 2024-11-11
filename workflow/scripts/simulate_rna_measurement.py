@@ -10,14 +10,17 @@ from scipy.stats import norm
 nucleoside_re = re.compile(r"\d*[ACGU]")
 
 # input
-true_sequence     = nucleoside_re.findall(snakemake.wildcards.seq)
-n_fragments       = int(snakemake.wildcards.n_fragments)
-nucleoside_masses = pl.read_csv(snakemake.input[0], separator="\t")
-max_n_parts       = int(snakemake.config["fragmentation_parameters"][0]["max_n_parts"])
-rel_error_rate    = snakemake.config["fragmentation_parameters"][1]["rel_error_rate"]
-breakageline      = snakemake.config["fragmentation_parameters"][2]["breakage_line"]
-backbone_masses   = snakemake.config["backbone_weights"]
-backbone_masses   = {k: v for d in backbone_masses for k, v in d.items()} #Convert the list of dictionaries to a single dictionary.
+true_sequence         = nucleoside_re.findall(snakemake.wildcards.seq)
+n_fragments           = int(snakemake.wildcards.n_fragments)
+nucleoside_masses     = pl.read_csv(snakemake.input[0], separator="\t")
+
+max_n_parts           = int(snakemake.config["fragmentation_parameters"][0]["max_n_parts"])
+rel_error_rate        = snakemake.config["fragmentation_parameters"][1]["rel_error_rate"]
+breakageline          = snakemake.config["fragmentation_parameters"][2]["breakage_line"]
+fragmentation_process = snakemake.config["fragmentation_parameters"][3]["fragmentation_process"]
+
+backbone_masses       = snakemake.config["backbone_weights"]
+backbone_masses       = {k: v for d in backbone_masses for k, v in d.items()} #Convert the list of dictionaries to a single dictionary.
 
 # helper functions
 #def random_fragment():
@@ -25,8 +28,7 @@ backbone_masses   = {k: v for d in backbone_masses for k, v in d.items()} #Conve
 #    r = random.randint(l + 1, len(true_sequence))
 #    return l, r
 
-# Divide the sequence into a maximum given number of "max_n_parts". 
-# At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
+# Divide the sequence into a given number of "max_n_parts". 
 
 def random_fragment(num_parts = max_n_parts):
     
@@ -46,8 +48,15 @@ def random_fragment(num_parts = max_n_parts):
     return breakagepoints
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 
-#Select how many parts the sequence gets broken into. #It can happen that the entire sequence remains intact.
-breakagepoints = [random_fragment(num_parts = random.randint(1,max_n_parts)) for _ in range(n_fragments)]
+#Select how many parts the sequence gets broken into.
+if fragmentation_process == 'random':
+    # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
+    #Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
+    # It can happen that the entire sequence remains intact.
+    breakagepoints = [random_fragment(num_parts = random.randint(1,max_n_parts)) for _ in range(n_fragments)]
+elif fragmentation_process == 'exact':
+    #Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
+    breakagepoints = [random_fragment(num_parts = max_n_parts) for _ in range(n_fragments)]
 
 # Generate "left" and "right" neuclotides based on the breakagepoints, 
 # which are the exact indices of the nucleotides in the generated fragments:
@@ -137,11 +146,18 @@ observed_fragment_masses = [
     for noise, mass in zip(fragment_noise, true_fragment_masses_with_backbone)
 ]
 
+#Get the fragment sequences
+fragment_sequences = [
+    ''.join(true_sequence[fragment["left"] : fragment["right"] + 1])
+    for fragment in fragments.iter_rows(named=True)
+]
+
 # compile final dataframe
 fragments = fragments.with_columns(
     (pl.col("left") == 0).alias("is_start(5')"),
     (pl.col("right") == (len(true_sequence))-1).alias("is_end(3')"),
     (pl.col("right") == pl.col("left")).alias("single_nucleoside"),
+    pl.Series(fragment_sequences).alias("sequence"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
     pl.Series(true_fragment_masses_with_backbone).alias("true_mass_with_backbone"),
     pl.Series(observed_fragment_masses).alias("observed_mass"),
