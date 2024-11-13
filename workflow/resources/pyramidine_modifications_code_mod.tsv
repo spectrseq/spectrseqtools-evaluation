@@ -1,0 +1,84 @@
+Standard_Symbol	Symbol	Nucleoside	Chemical Formula	Mass
+001C	Cf	2' fluorocytidine	C9 H12 N3 O4 F1	245.08118400
+002U	Tmoe	5-methyl-2'-O-methoxyethyluridine	C13 H20 N2 O7	316.12705094
+003U	Uf	2' fluorouridine	C9 H11 N2 O5 F1	246.06519959
+004C	m5Cmoe	5-methyl-2'-O-methoxyethylcytidine	C13 H21 N3 O6	315.14303535
+02U	s2Um	2-thio-2'-O-methyluridine	C10 H14 N2 O5 S1	274.06234252
+03U	m3Um	3,2'-O-dimethyluridine	C11 H16 N2 O6	272.10083620
+042C	ac4Cm	N4-acetyl-2'-O-methylcytidine	C12 H17 N3 O6	299.11173523
+044C	m4,4Cm	N4,N4,2'-O-trimethylcytidine	C12 H19 N3 O5	285.13247067
+04C	m4Cm	N4,2'-O-dimethylcytidine	C11 H17 N3 O5	271.11682061
+051U	cmnm5Um	5-carboxymethylaminomethyl- 2'-O-methyluridine	C13 H19 N3 O8	345.11721453
+0521U	mcm5Um	5-methoxycarbonylmethyl-2'-O-methyluridine	C13 H18 N2 O8	330.10631550
+0522U	mchm5Um	5-carboxyhydroxymethy-2'O-methyluridine methyl ester	C13 H18 N2 O9	346.10123012
+053U	ncm5Um	5-carbamoylmethyl-2'-O-methyluridine	C12 H17 N3 O7	315.10664985
+0583U	inm5Um	5-(isopentenylaminomethyl)- 2'-O-methyluridine	C16 H25 N3 O6	355.17433547
+05C	m5Cm	5,2'-O-dimethylcytidine	C11 H17 N3 O5	271.11682061
+05U	m5Um	5,2'-O-dimethyluridine	C11 H16 N2 O6	272.10083620
+071C	f5Cm	5-formyl-2'-O-methylcytidine	C11 H15 N3 O6	285.09608517
+09U	Ym	2'-O-methylpseudouridine	C10 H14 N2 O6	258.08518614
+0C	Cm	2'-O-methylcytidine	C10 H15 N3 O5	257.10117055
+0U	Um	2'-O-methyluridine	C10 H14 N2 O6	258.08518614
+1309U	m1acp3Y	1-methyl-3-(3-amino-3-carboxypropyl) pseudouridine	C14 H21 N3 O8	359.13286459
+19U	m1Y	1-methylpseudouridine	C10 H14 N2 O6	258.08518614
+20510U	nm5se2U	5-aminomethyl-2-selenouridine	C10 H15 N3 O5 Se1	336.07297055
+20511U	mnm5se2U	5-methylaminomethyl-2-selenouridine	C11 H17 N3 O5 Se1	350.08862061
+2051U	cmnm5se2U	5-carboxymethylaminomethyl-2-selenouridine	C10 H15 N3 O6	273.09608517
+20C	C+	agmatidine	C14 H22 N7 O4	352.17332714
+20U	se2U	2-selenouridine	C9 H12 N2 O5 Se1	307.04642146
+21511U	mnm5ges2U	5-methylaminomethyl-2-geranylthiouridine	C21 H33 N3 O5 S1	439.21409209
+2151U	cmnm5ges2U	geranylated 5-carboxymethylaminomethyl-2-thiouridine	C22 H33 N3 O7 S1	483.20392133
+21C	k2C	lysidine	C15 H25 N5 O6	371.18048347
+21U	ges2U	2-geranylthiouridine	C19 H28 N2 O5 S1	396.17189294
+2510U	nm5s2U	5-aminomethyl-2-thiouridine	C10 H15 N3 O5 S1	289.07324155
+2511U	mnm5s2U	5-methylaminomethyl-2-thiouridine	C11 H17 N3 O5 S1	303.08889161
+251U	cmnm5s2U	5-carboxymethylaminomethyl-2-thiouridine	C12 H17 N3 O7 S1	347.07872085
+2521U	mcm5s2U	5-methoxycarbonylmethyl-2-thiouridine	C12 H16 N2 O7 S1	332.06782182
+253U	ncm5s2U	5-carbamoylmethyl-2-thiouridine	C11 H15 N3 O6 S1	317.06815617
+2540U	cm5s2U	5-carboxymethyl-2-thiouridine	C11 H14 N2 O7 S1	318.05217176
+254U	tm5s2U	5-taurinomethyl-2-thiouridine	C12 H19 N3 O8 S2	397.06135653
+2583U	inm5s2U	5-(isopentenylaminomethyl)- 2-thiouridine	C15 H23 N3 O5 S1	357.13584179
+2C	s2C	2-thiocytidine	C9 H13 N3 O4 S1	259.06267687
+2U	s2U	2-thiouridine	C9 H12 N2 O5 S1	260.04669246
+308U	acp3D	3-(3-amino-3-carboxypropyl)-5,6-dihydrouridine	C13 H21 N3 O8	347.13286459
+309U	acp3Y	3-(3-amino-3-carboxypropyl)pseudouridine	C13 H19 N3 O8	345.11721453
+30U	acp3U	3-(3-amino-3-carboxypropyl)uridine	C13 H19 N3 O8	345.11721453
+39U	m3Y	3-methylpseudouridine	C10 H14 N2 O6	258.08518614
+3C	m3C	3-methylcytidine	C10 H15 N3 O5	257.10117055
+3U	m3U	3-methyluridine	C10 H14 N2 O6	258.08518614
+42C	ac4C	N4-acetylcytidine	C11 H15 N3 O6	285.09608517
+44C	m4,4C	N4,N4-dimethylcytidine	C11 H17 N3 O5	271.11682061
+4C	m4C	N4-methylcytidine	C10 H15 N3 O5	257.10117055
+501U	mo5U	5-methoxyuridine	C10 H14 N2 O7	274.08010076
+502U	cmo5U	uridine 5-oxyacetic acid	C11 H14 N2 O9	318.06993000
+503U	mcmo5U	uridine 5-oxyacetic acid methyl ester	C12 H16 N2 O9	332.08558006
+50C	ho5C	5-hydroxycytidine	C9 H13 N3 O6	259.08043511
+50U	ho5U	5-hydroxyuridine	C9 H12 N2 O7	260.06445070
+510U	nm5U	5-aminomethyl-uridine	C10 H15 N3 O6	273.09608517
+511U	mnm5U	5-methylaminomethyluridine	C11 H17 N3 O6	287.11173523
+51C	hm5C	5-hydroxymethylcytidine	C10 H15 N3 O6	273.09608517
+51U	cmnm5U	5-carboxymethylaminomethyluridine	C12 H17 N3 O8	331.10156447
+520U	chm5U	5-(carboxyhydroxymethyl)uridine	C11 H14 N2 O9	318.06993000
+521U	mcm5U	5-methoxycarbonylmethyluridine	C12 H16 N2 O8	316.09066544
+522U	mchm5U	5-(carboxyhydroxymethyl)uridine methyl ester	C12 H16 N2 O9	332.08558006
+52U	cm5U	5-carboxymethyluridine	C11 H14 N2 O8	302.07501538
+531U	nchm5U	5-carbamoylhydroxymethyluridine	C11 H15 N3 O8	317.08591441
+53U	ncm5U	5-carbamoylmethyluridine	C11 H15 N3 O7	301.09099979
+54U	tm5U	5-taurinomethyluridine	C12 H19 N3 O9 S1	381.08420015
+55U	cnm5U	5-cyanomethyl-uridine	C11 H13 N3 O6	283.08043511
+583U	inm5U	5-(isopentenylaminomethyl)uridine	C15 H23 N3 O6	341.15868541
+58U	m5D	5-methyldihydrouridine	C10 H16 N2 O6	260.10083620
+5C	m5C	5-methylcytidine	C10 H15 N3 O5	257.10117055
+5U	m5U	alias of 5-methyluridine(T)	C10 H14 N2 O6	258.08518614
+5U	m5s2U	5-methyl-2-thiouridine	C10 H14 N2 O5 S1	274.06234252
+71C	f5C	5-formylcytidine	C10 H13 N3 O6	271.08043511
+74U	s4U	4-thiouridine	C9 H12 N2 O5 S1	260.04669246
+8U	D	dihydrouridine	C9 H14 N2 O6	246.08518614
+9U	Y	pseudouridine	C9 H12 N2 O6	244.06953608
+A	A	adenosine	C10 H13 N5 O4	267.09675387
+C	C	cytidine	C9 H13 N3 O5	243.08552049
+G	G	guanosine	C10 H13 N5 O5	283.09166849
+U	U	uridine	C9 H12 N2 O6	244.06953608
+0503U	mcmo5Um	2'-O-methyluridine 5-oxyacetic acid methyl ester	C13H18N2O9	346.10123012
+051C	hm5Cm	5-hydroxymethylcytidine	C10 H15 N3 O6	273.09608517
+21510U	nm5ges2U	5-aminomethyl-2-geranylthiouridine	C20H31N3O5S	425.19844
