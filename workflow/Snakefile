@@ -8,6 +8,9 @@ include: "rules/evaluation.smk"
 rule all_simulations:
     input:
         collect_simulation_results("results/datavzrd/simulation/{seq}/{n_fragments}")
+    conda:
+        "../envs/pystats.yaml"
+
 
 rule all_predictions:
     input:
