@@ -102,7 +102,7 @@ def add_backbone_masses(fragment, backbone_masses, fragment_masses ,breakageline
     if breakageline == 'c-y':
         # TODO: Implement breaking at other points, this is currently c-y breakgae
         #Middle -> + PO2 - H
-        #5'end (start)  -> correct
+        #5'end (start)  -> correect (-H) (We add an additional H at the end)
         #3'end (end) cyclic phosphate -> + PO2  - 2H
         backbone_middle_addition =   backbone_masses["phosphorous"] + 2*backbone_masses["oxygen"] - backbone_masses["hydrogen"]
         backbone_start_addition  =  -backbone_masses["hydrogen"]
@@ -121,11 +121,13 @@ def add_backbone_masses(fragment, backbone_masses, fragment_masses ,breakageline
         if fragment["left"] == 0:
             fragment_masses[iter] += backbone_start_addition + backbone_masses["Tag5prime"] #Can add a 5'tag mass if applicable here!
         else:
-            fragment_masses[iter] += backbone_end_addition
+            fragment_masses[iter] += backbone_end_addition #The end here means that its the end of a fragment which is NOT the 5' end of the sequence itself. 
+            
         
         if fragment["right"] == len(true_sequence)-1:
             fragment_masses[iter] += + backbone_masses["Tag3prime"] #Can add a 3'tag mass if applicable here!   
-        
+            #Note that if the other end of one of the fragment corressponds to the 3' end, then there is no special mass addition to be considered.
+
         fragment_masses[iter] += (
             backbone_middle_addition*max(fragment["right"]-fragment["left"],0))
         
