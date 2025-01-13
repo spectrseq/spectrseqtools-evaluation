@@ -1,5 +1,4 @@
-import re, random 
-import polars as pl
+import re, random
 
 wildcard_constraints:
     n_fragments="[0-9]+",
@@ -14,8 +13,10 @@ def generate_random_sequences(seq_len,seed=0,mutation_rate=0,modified_nucleoside
     random.seed(seed)
 
     if modified_nucleosides is not None:
-        nucleosides = pl.read_csv(modified_nucleosides, separator="\t")
-        modified_nucleoside_names = nucleosides.filter(~pl.col("nucleoside").is_in(["U","A","G","C"])).select(pl.col("nucleoside")).to_series().to_list()        
+        
+        with open(modified_nucleosides, 'r') as file:
+            lines = file.readlines()[1:]
+        modified_nucleoside_names = [line.split("\t")[0] for line in lines if line.split("\t")[0] not in ["U", "A", "G", "C"]]
         
         # The weights defined using the mutation rate  by defining the probabilities of the different bases (of course including the normal bases)
         weights = [(1.-mutation_rate/len(modified_nucleoside_names))/4]*4 + [mutation_rate/len(modified_nucleoside_names)]*len(modified_nucleoside_names)
