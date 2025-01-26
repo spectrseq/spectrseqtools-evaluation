@@ -10,7 +10,7 @@ from scipy.stats import norm
 nucleoside_re = re.compile(r"\d*[ACGU]")
 
 # input
-true_sequence         = nucleoside_re.findall(snakcemake.wildcards.seq)
+true_sequence         = nucleoside_re.findall(snakemake.wildcards.seq)
 n_fragments           = int(snakemake.wildcards.n_fragments)
 nucleoside_masses     = pl.read_csv(snakemake.input[0], separator="\t")
 
