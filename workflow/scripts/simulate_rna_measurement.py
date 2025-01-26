@@ -96,6 +96,14 @@ true_fragment_masses = [
     for fragment in fragments.iter_rows(named=True)
 ]
 
+#Calculate observed masses WITHOUT the backbone masses
+fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+observed_fragment_masses_without_backbone = [
+    max(mass + mass*noise, 0.0)
+    for noise, mass in zip(fragment_noise, true_fragment_masses)
+]
+
+
 # Add backbone masses to the fragments, based on the position of the fragment in the sequence!
 def add_backbone_masses(fragment, backbone_masses, fragment_masses ,breakageline='c-y'):
     
@@ -156,11 +164,12 @@ fragment_sequences = [
 
 # compile final dataframe
 fragments = fragments.with_columns(
-    (pl.col("left") == 0).alias("is_start(5')"),
-    (pl.col("right") == (len(true_sequence))-1).alias("is_end(3')"),
+    (pl.col("left") == 0).alias("is_start"),
+    (pl.col("right") == (len(true_sequence))-1).alias("is_end"),
     (pl.col("right") == pl.col("left")).alias("single_nucleoside"),
     pl.Series(fragment_sequences).alias("sequence"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
+    pl.Series(observed_fragment_masses_without_backbone).alias("observed_mass_without_backbone"),
     pl.Series(true_fragment_masses_with_backbone).alias("true_mass_with_backbone"),
     pl.Series(observed_fragment_masses).alias("observed_mass"),
 )
