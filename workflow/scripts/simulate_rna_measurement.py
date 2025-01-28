@@ -76,8 +76,7 @@ elif fragmentation_process == "exact":
 
 # Generate "left" and "right" neuclotides based on the breakagepoints,
 # which are the exact indices of the nucleotides in the generated fragments:
-# NOTE: The change here from before: now left and right are the exact indices of the python list of nucleotides,
-# with both left and right included in the fragment. If left = right, then its a single nucleotide.
+
 def generate_left_right(breakagepoints):
     left, right = [], []
 
@@ -86,9 +85,9 @@ def generate_left_right(breakagepoints):
 
         for part in exp:
             if part != 0:
-                right.append(part - 1)
+                right.append(part)
                 left.append(part)
-        right.append(len(true_sequence) - 1)
+        right.append(len(true_sequence))
 
     return left, right
 
@@ -108,7 +107,7 @@ true_fragment_masses = [
         nucleoside_masses.filter(pl.col("nucleoside") == b)
         .select(pl.col("monoisotopic_mass"))
         .item()
-        for b in true_sequence[fragment["left"] : fragment["right"] + 1]
+        for b in true_sequence[fragment["left"] : fragment["right"]]
     )
     for fragment in fragments.iter_rows(named=True)
 ]
@@ -159,14 +158,14 @@ def add_backbone_masses(fragment, backbone_masses, fragment_masses, breakageline
                 backbone_end_addition  # The end here means that its the end of a fragment which is NOT the 5' end of the sequence itself.
             )
 
-        if fragment["right"] == len(true_sequence) - 1:
+        if fragment["right"] == len(true_sequence):
             fragment_masses[iter] += +backbone_masses[
                 "Tag3prime"
             ]  # Can add a 3'tag mass if applicable here!
             # Note that if the other end of one of the fragment corressponds to the 3' end, then there is no special mass addition to be considered.
 
         fragment_masses[iter] += backbone_middle_addition * max(
-            fragment["right"] - fragment["left"], 0
+            fragment["right"] - fragment["left"] - 1, 0
         )
 
         # Add a terminal Hydrogen
@@ -193,15 +192,15 @@ observed_fragment_masses = [
 
 # Get the fragment sequences
 fragment_sequences = [
-    "".join(true_sequence[fragment["left"] : fragment["right"] + 1])
+    "".join(true_sequence[fragment["left"] : fragment["right"]])
     for fragment in fragments.iter_rows(named=True)
 ]
 
 # compile final dataframe
 fragments = fragments.with_columns(
     (pl.col("left") == 0).alias("is_start"),
-    (pl.col("right") == (len(true_sequence)) - 1).alias("is_end"),
-    (pl.col("right") == pl.col("left")).alias("single_nucleoside"),
+    (pl.col("right") == (len(true_sequence))).alias("is_end"),
+    (pl.col("right") == pl.col("left")+1).alias("single_nucleoside"),
     pl.Series(fragment_sequences).alias("sequence"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
     pl.Series(observed_fragment_masses_without_backbone).alias(
