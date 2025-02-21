@@ -4,7 +4,7 @@ sys.stderr = open(snakemake.log[0], "w")
 
 import polars as pl
 import random, re
-from scipy.stats import norm
+from scipy.stats import norm, uniform
 
 # regex for separating given sequence into nucleosides
 nucleoside_re = re.compile(r"\d*[ACGU]")
@@ -20,6 +20,10 @@ breakageline = snakemake.config["fragmentation_parameters"][2]["breakage_line"]
 fragmentation_process = snakemake.config["fragmentation_parameters"][3][
     "fragmentation_process"
 ]
+noise_distrubution = snakemake.config["fragmentation_parameters"][4][
+    "noise_distrubution"
+]
+
 
 backbone_masses = snakemake.config["backbone_weights"]
 backbone_masses = {
@@ -113,7 +117,10 @@ true_fragment_masses = [
 ]
 
 # Calculate observed masses WITHOUT the backbone masses
-fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+if noise_distrubution == "normal":
+    fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+elif noise_distrubution == "uniform":
+    fragment_noise = uniform.rvs(scale=rel_error_rate,size=len(true_fragment_masses)) - rel_error_rate/2
 observed_fragment_masses_without_backbone = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses)
@@ -182,9 +189,12 @@ true_fragment_masses_with_backbone = add_backbone_masses(
 
 
 # simulate observed masses with noise -- we use the relative error rate to simulate the noise!
-fragment_noise = norm.rvs(
+if noise_distrubution == "normal":
+    fragment_noise = norm.rvs(
     scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
-)
+    )
+elif noise_distrubution == "uniform":
+    fragment_noise = uniform.rvs(scale=rel_error_rate,size=len(true_fragment_masses_with_backbone)) - rel_error_rate/2
 observed_fragment_masses = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses_with_backbone)
