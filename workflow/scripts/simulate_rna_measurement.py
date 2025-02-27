@@ -81,6 +81,7 @@ elif fragmentation_process == "exact":
 # Generate "left" and "right" neuclotides based on the breakagepoints,
 # which are the exact indices of the nucleotides in the generated fragments:
 
+
 def generate_left_right(breakagepoints):
     left, right = [], []
 
@@ -120,7 +121,10 @@ true_fragment_masses = [
 if noise_distrubution == "normal":
     fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
 elif noise_distrubution == "uniform":
-    fragment_noise = uniform.rvs(scale=rel_error_rate,size=len(true_fragment_masses)) - rel_error_rate/2
+    fragment_noise = (
+        uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+        - rel_error_rate / 2
+    )
 observed_fragment_masses_without_backbone = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses)
@@ -191,10 +195,13 @@ true_fragment_masses_with_backbone = add_backbone_masses(
 # simulate observed masses with noise -- we use the relative error rate to simulate the noise!
 if noise_distrubution == "normal":
     fragment_noise = norm.rvs(
-    scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
+        scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
     )
 elif noise_distrubution == "uniform":
-    fragment_noise = uniform.rvs(scale=rel_error_rate,size=len(true_fragment_masses_with_backbone)) - rel_error_rate/2
+    fragment_noise = (
+        uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses_with_backbone))
+        - rel_error_rate / 2
+    )
 observed_fragment_masses = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses_with_backbone)
@@ -210,7 +217,7 @@ fragment_sequences = [
 fragments = fragments.with_columns(
     (pl.col("left") == 0).alias("is_start"),
     (pl.col("right") == (len(true_sequence))).alias("is_end"),
-    (pl.col("right") == pl.col("left")+1).alias("single_nucleoside"),
+    (pl.col("right") == pl.col("left") + 1).alias("single_nucleoside"),
     pl.Series(fragment_sequences).alias("sequence"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
     pl.Series(observed_fragment_masses_without_backbone).alias(
