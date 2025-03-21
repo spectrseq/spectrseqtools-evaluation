@@ -215,8 +215,12 @@ fragment_sequences = [
 
 # compile final dataframe
 fragments = fragments.with_columns(
-    (pl.col("left") == 0).alias("is_start"),
-    (pl.col("right") == (len(true_sequence))).alias("is_end"),
+    # (pl.col("left") == 0).alias("is_start"),
+    # (pl.col("right") == (len(true_sequence))).alias("is_end"),
+    ((pl.col("left") == 0) & (~(pl.col("right") == (len(true_sequence))))).alias("is_start"),
+    ((pl.col("right") == (len(true_sequence))) & (~(pl.col("left") == 0))).alias("is_end"),
+    ((pl.col("left") == 0) & (pl.col("right") == (len(true_sequence)))).alias("is_start_end"),
+    ((~(pl.col("left") == 0)) & (~(pl.col("right") == (len(true_sequence))))).alias("is_internal"),
     (pl.col("right") == pl.col("left") + 1).alias("single_nucleoside"),
     pl.Series(fragment_sequences).alias("sequence"),
     pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
