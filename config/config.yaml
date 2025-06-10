@@ -1,7 +1,7 @@
 simulation: # Sequence convention is 5' to 3'
-  random: #Random sequence geenration  with given length which is fragmented "n_fragments" times, the mutation rate for base-pairs is also given
+  random: #Random sequence generation  with given length which is fragmented "n_fragments" times, the mutation rate for base-pairs is also given
     seed: 42325345
-    mutation_rate: 0.1 
+    mutation_rate: 0.1
     strata:
       - seq_len: 15
         n_fragments: 
@@ -44,7 +44,7 @@ fragmentation_parameters:
   - rel_error_rate: 0.00002 #0.00001
   - breakage_line: c-y
   - fragmentation_process: 'random' #'random' or 'exact': In 'random', the fragment is split into (1,max_n_parts) randomly, while in 'exact', the fragment is always split into 'max_n_parts' parts 
-  - noise_distrubution: 'uniform' # 'normal' or 'uniform': The noise distribution for the fragmentation process
+  - noise_distribution: 'uniform' # 'normal' or 'uniform': The noise distribution for the fragmentation process
   
 backbone_weights:
   - phosphorous: 30.973762 
