@@ -17,10 +17,10 @@ nucleoside_masses = pl.read_csv(snakemake.input[0], separator="\t")
 max_n_parts = int(snakemake.config["fragmentation_parameters"][0]["max_n_parts"])
 rel_error_rate = snakemake.config["fragmentation_parameters"][1]["rel_error_rate"]
 breakage_line = snakemake.config["fragmentation_parameters"][2]["breakage_line"]
-fragmentation_process = snakemake.config["fragmentation_parameters"][3][
+frag_process = snakemake.config["fragmentation_parameters"][3][
     "fragmentation_process"
 ]
-noise_distribution = snakemake.config["fragmentation_parameters"][4][
+noise_dist = snakemake.config["fragmentation_parameters"][4][
     "noise_distribution"
 ]
 
@@ -63,19 +63,24 @@ def random_fragment(num_parts=max_n_parts):
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 
 # Select how many parts the sequence gets broken into.
-if fragmentation_process == "random":
-    # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
-    # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
-    # It can happen that the entire sequence remains intact.
-    breakage_points = [
-        random_fragment(num_parts=random.randint(1, max_n_parts))
-        for _ in range(n_fragments)
-    ]
-elif fragmentation_process == "exact":
-    # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
-    breakage_points = [
-        random_fragment(num_parts=max_n_parts) for _ in range(n_fragments)
-    ]
+match frag_process:
+    case "random":
+        # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
+        # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
+        # It can happen that the entire sequence remains intact.
+        breakage_points = [
+            random_fragment(num_parts=random.randint(1, max_n_parts))
+            for _ in range(n_fragments)
+        ]
+    case "exact":
+        # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
+        breakage_points = [
+            random_fragment(num_parts=max_n_parts) for _ in range(n_fragments)
+        ]
+    case _:
+        raise NotImplementedError(
+            f"There is no option for the fragmentation process called '{frag_process}'."
+        )
 
 
 # Generate "left" and "right" nucleotides based on the breakage points,
@@ -118,13 +123,19 @@ true_fragment_masses = [
 ]
 
 # Calculate observed masses WITHOUT the backbone masses
-if noise_distribution == "normal":
-    fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
-elif noise_distribution == "uniform":
-    fragment_noise = (
-        uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
-        - rel_error_rate / 2
-    )
+match noise_dist:
+    case "normal":
+        fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+    case "uniform":
+        fragment_noise = (
+            uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
+            - rel_error_rate / 2
+        )
+    case _:
+        raise NotImplementedError(
+            f"There is no option for the noise distribution called '{noise_dist}'."
+        )
+
 observed_fragment_masses_without_backbone = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses)
@@ -133,33 +144,35 @@ observed_fragment_masses_without_backbone = [
 
 # Add backbone masses to the fragments, based on the position of the fragment in the sequence!
 def add_backbone_masses(
-    fragment, backbone_masses, fragment_masses, breakage_line="c-y"
+    fragment, backbone_masses, fragment_masses, breakage_line="c/y"
 ):
-    if breakage_line == "c-y":
-        # TODO: Implement breaking at other points, this is currently c-y breakgae
-        # Middle -> + PO2 - H
-        # 5'end (start)  -> correct (-H) (We add an additional H at the end)
-        # 3'end (end) cyclic phosphate -> + PO2  - 2H
-        backbone_middle_addition = (
-            backbone_masses["phosphorous"]
-            + 2 * backbone_masses["oxygen"]
-            - backbone_masses["hydrogen"]
-        )
-        backbone_start_addition = -backbone_masses["hydrogen"]
-        backbone_end_addition = (
-            backbone_masses["phosphorous"]
-            + 2 * backbone_masses["oxygen"]
-            - 2 * backbone_masses["hydrogen"]
-        )  # Cyclic phosphate
-
-    elif breakage_line == "a-w":
-        raise NotImplementedError("Breaking at 'a-w' is not implemented yet.")
-
-    elif breakage_line == "b-x":
-        raise NotImplementedError("Breaking at 'b-x' is not implemented yet.")
-
-    elif breakage_line == "d-z":
-        raise NotImplementedError("Breaking at 'd-z' is not implemented yet.")
+    match breakage_line:
+        case "c/y":
+            # TODO: Implement breaking at other points, this is currently c/y breakgae
+            # Middle -> + PO2 - H
+            # 5'end (start)  -> correct (-H) (We add an additional H at the end)
+            # 3'end (end) cyclic phosphate -> + PO2  - 2H
+            backbone_middle_addition = (
+                backbone_masses["phosphorous"]
+                + 2 * backbone_masses["oxygen"]
+                - backbone_masses["hydrogen"]
+            )
+            backbone_start_addition = -backbone_masses["hydrogen"]
+            backbone_end_addition = (
+                backbone_masses["phosphorous"]
+                + 2 * backbone_masses["oxygen"]
+                - 2 * backbone_masses["hydrogen"]
+            )  # Cyclic phosphate
+        case "a/w":
+            raise NotImplementedError("Breaking at 'a/w' is not implemented yet.")
+        case "b/x":
+            raise NotImplementedError("Breaking at 'b/x' is not implemented yet.")
+        case "d/z":
+            raise NotImplementedError("Breaking at 'd/z' is not implemented yet.")
+        case _:
+            raise NotImplementedError(
+                f"There is no breakage option called '{breakage_line}'."
+            )
 
     for iter, fragment in enumerate(fragments.iter_rows(named=True)):
         if fragment["left"] == 0:
@@ -195,15 +208,21 @@ true_fragment_masses_with_backbone = add_backbone_masses(
 
 
 # simulate observed masses with noise -- we use the relative error rate to simulate the noise!
-if noise_distribution == "normal":
-    fragment_noise = norm.rvs(
-        scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
-    )
-elif noise_distribution == "uniform":
-    fragment_noise = (
-        uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses_with_backbone))
-        - rel_error_rate / 2
-    )
+match noise_dist:
+    case "normal":
+        fragment_noise = norm.rvs(
+            scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
+        )
+    case "uniform":
+        fragment_noise = (
+            uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses_with_backbone))
+            - rel_error_rate / 2
+        )
+    case _:
+        raise NotImplementedError(
+            f"There is no option for the noise distribution called '{noise_dist}'."
+        )
+
 observed_fragment_masses = [
     max(mass + mass * noise, 0.0)
     for noise, mass in zip(fragment_noise, true_fragment_masses_with_backbone)
