@@ -1,12 +1,66 @@
-simulation:
-  - seq: CUA104GU1A
-    n_fragments:
-      - 10
-      - 20
-      - 30
-  - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-    n_fragments:
-      - 30
+simulation: # Sequence convention is 5' to 3'
+  random: #Random sequence generation  with given length which is fragmented "n_fragments" times, the mutation rate for base-pairs is also given
+    seed: 42325345
+    mutation_rate: 0.1
+    strata:
+      - seq_len: 15
+        n_fragments: 
+        - 30
+      - seq_len: 20
+        n_fragments:
+        - 40
+        - 100
+        - 400
+        - 800
+
+  custom: #Hardcodes the sequences
+    - seq: CUA104GU1A
+      n_fragments:
+        - 10
+        - 20
+        - 30
+    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+      n_fragments:
+        - 30
+        - 100
+        - 200
+        - 400
+    - seq: CAGCAAAACGAUCAUAUAGA
+      n_fragments:
+        - 30
+        - 100
+        - 200
+        - 400
+    - seq: GAUUGUCGUG #Shanice endlabelled test sequence
+      n_fragments:
+        - 20
+        - 30
+        - 50
+        - 100
+        - 200
+
+fragmentation_parameters:
+  - max_n_parts: 3 # The maximum number of parts a fragment can be split into!
+  - rel_error_rate: 0.00002 #0.00001
+  - breakage_line: c-y
+  - fragmentation_process: 'random' #'random' or 'exact': In 'random', the fragment is split into (1,max_n_parts) randomly, while in 'exact', the fragment is always split into 'max_n_parts' parts 
+  - noise_distribution: 'uniform' # 'normal' or 'uniform': The noise distribution for the fragmentation process
+  
+backbone_weights:
+  - phosphorous: 30.973762 
+  - oxygen: 15.9994
+  - hydrogen: 1.007276 # This is the weight of a proton, (the weight of true H with electron is =  1.00794) 
+  - carbon: 12.0107
+  - PO2: 62.972562
+  - Tag3prime : 0.
+  - Tag5prime: 0.
+  
+  # The following are for the RNA c-y breakage
+  - middle: 194.080742
+  - end_3prime: 195.088682
+  - end_5prime: 132.11612
+  #Note that in the file "masses_all", the 5' tail masses have been added to the base masses 
+  #(This is the correct NUCLEOSIDE MASS), We need to add the Phosphate mass to them!
 
 dev:
   envs:
