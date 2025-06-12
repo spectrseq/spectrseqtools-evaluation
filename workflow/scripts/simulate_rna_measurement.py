@@ -142,29 +142,20 @@ observed_fragment_masses_without_backbone = [
     for noise, mass in zip(fragment_noise, true_fragment_masses)
 ]
 
-
-# Add backbone masses to the fragments, based on the position of the fragment in the sequence!
+# METHOD: Consider each base in the form of a standard unit, which can be
+# combined arbitrarily to build any sequence, and only adapt the masses of the
+# fragment ends (either based on a tag or fragmentation/breakage).
 def add_backbone_masses(
-    fragment, element_masses, fragment_masses, breakage_line="c/y",
-    mass_5_prime=mass_5_prime, mass_3_prime=mass_3_prime
+    fragments, element_masses, fragment_masses, breakage_line="c/y",
+    mass_tag_5_prime=mass_5_prime, mass_tag_3_prime=mass_3_prime
 ):
+    # Determine breakage-specific masses for the 5'- and 3'-ends of a fragment
     match breakage_line:
+        # TODO: Implement breaking at other points, this is currently c/y-breakage
         case "c/y":
-            # TODO: Implement breaking at other points, this is currently c/y breakage
-            # Middle -> + PO2 - H
-            # 5'end (start)  -> correct (-H) (We add an additional H at the end)
-            # 3'end (end) cyclic phosphate -> + PO2  - 2H
-            backbone_middle_addition = (
-                element_masses["P"]
-                + 2 * element_masses["O"]
-                - element_masses["H+"]
-            )
-            backbone_start_addition = -element_masses["H+"]
-            backbone_end_addition = (
-                element_masses["P"]
-                + 2 * element_masses["O"]
-                - 2 * element_masses["H+"]
-            )  # Cyclic phosphate
+            mass_breakage_5_prime = element_masses["H+"]
+            mass_breakage_3_prime = -element_masses["H+"]  # assuming cyclization
+            # mass_breakage_3_prime = -element_masses["H+"]  # assuming no cyclization (?)
         case "a/w":
             raise NotImplementedError("Breaking at 'a/w' is not implemented yet.")
         case "b/x":
@@ -176,27 +167,34 @@ def add_backbone_masses(
                 f"There is no breakage option called '{breakage_line}'."
             )
 
-    for iter, fragment in enumerate(fragments.iter_rows(named=True)):
-        if fragment["left"] == 0:
-            fragment_masses[iter] += (
-                backbone_start_addition + mass_5_prime
-            )  # Can add a 5'tag mass if applicable here!
-        else:
-            fragment_masses[iter] += (
-                backbone_end_addition  # The end here means that its the end of a fragment which is NOT the 5' end of the sequence itself.
-            )
-
-        if fragment["right"] == len(true_sequence):
-            fragment_masses[iter] += mass_3_prime
-            # Can add a 3'tag mass if applicable here!
-            # Note that if the other end of one of the fragment corressponds to the 3' end, then there is no special mass addition to be considered.
-
-        fragment_masses[iter] += backbone_middle_addition * max(
-            fragment["right"] - fragment["left"] - 1, 0
+    for idx, fragment in enumerate(fragments.iter_rows(named=True)):
+        # Turn nucleoside masses into those of the corresponding standard units
+        fragment_masses[idx] += (fragment["right"]-fragment["left"])*(
+            element_masses["P"] + 2 * element_masses["O"] -
+            element_masses["H+"]
         )
 
-        # Add a terminal Hydrogen
-        fragment_masses[iter] += element_masses["H+"]
+        # Adapt 5'-end of fragment
+        if fragment["left"] == 0:
+            # Remove OH and add START tag for terminal fragments
+            fragment_masses[idx] += (
+                mass_tag_5_prime - element_masses["O"] - element_masses["H+"]
+            )
+        else:
+            # Add breakage-specific mass for internal fragments
+            fragment_masses[idx] += mass_breakage_5_prime
+
+        # Adapt 3'-end of fragment
+        if fragment["right"] == len(true_sequence):
+            # Remove PO3H2 and add END tag for terminal fragments
+            fragment_masses[idx] += (
+                mass_tag_3_prime - element_masses["P"] -
+                3 * element_masses["O"] -
+                2 * element_masses["H+"]
+            )
+        else:
+            # Add breakage-specific mass for internal fragments
+            fragment_masses[idx] += mass_breakage_3_prime
 
     return fragment_masses
 
