@@ -15,6 +15,7 @@ n_fragments = int(snakemake.wildcards.n_fragments)
 nucleoside_masses = pl.read_csv(snakemake.input["nucleosides"], separator="\t")
 element_masses = pl.read_csv(snakemake.input["elements"], separator="\t")
 
+random.seed(snakemake.config["fragmentation_params"]["random_seed"])
 max_n_parts = int(snakemake.config["fragmentation_params"]["max_n_parts"])
 rel_error_rate = snakemake.config["fragmentation_params"]["rel_error_rate"]
 breakage_line = snakemake.config["fragmentation_params"]["breakage_line"]
