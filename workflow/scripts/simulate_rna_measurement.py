@@ -37,25 +37,27 @@ element_masses = {row[element_masses.get_column_index("symbol")]:
 # Divide the sequence into a given number of "max_n_parts".
 
 
-def random_fragment(num_parts=max_n_parts):
-    if num_parts == 1:
-        # If it breaks into one part, the entire sequence remains intact.
-        breakage_points = [int(0)]
-
-    elif num_parts <= len(true_sequence):
-        # If the number of parts is less than or equal to the sequence length, then the sequence gets broken into the number of parts.
-        breakage_points = sorted(
-            random.sample(range(1, len(true_sequence)), num_parts - 1)
+def select_fragmentation_sites(num_parts=max_n_parts):
+    # Ensure there is a positive number of parts
+    if num_parts <= 0:
+        raise ValueError(
+            "The number of parts cannot be less than one!"
         )
-        # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
 
-    elif num_parts > len(true_sequence):
-        # The number of parts cannot be greater than the sequence length.
+    # Ensure the number of parts is not greater than the sequence length
+    if num_parts > len(true_sequence):
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
 
-    return breakage_points
+    # If the sequence "breaks" into one part, it remains intact
+    if num_parts == 1:
+        return [int(0)]
+
+    # Return randomly sampled breakage positions in the sequence
+    return sorted(random.sample(range(1, len(true_sequence)), num_parts - 1))
+    # LCK: I do not understand the comment below
+    # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
 
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
@@ -67,13 +69,13 @@ match frag_process:
         # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
         # It can happen that the entire sequence remains intact.
         breakage_points = [
-            random_fragment(num_parts=random.randint(1, max_n_parts))
+            select_fragmentation_sites(num_parts=random.randint(1, max_n_parts))
             for _ in range(n_fragments)
         ]
     case "exact":
         # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
         breakage_points = [
-            random_fragment(num_parts=max_n_parts) for _ in range(n_fragments)
+            select_fragmentation_sites(num_parts=max_n_parts) for _ in range(n_fragments)
         ]
     case _:
         raise NotImplementedError(
