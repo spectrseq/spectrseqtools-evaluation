@@ -5,8 +5,8 @@ import re
 import numpy as np
 from scipy.stats import norm, uniform
 
-# regex for separating given sequence into nucleosides
-nucleoside_re = re.compile(r"\d*[ACGU]")
+# Regex expression to separate given sequence into nucleosides
+_NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
 
 if 'snakemake' in locals():
     smk = snakemake
@@ -14,24 +14,17 @@ if 'snakemake' in locals():
 
     def main() -> None:
         """Simulate mass-spectrometry data via Snakemake."""
+        # Set random seeds
         random.seed(smk.config["fragmentation_params"]["random_seed"])
-        np.random.seed(0)
-
-        # Input
-        true_sequence = nucleoside_re.findall(smk.wildcards.seq)
-        n_fragments = int(smk.wildcards.n_fragments)
-        nucleoside_masses = pl.read_csv(smk.input["nucleosides"], separator="\t")
-
-        max_n_parts = int(smk.config["fragmentation_params"]["max_n_parts"])
-        rel_error_rate = smk.config["fragmentation_params"]["rel_error_rate"]
-        frag_process = smk.config["fragmentation_params"]["fragmentation_process"]
-        noise_dist = smk.config["fragmentation_params"]["noise_distribution"]
+        np.random.seed(smk.config["fragmentation_params"]["random_seed"])
 
         # Build dict with extra masses
         element_masses = pl.read_csv(smk.input["elements"], separator="\t")
-        element_masses = {row[element_masses.get_column_index("symbol")]:
-                              row[element_masses.get_column_index("mass")] for
-                          row in element_masses.iter_rows()}
+        element_masses = {
+            row[element_masses.get_column_index("symbol")]:
+            row[element_masses.get_column_index("mass")]
+            for row in element_masses.iter_rows()
+        }
 
         extra_mass_dict = build_extra_mass_dict(
             element_masses=element_masses,
@@ -42,8 +35,14 @@ if 'snakemake' in locals():
 
         # Simulate fragments
         simulated_fragments = simulate(
-            frag_process, max_n_parts, true_sequence, nucleoside_masses,
-            n_fragments, rel_error_rate, noise_dist, extra_mass_dict
+            frag_process=smk.config["fragmentation_params"]["fragmentation_process"],
+            max_n_parts=int(smk.config["fragmentation_params"]["max_n_parts"]),
+            true_sequence=_NUCLEOSIDE_RE.findall(smk.wildcards.seq),
+            nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
+            n_fragments=int(smk.wildcards.n_fragments),
+            rel_error_rate=smk.config["fragmentation_params"]["rel_error_rate"],
+            noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
+            extra_mass_dict=extra_mass_dict
         )
 
         # Write simulation data to file
