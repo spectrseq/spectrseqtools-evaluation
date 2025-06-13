@@ -78,32 +78,28 @@ def select_fragmentation_sites(num_parts=max_n_parts):
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 
-breakage_points = [
+frag_sites = [
     select_fragmentation_sites(select_num_of_breaks(frag_process, max_n_parts))
     for _ in range(n_fragments)
 ]
 
-# Generate "left" and "right" nucleotides based on the breakage points,
-# which are the exact indices of the nucleotides in the generated fragments:
-def generate_left_right(breakage_points):
-    left, right = [], []
+# Generate tuples of start and end index for each fragments
+def compute_fragment_tuples(frag_sites, seq_len):
+    tuples = []
 
-    for exp in breakage_points:
-        left.append(0)
+    for seq_copy in frag_sites:
+        if seq_copy[0] != 0:
+            seq_copy.insert(0,0)
+        if seq_copy[-1] != seq_len:
+            seq_copy.append(seq_len)
 
-        for part in exp:
-            if part != 0:
-                right.append(part)
-                left.append(part)
-        right.append(len(true_sequence))
+        tuples += list(zip(seq_copy[:-1], seq_copy[1:]))
 
-    return left, right
-
-l_breakage, r_breakage = generate_left_right(breakage_points)
+    return tuples
 
 # sample random fragments from true sequence
 fragments = pl.from_records(
-    list(zip(l_breakage, r_breakage)),
+    compute_fragment_tuples(frag_sites, len(true_sequence)),
     schema=["left", "right"],
     orient="row",
 )
