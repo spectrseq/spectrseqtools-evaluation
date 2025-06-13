@@ -115,24 +115,24 @@ true_fragment_masses = [
     for fragment in fragments.iter_rows(named=True)
 ]
 
-# Calculate observed masses WITHOUT the backbone masses
-match noise_dist:
-    case "normal":
-        fragment_noise = norm.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
-    case "uniform":
-        fragment_noise = (
-            uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses))
-            - rel_error_rate / 2
-        )
-    case _:
-        raise NotImplementedError(
-            f"There is no option for the noise distribution called '{noise_dist}'."
-        )
+def induce_noise(distribution_method, error_rate, mass_list):
+    match distribution_method:
+        case "normal":
+            noise_list = norm.rvs(scale=error_rate, size=len(mass_list))
+        case "uniform":
+            noise_list = (uniform.rvs(scale=error_rate, size=len(mass_list)) -
+                      error_rate / 2)
+        case _:
+            raise NotImplementedError(
+                f"There is no option for the noise distribution called '{noise_dist}'."
+            )
 
-observed_fragment_masses_without_backbone = [
-    max(mass + mass * noise, 0.0)
-    for noise, mass in zip(fragment_noise, true_fragment_masses)
-]
+    return [max(mass * (1 + noise), 0.0) for mass, noise in zip(mass_list, noise_list)]
+
+# Calculate observed masses WITHOUT the backbone masses
+observed_fragment_masses_without_backbone = induce_noise(
+    noise_dist, rel_error_rate, true_fragment_masses
+)
 
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
@@ -197,27 +197,10 @@ true_fragment_masses_with_backbone = add_backbone_masses(
     fragments, element_masses, true_fragment_masses_with_backbone
 )
 
-
-# simulate observed masses with noise -- we use the relative error rate to simulate the noise!
-match noise_dist:
-    case "normal":
-        fragment_noise = norm.rvs(
-            scale=rel_error_rate, size=len(true_fragment_masses_with_backbone)
-        )
-    case "uniform":
-        fragment_noise = (
-            uniform.rvs(scale=rel_error_rate, size=len(true_fragment_masses_with_backbone))
-            - rel_error_rate / 2
-        )
-    case _:
-        raise NotImplementedError(
-            f"There is no option for the noise distribution called '{noise_dist}'."
-        )
-
-observed_fragment_masses = [
-    max(mass + mass * noise, 0.0)
-    for noise, mass in zip(fragment_noise, true_fragment_masses_with_backbone)
-]
+# Simulate observed masses with noise using the relative error rate
+observed_fragment_masses = induce_noise(
+    noise_dist, rel_error_rate, true_fragment_masses_with_backbone
+)
 
 # Get the fragment sequences
 fragment_sequences = [
