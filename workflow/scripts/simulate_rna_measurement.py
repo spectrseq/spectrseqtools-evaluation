@@ -37,6 +37,21 @@ element_masses = {row[element_masses.get_column_index("symbol")]:
 
 # Divide the sequence into a given number of "max_n_parts".
 
+def select_num_of_breaks(frag_process, max_n_parts):
+    # Select how many parts the sequence gets broken into.
+    match frag_process:
+        case "random":
+            # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
+            # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
+            # It can happen that the entire sequence remains intact.
+            return random.randint(1, max_n_parts)
+        case "exact":
+            # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
+            return max_n_parts
+        case _:
+            raise NotImplementedError(
+                f"There is no option for the fragmentation process called '{frag_process}'."
+            )
 
 def select_fragmentation_sites(num_parts=max_n_parts):
     # Ensure there is a positive number of parts
@@ -63,31 +78,13 @@ def select_fragmentation_sites(num_parts=max_n_parts):
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 
-# Select how many parts the sequence gets broken into.
-match frag_process:
-    case "random":
-        # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
-        # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
-        # It can happen that the entire sequence remains intact.
-        breakage_points = [
-            select_fragmentation_sites(num_parts=random.randint(1, max_n_parts))
-            for _ in range(n_fragments)
-        ]
-    case "exact":
-        # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
-        breakage_points = [
-            select_fragmentation_sites(num_parts=max_n_parts) for _ in range(n_fragments)
-        ]
-    case _:
-        raise NotImplementedError(
-            f"There is no option for the fragmentation process called '{frag_process}'."
-        )
-
+breakage_points = [
+    select_fragmentation_sites(select_num_of_breaks(frag_process, max_n_parts))
+    for _ in range(n_fragments)
+]
 
 # Generate "left" and "right" nucleotides based on the breakage points,
 # which are the exact indices of the nucleotides in the generated fragments:
-
-
 def generate_left_right(breakage_points):
     left, right = [], []
 
@@ -101,7 +98,6 @@ def generate_left_right(breakage_points):
         right.append(len(true_sequence))
 
     return left, right
-
 
 l_breakage, r_breakage = generate_left_right(breakage_points)
 
