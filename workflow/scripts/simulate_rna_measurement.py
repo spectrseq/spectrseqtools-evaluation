@@ -2,6 +2,7 @@ import sys
 import polars as pl
 import random
 import re
+import numpy as np
 from scipy.stats import norm, uniform
 
 # regex for separating given sequence into nucleosides
@@ -14,6 +15,7 @@ if 'snakemake' in locals():
     def main() -> None:
         """Simulate mass-spectrometry data via Snakemake."""
         random.seed(smk.config["fragmentation_params"]["random_seed"])
+        np.random.seed(0)
 
         # Input
         true_sequence = nucleoside_re.findall(smk.wildcards.seq)
@@ -50,82 +52,87 @@ if 'snakemake' in locals():
 #    r = random.randint(l + 1, len(true_sequence))
 #    return l, r
 
+# TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
+
 # Divide the sequence into a given number of "max_n_parts".
 def simulate(frag_process, max_n_parts, true_sequence, nucleoside_masses,
              element_masses, n_fragments, rel_error_rate, breakage_line,
              noise_dist, mass_5_prime, mass_3_prime):
-    # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
-
     # Sample random fragments from true sequence
     frag_sites = [
         select_fragmentation_sites(
             select_num_of_breaks(frag_process, max_n_parts), len(true_sequence))
         for _ in range(n_fragments)
     ]
+
+    # Build fragment dataframe
     fragments = pl.from_records(
         compute_fragment_tuples(frag_sites, len(true_sequence)),
         schema=["left", "right"],
         orient="row",
     )
 
-    # Calculate true masses based on known nucleoside masses
-    true_fragment_masses = [
-        sum(
-            nucleoside_masses.filter(pl.col("nucleoside") == b)
-            .select(pl.col("monoisotopic_mass"))
-            .item()
-            for b in true_sequence[fragment["left"]: fragment["right"]]
-        )
-        for fragment in fragments.iter_rows(named=True)
-    ]
-
-    # Calculate observed masses WITHOUT the backbone masses
-    observed_fragment_masses_without_backbone = induce_noise(
-        noise_dist, rel_error_rate, true_fragment_masses
+    # Add columns with boolean values to fragment dataframe
+    fragments = fragments.with_columns(
+        ((pl.col("left") == 0) & (~(pl.col("right") == len(true_sequence)))).alias("is_start"),
+        ((~(pl.col("left") == 0)) & (pl.col("right") == len(true_sequence))).alias("is_end"),
+        ((pl.col("left") == 0) & (pl.col("right") == len(true_sequence))).alias("is_start_end"),
+        ((~(pl.col("left") == 0)) & (~(pl.col("right") == len(true_sequence)))).alias("is_internal"),
+        (pl.col("right") == (pl.col("left") + 1)).alias("single_nucleoside"),
     )
 
-    # Copying the fragment masses to a new list to add the backbone masses to the fragments
-    true_fragment_masses_with_backbone = add_backbone_masses(
-        fragments, element_masses, true_fragment_masses.copy(),
-        len(true_sequence), mass_5_prime, mass_3_prime, breakage_line
+    # Add column with true sequences to fragment dataframe
+    fragments = fragments.with_columns(
+        pl.struct("left", "right").map_elements(
+            lambda x: "".join(true_sequence[x["left"]:x["right"]]),
+            return_dtype=str
+        ).alias("sequence")
     )
 
-    # Simulate observed masses with noise using the relative error rate
-    observed_fragment_masses = induce_noise(
-        noise_dist, rel_error_rate, true_fragment_masses_with_backbone
+    # Add column with exact nucleoside masses to fragment dataframe
+    fragments = fragments.with_columns(
+        pl.struct("left", "right").map_elements(
+            lambda x: sum(
+                nucleoside_masses.filter(pl.col("nucleoside") == base)
+                .select(pl.col("monoisotopic_mass"))
+                .item()
+                for base in
+                true_sequence[x["left"]:x["right"]]
+            ),
+            return_dtype=float
+        ).alias("true_nucleoside_mass")
     )
 
-    # Get the fragment sequences
-    fragment_sequences = [
-        "".join(true_sequence[fragment["left"] : fragment["right"]])
-        for fragment in fragments.iter_rows(named=True)
-    ]
-
-    # Compile final dataframe
-    return fragments.with_columns(
-        # (pl.col("left") == 0).alias("is_start"),
-        # (pl.col("right") == (len(true_sequence))).alias("is_end"),
-        ((pl.col("left") == 0) & (~(pl.col("right") == (len(true_sequence))))).alias(
-            "is_start"
-        ),
-        ((pl.col("right") == (len(true_sequence))) & (~(pl.col("left") == 0))).alias(
-            "is_end"
-        ),
-        ((pl.col("left") == 0) & (pl.col("right") == (len(true_sequence)))).alias(
-            "is_start_end"
-        ),
-        ((~(pl.col("left") == 0)) & (~(pl.col("right") == (len(true_sequence))))).alias(
-            "is_internal"
-        ),
-        (pl.col("right") == pl.col("left") + 1).alias("single_nucleoside"),
-        pl.Series(fragment_sequences).alias("sequence"),
-        pl.Series(true_fragment_masses).alias("true_nucleoside_mass"),
-        pl.Series(observed_fragment_masses_without_backbone).alias(
-            "observed_mass_without_backbone"
-        ),
-        pl.Series(true_fragment_masses_with_backbone).alias("true_mass_with_backbone"),
-        pl.Series(observed_fragment_masses).alias("observed_mass"),
+    # Add column with noisy nucleoside masses to fragment dataframe
+    fragments = fragments.with_columns(
+        pl.struct("*").map_elements(
+            lambda x: induce_noise(noise_dist, rel_error_rate, x["true_nucleoside_mass"]),
+            return_dtype=float
+        ).alias("observed_mass_without_backbone")
     )
+
+    # Add column with exact nucleotide masses to fragment dataframe
+    fragments = fragments.with_columns(
+        pl.struct("*").map_elements(
+            lambda x: add_backbone_mass(
+                x, element_masses, x["true_nucleoside_mass"],
+                len(true_sequence), mass_5_prime, mass_3_prime, breakage_line
+            ),
+            return_dtype=float
+        ).alias("true_mass_with_backbone")
+    )
+
+    # Add column with noisy nucleotide masses to fragment dataframe
+    fragments = fragments.with_columns(
+        pl.struct("*").map_elements(
+            lambda x: induce_noise(noise_dist, rel_error_rate,
+                                   x["true_mass_with_backbone"]),
+            return_dtype=float
+        ).alias("observed_mass")
+    )
+
+    # Return final fragment dataframe
+    return fragments
 
 def select_num_of_breaks(frag_process, max_n_parts):
     # Select how many parts the sequence gets broken into.
@@ -179,26 +186,25 @@ def compute_fragment_tuples(frag_sites, seq_len):
 
     return tuples
 
-def induce_noise(distribution_method, error_rate, mass_list):
+def induce_noise(distribution_method, error_rate, mass):
     match distribution_method:
         case "normal":
-            noise_list = norm.rvs(scale=error_rate, size=len(mass_list))
+            noise = norm.rvs(scale=error_rate)
         case "uniform":
-            noise_list = (uniform.rvs(scale=error_rate, size=len(mass_list)) -
-                      error_rate / 2)
+            noise = uniform.rvs(scale=error_rate) - error_rate / 2
         case _:
             raise NotImplementedError(
                 f"There is no option for the noise distribution called '{distribution_method}'."
             )
 
-    return [max(mass * (1 + noise), 0.0) for mass, noise in zip(mass_list, noise_list)]
+    return max(mass * (1 + noise), 0.0)
 
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
 # fragment ends (either based on a tag or fragmentation/breakage).
-def add_backbone_masses(
-    fragments, element_masses, fragment_masses, seq_len, mass_tag_5_prime,
-    mass_tag_3_prime, breakage_line="c/y"
+def add_backbone_mass(
+        fragment, element_masses, mass, seq_len, mass_tag_5_prime,
+        mass_tag_3_prime, breakage_line="c/y"
 ):
     # Determine breakage-specific masses for the 5'- and 3'-ends of a fragment
     match breakage_line:
@@ -218,36 +224,32 @@ def add_backbone_masses(
                 f"There is no breakage option called '{breakage_line}'."
             )
 
-    for idx, fragment in enumerate(fragments.iter_rows(named=True)):
-        # Turn nucleoside masses into those of the corresponding standard units
-        fragment_masses[idx] += (fragment["right"]-fragment["left"])*(
-            element_masses["P"] + 2 * element_masses["O"] -
-            element_masses["H+"]
-        )
+    # Turn nucleoside mass into the one of the corresponding standard units
+    mass += (fragment["right"]-fragment["left"]) * (
+            element_masses["P"]+2 * element_masses["O"]-element_masses["H+"]
+    )
 
-        # Adapt 5'-end of fragment
-        if fragment["left"] == 0:
-            # Remove OH and add START tag for terminal fragments
-            fragment_masses[idx] += (
-                mass_tag_5_prime - element_masses["O"] - element_masses["H+"]
-            )
-        else:
-            # Add breakage-specific mass for internal fragments
-            fragment_masses[idx] += mass_breakage_5_prime
+    # Adapt 5'-end of fragment
+    if fragment["left"] == 0:
+        # Remove OH and add START tag for terminal fragments
+        mass += mass_tag_5_prime-element_masses["O"]-element_masses["H+"]
+    else:
+        # Add breakage-specific mass for internal fragments
+        mass += mass_breakage_5_prime
 
-        # Adapt 3'-end of fragment
-        if fragment["right"] == seq_len:
-            # Remove PO3H2 and add END tag for terminal fragments
-            fragment_masses[idx] += (
-                mass_tag_3_prime - element_masses["P"] -
-                3 * element_masses["O"] -
+    # Adapt 3'-end of fragment
+    if fragment["right"] == seq_len:
+        # Remove PO3H2 and add END tag for terminal fragments
+        mass += (
+                mass_tag_3_prime-element_masses["P"]-
+                3 * element_masses["O"]-
                 2 * element_masses["H+"]
-            )
-        else:
-            # Add breakage-specific mass for internal fragments
-            fragment_masses[idx] += mass_breakage_3_prime
+        )
+    else:
+        # Add breakage-specific mass for internal fragments
+        mass += mass_breakage_3_prime
 
-    return fragment_masses
+    return mass
 
 if __name__ == '__main__':
     if "snakemake" in locals():
