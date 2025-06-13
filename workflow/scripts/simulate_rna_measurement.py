@@ -1,33 +1,48 @@
 import sys
-
-sys.stderr = open(snakemake.log[0], "w")
-
 import polars as pl
-import random, re
+import random
+import re
 from scipy.stats import norm, uniform
 
 # regex for separating given sequence into nucleosides
 nucleoside_re = re.compile(r"\d*[ACGU]")
 
-# input
-true_sequence = nucleoside_re.findall(snakemake.wildcards.seq)
-n_fragments = int(snakemake.wildcards.n_fragments)
-nucleoside_masses = pl.read_csv(snakemake.input["nucleosides"], separator="\t")
-element_masses = pl.read_csv(snakemake.input["elements"], separator="\t")
+if 'snakemake' in locals():
+    smk = snakemake
+    sys.stderr = open(smk.log[0], "w")
 
-random.seed(snakemake.config["fragmentation_params"]["random_seed"])
-max_n_parts = int(snakemake.config["fragmentation_params"]["max_n_parts"])
-rel_error_rate = snakemake.config["fragmentation_params"]["rel_error_rate"]
-breakage_line = snakemake.config["fragmentation_params"]["breakage_line"]
-frag_process = snakemake.config["fragmentation_params"]["fragmentation_process"]
-noise_dist = snakemake.config["fragmentation_params"]["noise_distribution"]
-mass_5_prime = snakemake.config["fragmentation_params"]["mass_5_prime"]
-mass_3_prime = snakemake.config["fragmentation_params"]["mass_3_prime"]
+    def main() -> None:
+        """Simulate mass-spectrometry data via Snakemake."""
+        random.seed(smk.config["fragmentation_params"]["random_seed"])
 
-# Convert dataframe of element weights to dict
-element_masses = {row[element_masses.get_column_index("symbol")]:
-                  row[element_masses.get_column_index("mass")] for
-                  row in element_masses.iter_rows()}
+        # Input
+        true_sequence = nucleoside_re.findall(smk.wildcards.seq)
+        n_fragments = int(smk.wildcards.n_fragments)
+        nucleoside_masses = pl.read_csv(smk.input["nucleosides"], separator="\t")
+        element_masses = pl.read_csv(smk.input["elements"], separator="\t")
+
+        max_n_parts = int(smk.config["fragmentation_params"]["max_n_parts"])
+        rel_error_rate = smk.config["fragmentation_params"]["rel_error_rate"]
+        breakage_line = smk.config["fragmentation_params"]["breakage_line"]
+        frag_process = smk.config["fragmentation_params"]["fragmentation_process"]
+        noise_dist = smk.config["fragmentation_params"]["noise_distribution"]
+        mass_5_prime = smk.config["fragmentation_params"]["mass_5_prime"]
+        mass_3_prime = smk.config["fragmentation_params"]["mass_3_prime"]
+
+        # Convert dataframe of element weights to dict
+        element_masses = {row[element_masses.get_column_index("symbol")]:
+                          row[element_masses.get_column_index("mass")] for
+                          row in element_masses.iter_rows()}
+
+        # Simulate fragments
+        simulated_fragments = simulate(
+            frag_process, max_n_parts, true_sequence, nucleoside_masses,
+            element_masses, n_fragments, rel_error_rate, breakage_line,
+            noise_dist, mass_5_prime, mass_3_prime
+        )
+
+        # Write simulation data to file
+        simulated_fragments.write_csv(smk.output[0], separator="\t")
 
 # helper functions
 # def random_fragment():
@@ -44,7 +59,7 @@ def simulate(frag_process, max_n_parts, true_sequence, nucleoside_masses,
     # Sample random fragments from true sequence
     frag_sites = [
         select_fragmentation_sites(
-            select_num_of_breaks(frag_process, max_n_parts))
+            select_num_of_breaks(frag_process, max_n_parts), len(true_sequence))
         for _ in range(n_fragments)
     ]
     fragments = pl.from_records(
@@ -72,7 +87,7 @@ def simulate(frag_process, max_n_parts, true_sequence, nucleoside_masses,
     # Copying the fragment masses to a new list to add the backbone masses to the fragments
     true_fragment_masses_with_backbone = add_backbone_masses(
         fragments, element_masses, true_fragment_masses.copy(),
-        mass_5_prime, mass_3_prime
+        len(true_sequence), mass_5_prime, mass_3_prime, breakage_line
     )
 
     # Simulate observed masses with noise using the relative error rate
@@ -128,7 +143,7 @@ def select_num_of_breaks(frag_process, max_n_parts):
                 f"There is no option for the fragmentation process called '{frag_process}'."
             )
 
-def select_fragmentation_sites(num_parts=max_n_parts):
+def select_fragmentation_sites(num_parts, seq_len):
     # Ensure there is a positive number of parts
     if num_parts <= 0:
         raise ValueError(
@@ -136,7 +151,7 @@ def select_fragmentation_sites(num_parts=max_n_parts):
         )
 
     # Ensure the number of parts is not greater than the sequence length
-    if num_parts > len(true_sequence):
+    if num_parts > seq_len:
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
@@ -146,7 +161,7 @@ def select_fragmentation_sites(num_parts=max_n_parts):
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    return sorted(random.sample(range(1, len(true_sequence)), num_parts - 1))
+    return sorted(random.sample(range(1, seq_len), num_parts - 1))
     # LCK: I do not understand the comment below
     # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
 
@@ -173,7 +188,7 @@ def induce_noise(distribution_method, error_rate, mass_list):
                       error_rate / 2)
         case _:
             raise NotImplementedError(
-                f"There is no option for the noise distribution called '{noise_dist}'."
+                f"There is no option for the noise distribution called '{distribution_method}'."
             )
 
     return [max(mass * (1 + noise), 0.0) for mass, noise in zip(mass_list, noise_list)]
@@ -182,7 +197,7 @@ def induce_noise(distribution_method, error_rate, mass_list):
 # combined arbitrarily to build any sequence, and only adapt the masses of the
 # fragment ends (either based on a tag or fragmentation/breakage).
 def add_backbone_masses(
-    fragments, element_masses, fragment_masses, mass_tag_5_prime,
+    fragments, element_masses, fragment_masses, seq_len, mass_tag_5_prime,
     mass_tag_3_prime, breakage_line="c/y"
 ):
     # Determine breakage-specific masses for the 5'- and 3'-ends of a fragment
@@ -221,7 +236,7 @@ def add_backbone_masses(
             fragment_masses[idx] += mass_breakage_5_prime
 
         # Adapt 3'-end of fragment
-        if fragment["right"] == len(true_sequence):
+        if fragment["right"] == seq_len:
             # Remove PO3H2 and add END tag for terminal fragments
             fragment_masses[idx] += (
                 mass_tag_3_prime - element_masses["P"] -
@@ -234,9 +249,8 @@ def add_backbone_masses(
 
     return fragment_masses
 
-# Write simulation output
-simulated_fragments = simulate(
-    frag_process, max_n_parts, true_sequence, nucleoside_masses,
-    element_masses, n_fragments, rel_error_rate, breakage_line, noise_dist,
-    mass_5_prime, mass_3_prime)
-simulated_fragments.write_csv(snakemake.output[0], separator="\t")
+if __name__ == '__main__':
+    if "snakemake" in locals():
+        main()
+    else:
+        print('Not Defined.')
