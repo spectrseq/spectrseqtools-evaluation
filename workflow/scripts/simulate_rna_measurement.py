@@ -21,43 +21,82 @@ if 'snakemake' in locals():
         true_sequence = nucleoside_re.findall(smk.wildcards.seq)
         n_fragments = int(smk.wildcards.n_fragments)
         nucleoside_masses = pl.read_csv(smk.input["nucleosides"], separator="\t")
-        element_masses = pl.read_csv(smk.input["elements"], separator="\t")
 
         max_n_parts = int(smk.config["fragmentation_params"]["max_n_parts"])
         rel_error_rate = smk.config["fragmentation_params"]["rel_error_rate"]
-        breakage_line = smk.config["fragmentation_params"]["breakage_line"]
         frag_process = smk.config["fragmentation_params"]["fragmentation_process"]
         noise_dist = smk.config["fragmentation_params"]["noise_distribution"]
-        mass_5_prime = smk.config["fragmentation_params"]["mass_5_prime"]
-        mass_3_prime = smk.config["fragmentation_params"]["mass_3_prime"]
 
-        # Convert dataframe of element weights to dict
+        # Build dict with extra masses
+        element_masses = pl.read_csv(smk.input["elements"], separator="\t")
         element_masses = {row[element_masses.get_column_index("symbol")]:
-                          row[element_masses.get_column_index("mass")] for
+                              row[element_masses.get_column_index("mass")] for
                           row in element_masses.iter_rows()}
+
+        extra_mass_dict = build_extra_mass_dict(
+            element_masses=element_masses,
+            breakage_line=smk.config["fragmentation_params"]["breakage_line"],
+            mass_5_prime=smk.config["fragmentation_params"]["mass_5_prime"],
+            mass_3_prime=smk.config["fragmentation_params"]["mass_3_prime"]
+        )
 
         # Simulate fragments
         simulated_fragments = simulate(
             frag_process, max_n_parts, true_sequence, nucleoside_masses,
-            element_masses, n_fragments, rel_error_rate, breakage_line,
-            noise_dist, mass_5_prime, mass_3_prime
+            n_fragments, rel_error_rate, noise_dist, extra_mass_dict
         )
 
         # Write simulation data to file
         simulated_fragments.write_csv(smk.output[0], separator="\t")
 
-# helper functions
-# def random_fragment():
-#    l = random.randint(0, len(true_sequence) - 1)
-#    r = random.randint(l + 1, len(true_sequence))
-#    return l, r
+# METHOD: Consider each base in the form of a standard unit, which can be
+# combined arbitrarily to build any sequence, and only adapt the masses of the
+# fragment ends (either based on a tag or fragmentation/breakage).
+def build_extra_mass_dict(
+        breakage_line, element_masses, mass_5_prime, mass_3_prime
+):
+    # Initialize dict with universal masses
+    extra_mass_dict = {
+        # Mass needed to turn a nucleoside to a standard unit (SU)
+        "to_standard_unit": (
+            element_masses["P"]+2 * element_masses["O"]-element_masses["H+"]
+        ),
+        # Remove OH from SU and add START tag for 5'-end of terminal fragments
+        "5_prime_terminal": (
+            mass_5_prime-element_masses["O"]-element_masses["H+"]
+        ),
+        # Remove PO3H2 from SU and add END tag for 3'-end of terminal fragments
+        "3_prime_terminal": (
+            mass_3_prime-element_masses["P"]-3 * element_masses["O"] - 2 *
+            element_masses["H+"]
+        ),
+    }
 
-# TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
+    # Add breakage-specific masses for 5'- and 3'-ends of a fragment to dict
+    match breakage_line:
+        # TODO: Implement breaking at other points, this is currently c/y-breakage
+        case "c/y":
+            extra_mass_dict["5_prime_internal"] = element_masses["H+"]
+            extra_mass_dict["3_prime_internal"] = -element_masses["H+"]  # assuming cyclization
+            # extra_mass_dict["3_prime_internal"] = -element_masses["H+"]  # assuming no cyclization (?)
+        case "a/w":
+            raise NotImplementedError("Breaking at 'a/w' is not implemented yet.")
+        case "b/x":
+            raise NotImplementedError("Breaking at 'b/x' is not implemented yet.")
+        case "d/z":
+            raise NotImplementedError("Breaking at 'd/z' is not implemented yet.")
+        case _:
+            raise NotImplementedError(
+                f"There is no breakage option called '{breakage_line}'."
+            )
+
+    return extra_mass_dict
 
 # Divide the sequence into a given number of "max_n_parts".
-def simulate(frag_process, max_n_parts, true_sequence, nucleoside_masses,
-             element_masses, n_fragments, rel_error_rate, breakage_line,
-             noise_dist, mass_5_prime, mass_3_prime):
+def simulate(
+    frag_process, max_n_parts, true_sequence, nucleoside_masses,
+    n_fragments, rel_error_rate, noise_dist, extra_mass_dict
+):
     # Sample random fragments from true sequence
     frag_sites = [
         select_fragmentation_sites(
@@ -115,8 +154,8 @@ def simulate(frag_process, max_n_parts, true_sequence, nucleoside_masses,
     fragments = fragments.with_columns(
         pl.struct("*").map_elements(
             lambda x: add_backbone_mass(
-                x, element_masses, x["true_nucleoside_mass"],
-                len(true_sequence), mass_5_prime, mass_3_prime, breakage_line
+                fragment=x, mass=x["true_nucleoside_mass"],
+                seq_len=len(true_sequence), mass_dict=extra_mass_dict
             ),
             return_dtype=float
         ).alias("true_mass_with_backbone")
@@ -150,6 +189,7 @@ def select_num_of_breaks(frag_process, max_n_parts):
                 f"There is no option for the fragmentation process called '{frag_process}'."
             )
 
+# TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 def select_fragmentation_sites(num_parts, seq_len):
     # Ensure there is a positive number of parts
     if num_parts <= 0:
@@ -199,55 +239,21 @@ def induce_noise(distribution_method, error_rate, mass):
 
     return max(mass * (1 + noise), 0.0)
 
-# METHOD: Consider each base in the form of a standard unit, which can be
-# combined arbitrarily to build any sequence, and only adapt the masses of the
-# fragment ends (either based on a tag or fragmentation/breakage).
-def add_backbone_mass(
-        fragment, element_masses, mass, seq_len, mass_tag_5_prime,
-        mass_tag_3_prime, breakage_line="c/y"
-):
-    # Determine breakage-specific masses for the 5'- and 3'-ends of a fragment
-    match breakage_line:
-        # TODO: Implement breaking at other points, this is currently c/y-breakage
-        case "c/y":
-            mass_breakage_5_prime = element_masses["H+"]
-            mass_breakage_3_prime = -element_masses["H+"]  # assuming cyclization
-            # mass_breakage_3_prime = -element_masses["H+"]  # assuming no cyclization (?)
-        case "a/w":
-            raise NotImplementedError("Breaking at 'a/w' is not implemented yet.")
-        case "b/x":
-            raise NotImplementedError("Breaking at 'b/x' is not implemented yet.")
-        case "d/z":
-            raise NotImplementedError("Breaking at 'd/z' is not implemented yet.")
-        case _:
-            raise NotImplementedError(
-                f"There is no breakage option called '{breakage_line}'."
-            )
-
+def add_backbone_mass(fragment, mass, seq_len, mass_dict):
     # Turn nucleoside mass into the one of the corresponding standard units
-    mass += (fragment["right"]-fragment["left"]) * (
-            element_masses["P"]+2 * element_masses["O"]-element_masses["H+"]
-    )
+    mass += (fragment["right"]-fragment["left"]) * mass_dict["to_standard_unit"]
 
     # Adapt 5'-end of fragment
-    if fragment["left"] == 0:
-        # Remove OH and add START tag for terminal fragments
-        mass += mass_tag_5_prime-element_masses["O"]-element_masses["H+"]
-    else:
-        # Add breakage-specific mass for internal fragments
-        mass += mass_breakage_5_prime
+    mass += (
+        mass_dict["5_prime_terminal"] if fragment["left"] == 0 else
+        mass_dict["5_prime_internal"]
+    )
 
     # Adapt 3'-end of fragment
-    if fragment["right"] == seq_len:
-        # Remove PO3H2 and add END tag for terminal fragments
-        mass += (
-                mass_tag_3_prime-element_masses["P"]-
-                3 * element_masses["O"]-
-                2 * element_masses["H+"]
-        )
-    else:
-        # Add breakage-specific mass for internal fragments
-        mass += mass_breakage_3_prime
+    mass += (
+        mass_dict["3_prime_terminal"] if fragment["right"] == seq_len else
+        mass_dict["3_prime_internal"]
+    )
 
     return mass
 
