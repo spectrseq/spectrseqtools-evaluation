@@ -1,6 +1,7 @@
 rule simulate_measurement:
     input:
-        workflow.source_path("../resources/masses_all.tsv"),
+        nucleosides=workflow.source_path("../resources/masses_all.tsv"),
+        elements=workflow.source_path("../resources/element_masses.tsv")
     output:
         "results/simulation/{seq}/{n_fragments}.tsv",
     log:

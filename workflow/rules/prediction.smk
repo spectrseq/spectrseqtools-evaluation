@@ -15,6 +15,6 @@ rule lionelmssq:
         "--fragment-predictions {output.fragment_predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
-        "--solver gurobi "
+        "--solver cbc "
         "--threads {threads} "
         "2> {log}"
