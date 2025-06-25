@@ -49,8 +49,8 @@ def collect_simulation_results(*patterns):
                 seq_len = seq["seq_len"], 
                 seed = lookup(dpath="simulation/random", within=config)["seed"], 
                 mutation_rate = lookup(dpath="simulation/random", within=config)["mutation_rate"],
-                modified_nucleosides = workflow.source_path("resources/masses_all.tsv")
-                ),
+                modified_nucleosides = workflow.source_path("../resources/masses_all.tsv")
+            ),
             n_fragments=n_fragments,
         )
         for seq in lookup(dpath="simulation/random/strata", within=config)
