@@ -230,7 +230,7 @@ def induce_noise(distribution_method, error_rate, mass):
         case "normal":
             noise = norm.rvs(scale=error_rate)
         case "uniform":
-            noise = uniform.rvs(scale=error_rate) - error_rate / 2
+            noise = uniform.rvs(loc=-error_rate, scale=2*error_rate)
         case _:
             raise NotImplementedError(
                 f"There is no option for the noise distribution called '{distribution_method}'."
