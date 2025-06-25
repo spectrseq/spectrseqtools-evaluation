@@ -7,6 +7,7 @@ from scipy.stats import norm, uniform
 
 # Regex expression to separate given sequence into nucleosides
 _NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
+GHOST_FRAGMENT_MAGNITUDE = 1000
 
 if "snakemake" in locals():
     smk = snakemake
@@ -41,6 +42,7 @@ if "snakemake" in locals():
             true_sequence=_NUCLEOSIDE_RE.findall(smk.wildcards.seq),
             nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
             n_fragments=int(smk.wildcards.n_fragments),
+            ghost_rate=float(smk.config["fragmentation_params"]["ghost_rate"]),
             rel_error_rate=smk.config["fragmentation_params"]["rel_error_rate"],
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
             extra_mass_dict=extra_mass_dict,
@@ -101,6 +103,7 @@ def simulate(
     true_sequence,
     nucleoside_masses,
     n_fragments,
+    ghost_rate,
     rel_error_rate,
     noise_dist,
     extra_mass_dict,
@@ -110,7 +113,7 @@ def simulate(
         select_fragmentation_sites(
             select_num_of_breaks(frag_process, max_n_parts), len(true_sequence)
         )
-        for _ in range(n_fragments)
+        for _ in range(round(n_fragments * (1 + ghost_rate)))
     ]
 
     # Build fragment dataframe
@@ -194,6 +197,38 @@ def simulate(
         .map_elements(
             lambda x: induce_noise(
                 noise_dist, rel_error_rate, x["true_mass_with_backbone"]
+            ),
+            return_dtype=float,
+        )
+        .alias("observed_mass")
+    )
+
+    # Select ghost (i.e. invalid) fragments
+    fragments = fragments.with_columns(
+        pl.struct("*")
+        .map_elements(
+            lambda x: True if uniform.rvs() < ghost_rate else False,
+            return_dtype=bool,
+        )
+        .alias("is_ghost_fragment")
+    )
+
+    # Update classification for ghost fragments by setting all to internal
+    fragments = fragments.with_columns(
+        (pl.col("is_start") & ~pl.col("is_ghost_fragment")).alias("is_start"),
+        (pl.col("is_end") & ~pl.col("is_ghost_fragment")).alias("is_end"),
+        (pl.col("is_start_end") & ~pl.col("is_ghost_fragment")).alias("is_start_end"),
+        (pl.col("is_internal") | pl.col("is_ghost_fragment")).alias("is_internal"),
+    )
+
+    # Update observed mass for ghost fragments by adjusting it randomly
+    fragments = fragments.with_columns(
+        pl.struct("*")
+        .map_elements(
+            lambda x: x["observed_mass"]
+            + int(x["is_ghost_fragment"])
+            * uniform.rvs(
+                loc=-GHOST_FRAGMENT_MAGNITUDE, scale=2 * GHOST_FRAGMENT_MAGNITUDE
             ),
             return_dtype=float,
         )
