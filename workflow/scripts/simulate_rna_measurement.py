@@ -58,15 +58,15 @@ def build_extra_mass_dict(
     extra_mass_dict = {
         # Mass needed to turn a nucleoside to a standard unit (SU)
         "to_standard_unit": (
-            element_masses["P"]+2 * element_masses["O"]-element_masses["H+"]
+            element_masses["P"] + 2 * element_masses["O"] - element_masses["H+"]
         ),
-        # Remove OH from SU and add START tag for 5'-end of terminal fragments
+        # Remove O from SU and add START tag for 5'-end of terminal fragments
         "5_prime_terminal": (
-            mass_5_prime-element_masses["O"]-element_masses["H+"]
+            mass_5_prime - element_masses["O"]
         ),
-        # Remove PO3H2 from SU and add END tag for 3'-end of terminal fragments
+        # Remove PO3H from SU and add END tag for 3'-end of terminal fragments
         "3_prime_terminal": (
-            mass_3_prime-element_masses["P"]-3 * element_masses["O"] - 2 *
+            mass_3_prime - element_masses["P"] - 3 * element_masses["O"] -
             element_masses["H+"]
         ),
     }
