@@ -45,14 +45,14 @@ simulation: # Sequence convention is 5' to 3'
 fragmentation_params:
   random_seed: 1234
   max_n_parts: 3 # The maximum number of parts a fragment can be split into!
-  rel_error_rate: 0.00002 #0.00001
+  rel_error_rate: 0.00001
   breakage_line: "c/y"
   fragmentation_process: "random" #'random' or 'exact': In 'random', the fragment is split into (1,max_n_parts) randomly, while in 'exact', the fragment is always split into 'max_n_parts' parts
   noise_distribution: "uniform" # 'normal' or 'uniform': The noise distribution for the fragmentation process
   mass_5_prime: 555.1294
   mass_3_prime: 455.1491
-#  mass_5_prime: 18.01056
-#  mass_3_prime: 79.96633
+#  mass_5_prime: 17.002206  # Tag imitates c/y-breakage
+#  mass_3_prime: 78.958550  # Tag imitates c/y-breakage
 
 dev:
   envs:
