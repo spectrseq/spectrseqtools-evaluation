@@ -1,15 +1,15 @@
 configfile: "config/config.yaml"
 
+
 include: "rules/common.smk"
 include: "rules/simulation.smk"
 include: "rules/prediction.smk"
 include: "rules/evaluation.smk"
 
+
 rule all_simulations:
     input:
-        collect_simulation_results("results/datavzrd/simulation/{seq}/{n_fragments}")
-    #conda:
-    #    "../envs/pystats.yaml"
+        collect_simulation_results("results/datavzrd/simulation/{seq}/{n_fragments}"),
 
 
 rule all_predictions:

@@ -1,7 +1,7 @@
 rule simulate_measurement:
     input:
         nucleosides=workflow.source_path("../resources/masses_all.tsv"),
-        elements=workflow.source_path("../resources/element_masses.tsv")
+        elements=workflow.source_path("../resources/element_masses.tsv"),
     output:
         "results/simulation/{seq}/{n_fragments}.tsv",
     log:
@@ -27,4 +27,3 @@ rule datavzrd:
         "logs/datavzrd/simulation/{seq}/{n_fragments}.log",
     wrapper:
         "v5.0.2/utils/datavzrd"
-        #"v5.0.1-1-g34a454a/utils/datavzrd"
