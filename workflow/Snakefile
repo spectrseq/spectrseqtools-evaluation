@@ -18,3 +18,10 @@ rule all_predictions:
             "results/lionelmssq/{seq}/{n_fragments}.fasta",
             "results/plots/lionelmssq_prediction/{seq}/{n_fragments}.html",
         ),
+
+
+rule all:
+    input:
+        rules.all_simulations.input,
+        rules.all_predictions.input,
+    default_target: True
