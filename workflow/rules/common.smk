@@ -15,11 +15,9 @@ def get_seq_len(wildcards):
 def generate_random_sequences(
     seq_len, seed=0, mutation_rate=0, modified_nucleosides=None
 ):
-
     random.seed(seed)
 
     if modified_nucleosides is not None:
-
         with open(modified_nucleosides, "r") as file:
             lines = file.readlines()[1:]
         modified_nucleoside_names = [
@@ -46,7 +44,6 @@ def generate_random_sequences(
 
 
 def collect_simulation_results(*patterns):
-
     retval = []
 
     if lookup(dpath="simulation/custom", within=config) is not None:
