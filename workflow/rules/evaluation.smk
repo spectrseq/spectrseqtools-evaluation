@@ -8,6 +8,6 @@ rule plot_lionelmssq_prediction:
     log:
         "logs/plots/lionelmssq_prediction/{seq}/{n_fragments}.log",
     conda:
-        lookup(dpath="dev/envs/lionelmssq", within=config)
+        "../envs/lionelmssq.yaml"
     script:
         "../scripts/plot_lionelmssq_prediction.py"
