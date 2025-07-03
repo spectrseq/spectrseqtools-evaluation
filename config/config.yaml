@@ -31,38 +31,38 @@ simulation: # Sequence convention is 5' to 3'
 #        - 100
 #        - 200
       name: "testcase_02"
-    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-      n_fragments:
-#        - 30
-        - 100
-#        - 200
-#        - 400
-      name: "testcase_06"
-    - seq: CAGCAAAACGAUCAUAUAGA
-      n_fragments:
-#        - 30
+#    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+#      n_fragments:
+##        - 30
 #        - 100
-#        - 200
-        - 400
-      name: "testcase_07"
+##        - 200
+##        - 400
+#      name: "testcase_06"
+#    - seq: CAGCAAAACGAUCAUAUAGA
+#      n_fragments:
+##        - 30
+##        - 100
+##        - 200
+#        - 400
+#      name: "testcase_07"
 
 experiment:
   - seq: GAUUGUCGUG
     fragments: "0"
     meta: "meta.yaml"
     name: "testcase_03"
-  - seq: CAACAAGCGAGAGGUUCGAA
-    fragments: "0"
-    meta: "meta.yaml"
-    name: "testcase_04"
-  - seq: AGAGGCUAAUAGUAAGUUAA
-    fragments: "0"
-    meta: "meta.yaml"
-    name: "testcase_05"
-  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
-    fragments: "0"
-    meta: "meta.yaml"
-    name: "testcase_08"
+#  - seq: CAACAAGCGAGAGGUUCGAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_04"
+#  - seq: AGAGGCUAAUAGUAAGUUAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_05"
+#  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_08"
 
 
 fragmentation_params:
