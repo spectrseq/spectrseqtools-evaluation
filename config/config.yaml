@@ -64,7 +64,10 @@ experiment:
 #    meta: "meta.yaml"
 #    name: "testcase_08"
 
+# Select solver name; allowed: "gurobi" (license required) or "cbc"
+solver: "gurobi"
 
+# Select parameter for fragmentation during data simulation
 fragmentation_params:
   random_seed: 1234
   max_n_parts: 3 # The maximum number of parts a fragment can be split into!

@@ -6,6 +6,7 @@ rule lionelmssq:
         sequence="results/lionelmssq/{modus}/{seq}/{n_fragments}.fasta",
     params:
         seq_len=get_seq_len,
+        solver=config["solver"]
     log:
         "logs/lionelmssq/{modus}/{seq}/{n_fragments}.log",
     conda:
@@ -16,6 +17,6 @@ rule lionelmssq:
         "--fragment-predictions {output.fragment_predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
-        "--solver cbc "
+        "--solver {params.solver} "
         "--threads {threads} "
         "2> {log}"
