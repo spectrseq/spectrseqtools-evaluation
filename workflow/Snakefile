@@ -12,9 +12,10 @@ rule all_simulations:
         collect_simulations(
             "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta",
             "results/lionelmssq/simulation/{seq}/{n_fragments}.tsv",
-            "results/plots/simulated_fragments/{seq}/{""n_fragments}",
+            "results/plots/simulated_fragments/{seq}/{" "n_fragments}",
             "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html",
         ),
+
 
 rule all_experiments:
     input:
@@ -22,7 +23,8 @@ rule all_experiments:
             "results/lionelmssq/experiment/{seq}/{n_fragments}.fasta",
             "results/lionelmssq/experiment/{seq}/{n_fragments}.tsv",
             "results/plots/lionelmssq_prediction/experiment/{seq}/{n_fragments}.html",
-        )
+        ),
+
 
 rule all:
     input:

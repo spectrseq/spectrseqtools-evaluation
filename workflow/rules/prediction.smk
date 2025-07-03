@@ -6,7 +6,7 @@ rule lionelmssq:
         sequence="results/lionelmssq/{modus}/{seq}/{n_fragments}.fasta",
     params:
         seq_len=get_seq_len,
-        solver=config["solver"]
+        solver=config["solver"],
     log:
         "logs/lionelmssq/{modus}/{seq}/{n_fragments}.log",
     conda:

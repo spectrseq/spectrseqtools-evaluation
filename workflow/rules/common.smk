@@ -77,7 +77,6 @@ def collect_simulations(*patterns):
             for n_fragments in seq["n_fragments"]
         ]
 
-
     if len(retval) == 0:
         print("No simulation data given.")
 
