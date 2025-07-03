@@ -3,7 +3,7 @@ rule simulate_measurement:
         nucleosides=workflow.source_path("../resources/masses_all.tsv"),
         elements=workflow.source_path("../resources/element_masses.tsv"),
     output:
-        "results/simulation/{seq}/{n_fragments}.tsv",
+        "data/simulation/{seq}/{n_fragments}.tsv",
     log:
         "logs/simulation/{seq}/{n_fragments}.log",
     conda:
@@ -15,7 +15,7 @@ rule simulate_measurement:
 rule datavzrd:
     input:
         config=workflow.source_path("../resources/datavzrd/simulation.yaml"),
-        simulation="results/simulation/{seq}/{n_fragments}.tsv",
+        simulation="data/simulation/{seq}/{n_fragments}.tsv",
     output:
         report(
             directory("results/datavzrd/simulation/{seq}/{n_fragments}"),

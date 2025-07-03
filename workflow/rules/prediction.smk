@@ -1,6 +1,6 @@
 rule lionelmssq:
     input:
-        fragments="results/simulation/{seq}/{n_fragments}.tsv",
+        fragments="data/simulation/{seq}/{n_fragments}.tsv",
     output:
         fragment_predictions="results/lionelmssq/{seq}/{n_fragments}.tsv",
         sequence="results/lionelmssq/{seq}/{n_fragments}.fasta",
