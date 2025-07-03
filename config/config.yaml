@@ -42,6 +42,8 @@ simulation: # Sequence convention is 5' to 3'
         - 100
         - 200
 
+experiment:
+
 fragmentation_params:
   random_seed: 1234
   max_n_parts: 3 # The maximum number of parts a fragment can be split into!

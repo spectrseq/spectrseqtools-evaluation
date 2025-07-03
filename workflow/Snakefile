@@ -9,19 +9,24 @@ include: "rules/evaluation.smk"
 
 rule all_simulations:
     input:
-        collect_simulation_results("results/plots/fragments/simulation/{seq}/{n_fragments}"),
-
-
-rule all_predictions:
-    input:
-        collect_simulation_results(
+        collect_simulations(
             "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta",
+            "results/lionelmssq/simulation/{seq}/{n_fragments}.tsv",
+            "results/plots/fragments/simulation/{seq}/{""n_fragments}",
             "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html",
         ),
 
+rule all_experiments:
+    input:
+        collect_experiments(
+            "results/lionelmssq/experiment/{seq}/{n_fragments}.fasta",
+            "results/lionelmssq/experiment/{seq}/{n_fragments}.tsv",
+            "results/plots/fragments/experiment/{seq}/{n_fragments}",
+            "results/plots/lionelmssq_prediction/experiment/{seq}/{n_fragments}.html",
+        )
 
 rule all:
     input:
         rules.all_simulations.input,
-        rules.all_predictions.input,
+        rules.all_experiments.input,
     default_target: True

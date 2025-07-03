@@ -43,7 +43,7 @@ def generate_random_sequences(
         return "".join([random.choice(["A", "U", "G", "C"]) for _ in range(seq_len)])
 
 
-def collect_simulation_results(*patterns):
+def collect_simulations(*patterns):
     retval = []
 
     if lookup(dpath="simulation/custom", within=config) is not None:
@@ -77,9 +77,27 @@ def collect_simulation_results(*patterns):
             for n_fragments in seq["n_fragments"]
         ]
 
-    if len(retval) > 0:
-        return retval
-    else:
-        raise IndexError(
-            "Define at least one custom sequences in the config file or define the seq_len for random sequence generation"
-        )
+
+    if len(retval) == 0:
+        print("No simulation data given.")
+
+    return retval
+
+
+def collect_experiments(*patterns):
+    retval = []
+
+    if lookup(dpath="experiment", within=config) is not None:
+        retval += [
+            collect(
+                patterns,
+                seq=item["seq"],
+                n_fragments=item["fragments"],
+            )
+            for item in lookup(dpath="experiment", within=config)
+        ]
+
+    if len(retval) == 0:
+        print("No experimental data given.")
+
+    return retval
