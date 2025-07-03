@@ -1,13 +1,13 @@
 rule lionelmssq:
     input:
-        fragments="data/simulation/{seq}/{n_fragments}.tsv",
+        fragments="data/{modus}/{seq}/{n_fragments}.tsv",
     output:
-        fragment_predictions="results/lionelmssq/{seq}/{n_fragments}.tsv",
-        sequence="results/lionelmssq/{seq}/{n_fragments}.fasta",
+        fragment_predictions="results/lionelmssq/{modus}/{seq}/{n_fragments}.tsv",
+        sequence="results/lionelmssq/{modus}/{seq}/{n_fragments}.fasta",
     params:
         seq_len=get_seq_len,
     log:
-        "logs/lionelmssq/{seq}/{n_fragments}.log",
+        "logs/lionelmssq/{modus}/{seq}/{n_fragments}.log",
     conda:
         "../envs/lionelmssq.yaml"
     threads: 64

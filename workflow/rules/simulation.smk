@@ -12,18 +12,18 @@ rule simulate_measurement:
         "../scripts/simulate_rna_measurement.py"
 
 
-rule datavzrd:
+rule plot_fragment_data:
     input:
         config=workflow.source_path("../resources/datavzrd/simulation.yaml"),
-        simulation="data/simulation/{seq}/{n_fragments}.tsv",
+        simulation="data/{modus}/{seq}/{n_fragments}.tsv",
     output:
         report(
-            directory("results/datavzrd/simulation/{seq}/{n_fragments}"),
+            directory("results/plots/fragments/{modus}/{seq}/{n_fragments}"),
             htmlindex="index.html",
-            category="Simulation",
+            category="{modus}",
             labels={"seq": "{seq}", "n_fragments": "{n_fragments}"},
         ),
     log:
-        "logs/datavzrd/simulation/{seq}/{n_fragments}.log",
+        "logs/plots/fragments/{modus}/{seq}/{n_fragments}.log",
     wrapper:
         "v5.0.2/utils/datavzrd"

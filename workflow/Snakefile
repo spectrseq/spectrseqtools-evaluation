@@ -9,14 +9,14 @@ include: "rules/evaluation.smk"
 
 rule all_simulations:
     input:
-        collect_simulation_results("results/datavzrd/simulation/{seq}/{n_fragments}"),
+        collect_simulation_results("results/plots/fragments/simulation/{seq}/{n_fragments}"),
 
 
 rule all_predictions:
     input:
         collect_simulation_results(
-            "results/lionelmssq/{seq}/{n_fragments}.fasta",
-            "results/plots/lionelmssq_prediction/{seq}/{n_fragments}.html",
+            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta",
+            "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html",
         ),
 
 
