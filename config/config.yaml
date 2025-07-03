@@ -65,7 +65,8 @@ experiment:
 #    name: "testcase_08"
 
 # Select solver name; allowed: "gurobi" (license required) or "cbc"
-solver: "gurobi"
+# solver: "gurobi"
+solver: "cbc"
 
 # Select parameter for fragmentation during data simulation
 fragmentation_params:

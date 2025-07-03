@@ -14,6 +14,7 @@ prediction = Prediction.from_files(
 true_seq = snakemake.wildcards.seq
 simulation = pl.read_csv(snakemake.input.sim, separator="\t")
 
-chart = plot_prediction(prediction, true_seq, simulation)
+chart = plot_prediction(prediction, true_seq, simulation if
+snakemake.wildcards.modus == "simulation" else None)
 
 chart.save(snakemake.output[0])
