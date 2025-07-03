@@ -5,44 +5,65 @@ simulation: # Sequence convention is 5' to 3'
     seed: 42325345
     mutation_rate: 0.1
     strata:
-      - seq_len: 15
-        n_fragments:
-        - 30
-      - seq_len: 20
-        n_fragments:
-        - 40
-        - 100
-        - 400
-        - 800
+#      - seq_len: 15
+#        n_fragments:
+#        - 30
+#      - seq_len: 20
+#        n_fragments:
+#        - 40
+#        - 100
+#        - 400
+#        - 800
 
   # Hardcodes the sequences
   custom:
     - seq: CUA104GU1A
       n_fragments:
-        - 10
-        - 20
+#        - 10
+#        - 20
         - 30
-    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-      n_fragments:
-        - 30
-        - 100
-        - 200
-        - 400
-    - seq: CAGCAAAACGAUCAUAUAGA
-      n_fragments:
-        - 30
-        - 100
-        - 200
-        - 400
+      name: "testcase_01"
     - seq: GAUUGUCGUG #Shanice endlabelled test sequence
       n_fragments:
-        - 20
-        - 30
+#        - 20
+#        - 30
         - 50
+#        - 100
+#        - 200
+      name: "testcase_02"
+    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+      n_fragments:
+#        - 30
         - 100
-        - 200
+#        - 200
+#        - 400
+      name: "testcase_06"
+    - seq: CAGCAAAACGAUCAUAUAGA
+      n_fragments:
+#        - 30
+#        - 100
+#        - 200
+        - 400
+      name: "testcase_07"
 
 experiment:
+  - seq: GAUUGUCGUG
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "testcase_03"
+  - seq: CAACAAGCGAGAGGUUCGAA
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "testcase_04"
+  - seq: AGAGGCUAAUAGUAAGUUAA
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "testcase_05"
+  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "testcase_08"
+
 
 fragmentation_params:
   random_seed: 1234
