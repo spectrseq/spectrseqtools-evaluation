@@ -1,13 +1,13 @@
 rule plot_lionelmssq_prediction:
     input:
-        pred_fragments="results/lionelmssq/{seq}/{n_fragments}.tsv",
-        pred_seq="results/lionelmssq/{seq}/{n_fragments}.fasta",
-        sim="results/simulation/{seq}/{n_fragments}.tsv",
+        pred_fragments="results/lionelmssq/{modus}/{seq}/{n_fragments}.tsv",
+        pred_seq="results/lionelmssq/{modus}/{seq}/{n_fragments}.fasta",
+        sim="data/{modus}/{seq}/{n_fragments}.tsv",
     output:
-        "results/plots/lionelmssq_prediction/{seq}/{n_fragments}.html",
+        "results/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.html",
     log:
-        "logs/plots/lionelmssq_prediction/{seq}/{n_fragments}.log",
+        "logs/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.log",
     conda:
-        lookup(dpath="dev/envs/lionelmssq", within=config)
+        "../envs/lionelmssq.yaml"
     script:
         "../scripts/plot_lionelmssq_prediction.py"

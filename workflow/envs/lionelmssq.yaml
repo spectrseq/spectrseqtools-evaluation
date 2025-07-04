@@ -1,0 +1,11 @@
+name: lionelmssq
+channels:
+  - defaults
+  - bioconda
+  - gurobi
+dependencies:
+  - gurobi
+  - python=3.12
+  - pip
+  - pip:
+    - git+https://github.com/koesterlab/lionelmssq.git
