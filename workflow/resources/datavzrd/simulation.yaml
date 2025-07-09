@@ -30,6 +30,18 @@ views:
             with:
               true_value: "true"
               false_value: "false"
+        is_internal:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+        is_start_end:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
         single_nucleoside:
           spell:
             url: v1.1.3/logic/boolean
@@ -44,3 +56,9 @@ views:
           plot:
             heatmap:
               scale: linear
+        is_ghost_fragment:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
