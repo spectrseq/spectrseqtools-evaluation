@@ -26,4 +26,4 @@ rule plot_simulated_fragments:
     log:
         "logs/plots/simulated_fragments/{seq}/{n_fragments}.log",
     wrapper:
-        "v5.0.2/utils/datavzrd"
+        "v7.2.0/utils/datavzrd"
