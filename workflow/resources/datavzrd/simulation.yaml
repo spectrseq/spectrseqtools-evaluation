@@ -1,5 +1,8 @@
 __use_yte__: true
 
+__variables__:
+  seq_len: ?wildcards.seq.count("A") + wildcards.seq.count("C") + wildcards.seq.count("G") + wildcards.seq.count("U")
+
 datasets:
   simulation:
     path: ?input.simulation
@@ -11,13 +14,9 @@ views:
     render-table:
       columns:
         left:
-          plot:
-            ticks:
-              scale: linear
+          display-mode: hidden
         right:
-          plot:
-            ticks:
-              scale: linear
+          display-mode: hidden
         is_start:
           spell:
             url: v1.1.3/logic/boolean
@@ -25,6 +24,18 @@ views:
               true_value: "true"
               false_value: "false"
         is_end:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+        is_internal:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+        is_start_end:
           spell:
             url: v1.1.3/logic/boolean
             with:
@@ -44,3 +55,51 @@ views:
           plot:
             heatmap:
               scale: linear
+        is_ghost_fragment:
+          spell:
+            url: v1.1.3/logic/boolean
+            with:
+              true_value: "true"
+              false_value: "false"
+      add-columns:
+        fragment:
+          custom-plot:
+            data: |
+              function(value, row) {
+                const start = row['left'];
+                const end = row['right'];
+                return [
+                  {"left": start, "right": end}
+                ]
+              }
+            spec: |
+              ?f'''
+              {{
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "mark": {{"type": "rule", "tooltip": true}},
+                "encoding": {{
+                  "x": {{
+                    "field": "left", 
+                    "type": "quantitative", 
+                    "scale": {{
+                      "domain": [0, {seq_len}]
+                    }}, 
+                    "title": null
+                  }},
+                  "x2": {{
+                    "field": "right", 
+                    "type": "quantitative", 
+                    "scale": {{
+                      "domain": [0, {seq_len}]
+                    }}, 
+                    "title": null
+                  }}, 
+                  "size": {{"value": 3}}, 
+                  "color": {{"value": "gold"}}
+                }},
+                "config": {{
+                  "legend": {{"disable": true}},
+                  "title": {{"disable": true}}
+                }}
+              }}
+              '''
