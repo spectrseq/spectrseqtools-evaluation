@@ -62,14 +62,14 @@ def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_pr
         "to_standard_unit": (
             element_masses["P"] + 2 * element_masses["O"] - element_masses["H+"]
         ),
-        # Remove O from SU and add START tag for 5'-end of terminal fragments
-        "5_prime_terminal": (mass_5_prime - element_masses["O"]),
-        # Remove PO3H from SU and add END tag for 3'-end of terminal fragments
+        # Remove O from SU and add START tag (-H) for 5'-end of terminal fragments
+        "5_prime_terminal": mass_5_prime - element_masses["O"] - element_masses["H+"],
+        # Remove PO3H from SU and add END tag (-H) for 3'-end of terminal fragments
         "3_prime_terminal": (
             mass_3_prime
             - element_masses["P"]
             - 3 * element_masses["O"]
-            - element_masses["H+"]
+            - 2 * element_masses["H+"]
         ),
     }
 
