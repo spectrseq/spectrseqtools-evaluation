@@ -8,4 +8,5 @@ dependencies:
   - python=3.12
   - pip
   - pip:
+#    - -e /home/laura/Uni/RNA/Git/lionelmssq
     - git+https://github.com/koesterlab/lionelmssq.git
