@@ -75,19 +75,30 @@ def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_pr
 
     # Add breakage-specific masses for 5'- and 3'-ends of a fragment to dict
     match breakage_line:
-        # TODO: Implement breaking at other points, this is currently c/y-breakage
-        case "c/y":
-            extra_mass_dict["5_prime_internal"] = element_masses["H+"]
-            extra_mass_dict["3_prime_internal"] = -element_masses[
-                "H+"
-            ]  # assuming cyclization
-            # extra_mass_dict["3_prime_internal"] = -element_masses["H+"]  # assuming no cyclization (?)
-        case "a/w":
-            raise NotImplementedError("Breaking at 'a/w' is not implemented yet.")
+        case "a/w":  # assuming double bond for 3'-end
+            extra_mass_dict["5_prime_internal"] = (
+                element_masses["P"] + 3 * element_masses["O"] + 2 * element_masses["H+"]
+            )
+            extra_mass_dict["3_prime_internal"] = -(
+                element_masses["P"] + 3 * element_masses["O"] + 2 * element_masses["H+"]
+            )
         case "b/x":
-            raise NotImplementedError("Breaking at 'b/x' is not implemented yet.")
-        case "d/z":
-            raise NotImplementedError("Breaking at 'd/z' is not implemented yet.")
+            extra_mass_dict["5_prime_internal"] = (
+                element_masses["P"] + 2 * element_masses["O"]
+            )
+            extra_mass_dict["3_prime_internal"] = -(
+                element_masses["P"] + 2 * element_masses["O"]
+            )
+        case "c/y":  # assuming cyclization for 3'-end
+            extra_mass_dict["5_prime_internal"] = element_masses["H+"]
+            extra_mass_dict["3_prime_internal"] = -element_masses["H+"]
+        case "d/z":  # assuming double bond for 5'-end
+            extra_mass_dict["5_prime_internal"] = -(
+                element_masses["O"] + element_masses["H+"]
+            )
+            extra_mass_dict["3_prime_internal"] = (
+                element_masses["O"] + element_masses["H+"]
+            )
         case _:
             raise NotImplementedError(
                 f"There is no breakage option called '{breakage_line}'."
