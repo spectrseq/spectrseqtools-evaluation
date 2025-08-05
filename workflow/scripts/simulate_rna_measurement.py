@@ -2,6 +2,7 @@ import sys
 import polars as pl
 import random
 import re
+import yaml
 import numpy as np
 from scipy.stats import norm, uniform
 
@@ -19,6 +20,15 @@ if "snakemake" in locals():
         random.seed(smk.config["fragmentation_params"]["random_seed"])
         np.random.seed(smk.config["fragmentation_params"]["random_seed"])
 
+        # Build meta dict
+        true_sequence = _NUCLEOSIDE_RE.findall(smk.wildcards.seq)
+        meta = {
+            "identity": "simulated data",
+            "label_mass_3T": smk.config["fragmentation_params"]["mass_3_prime"],
+            "label_mass_5T": smk.config["fragmentation_params"]["mass_5_prime"],
+            "true_sequence": "".join(true_sequence),
+        }
+
         # Build dict with extra masses
         element_masses = pl.read_csv(smk.input["elements"], separator="\t")
         element_masses = {
@@ -31,15 +41,15 @@ if "snakemake" in locals():
         extra_mass_dict = build_extra_mass_dict(
             element_masses=element_masses,
             breakage_line=smk.config["fragmentation_params"]["breakage_line"],
-            mass_5_prime=smk.config["fragmentation_params"]["mass_5_prime"],
-            mass_3_prime=smk.config["fragmentation_params"]["mass_3_prime"],
+            mass_5_prime=meta["label_mass_5T"],
+            mass_3_prime=meta["label_mass_3T"],
         )
 
         # Simulate fragments
         simulated_fragments = simulate(
             frag_process=smk.config["fragmentation_params"]["fragmentation_process"],
             max_n_parts=int(smk.config["fragmentation_params"]["max_n_parts"]),
-            true_sequence=_NUCLEOSIDE_RE.findall(smk.wildcards.seq),
+            true_sequence=true_sequence,
             nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
             n_fragments=int(smk.wildcards.n_fragments),
             ghost_rate=float(smk.config["fragmentation_params"]["ghost_rate"]),
@@ -49,7 +59,10 @@ if "snakemake" in locals():
         )
 
         # Write simulation data to file
-        simulated_fragments.write_csv(smk.output[0], separator="\t")
+        simulated_fragments.write_csv(smk.output["fragments"], separator="\t")
+
+        with open(smk.output["meta"], "w") as f:
+            yaml.safe_dump(meta, f)
 
 
 # METHOD: Consider each base in the form of a standard unit, which can be
