@@ -4,6 +4,7 @@ import random
 import re
 import yaml
 import numpy as np
+from pathlib import Path
 from scipy.stats import norm, uniform
 
 # Regex expression to separate given sequence into nucleosides
@@ -30,16 +31,8 @@ if "snakemake" in locals():
         }
 
         # Build dict with extra masses
-        element_masses = pl.read_csv(smk.input["elements"], separator="\t")
-        element_masses = {
-            row[element_masses.get_column_index("symbol")]: row[
-                element_masses.get_column_index("mass")
-            ]
-            for row in element_masses.iter_rows()
-        }
-
         extra_mass_dict = build_extra_mass_dict(
-            element_masses=element_masses,
+            element_mass_path=smk.input["elements"],
             breakage_line=smk.config["fragmentation_params"]["breakage_line"],
             mass_5_prime=meta["label_mass_5T"],
             mass_3_prime=meta["label_mass_3T"],
@@ -79,7 +72,21 @@ if "snakemake" in locals():
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
 # fragment ends (either based on a tag or fragmentation/breakage).
-def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_prime):
+def build_extra_mass_dict(
+    breakage_line: str,
+    element_mass_path: Path,
+    mass_5_prime: float,
+    mass_3_prime: float,
+) -> dict:
+    # Build dict of elemental masses
+    element_masses = pl.read_csv(element_mass_path, separator="\t")
+    element_masses = {
+        row[element_masses.get_column_index("symbol")]: row[
+            element_masses.get_column_index("mass")
+        ]
+        for row in element_masses.iter_rows()
+    }
+
     # Initialize dict with universal masses
     extra_mass_dict = {
         # Mass needed to turn a nucleoside to a standard unit (SU)
