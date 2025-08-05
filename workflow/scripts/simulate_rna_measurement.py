@@ -45,6 +45,17 @@ if "snakemake" in locals():
             mass_3_prime=meta["label_mass_3T"],
         )
 
+        # Add sequence mass to meta dict
+        meta["sequence_mass"] = (
+            get_seq_weight(
+                seq=true_sequence,
+                masses=pl.read_csv(smk.input["bases"], separator="\t"),
+            )
+            + len(true_sequence) * extra_mass_dict["to_standard_unit"]
+            + extra_mass_dict["3_prime_terminal"]
+            + extra_mass_dict["5_prime_terminal"]
+        )
+
         # Simulate fragments
         simulated_fragments = simulate(
             frag_process=smk.config["fragmentation_params"]["fragmentation_process"],
@@ -118,6 +129,21 @@ def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_pr
             )
 
     return extra_mass_dict
+
+
+def get_seq_weight(seq: list, masses: dict) -> float:
+    seq_df = pl.DataFrame(data=seq, schema=["name"])
+    seq_df = seq_df.with_columns(
+        pl.col("name")
+        .map_elements(
+            lambda x: masses.filter(pl.col("nucleoside") == x)
+            .get_column("monoisotopic_mass")
+            .to_list()[0],
+            return_dtype=pl.Float64,
+        )
+        .alias("mass")
+    )
+    return seq_df.select("mass").sum().item()
 
 
 # Divide the sequence into a given number of "max_n_parts".
