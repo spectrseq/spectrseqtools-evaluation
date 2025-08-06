@@ -152,7 +152,6 @@ def get_seq_weight(seq: list, masses: dict) -> float:
     return seq_df.select("mass").sum().item()
 
 
-# Divide the sequence into a given number of "max_n_parts".
 def simulate(
     true_sequence,
     nucleoside_masses,
@@ -292,10 +291,18 @@ def simulate(
     return fragments
 
 
+# METHOD: Consider fragments without any breakage, i.e. complete fragments,
+# separately (randomly select based on given probability); if the sequence
+# does break, use a geometric distribution to determine the number of breaks
+# while approximating the true distribution of fragment lengths observed in
+# experimental data (exponential distribution with many small and few larger
+# fragments, which gets sharper with increasing sequence length)
 def select_num_breaks(seq_len: int) -> int:
     if np.random.rand() < NO_FRAGMENTATION_PROBABILITY:
         return 0
-    return min(np.random.geometric(0.3), seq_len - 1)
+    # Note that p = factor/seq_len with factor = seq_len/alpha
+    # thus using p = seq_len/alpha/seq_len = 1/alpha
+    return min(np.random.geometric(p=0.3), seq_len - 1)
 
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
@@ -318,10 +325,10 @@ def select_fragmentation_sites(num_breaks, seq_len):
     return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
 
 
-# Generate tuples of start and end index for each fragments
 def compute_fragment_tuples(frag_sites, seq_len):
     tuples = []
 
+    # Generate tuples of start and end index for each fragments
     for seq_copy in frag_sites:
         if seq_copy[0] != 0:
             seq_copy.insert(0, 0)
