@@ -10,6 +10,7 @@ from scipy.stats import norm, uniform
 # Regex expression to separate given sequence into nucleosides
 _NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
 GHOST_FRAGMENT_MAGNITUDE = 1000
+NO_FRAGMENTATION_PROBABILITY = 0.05
 
 if "snakemake" in locals():
     smk = snakemake
@@ -292,6 +293,8 @@ def simulate(
 
 
 def select_num_breaks(seq_len: int) -> int:
+    if np.random.rand() < NO_FRAGMENTATION_PROBABILITY:
+        return 0
     return min(np.random.geometric(0.3), seq_len - 1)
 
 
