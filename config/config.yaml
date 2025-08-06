@@ -21,7 +21,7 @@ simulation: # Sequence convention is 5' to 3'
       n_fragments:
 #        - 10
 #        - 20
-        - 30
+        - 50
       name: "testcase_01"
     - seq: GAUUGUCGUG #Shanice endlabelled test sequence
       n_fragments:
@@ -34,16 +34,16 @@ simulation: # Sequence convention is 5' to 3'
 #    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
 #      n_fragments:
 ##        - 30
-#        - 100
+#        - 50
 ##        - 200
 ##        - 400
 #      name: "testcase_06"
 #    - seq: CAGCAAAACGAUCAUAUAGA
 #      n_fragments:
 ##        - 30
-##        - 100
+#        - 100
 ##        - 200
-#        - 400
+##        - 400
 #      name: "testcase_07"
 
 experiment:
@@ -65,17 +65,15 @@ experiment:
 #    name: "testcase_08"
 
 # Select solver name; allowed: "gurobi" (license required) or "cbc"
-# solver: "gurobi"
+#solver: "gurobi"
 solver: "cbc"
 
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
   random_seed: 1234
-  max_n_parts: 3 # The maximum number of parts a fragment can be split into!
-  ghost_rate: 0.1
+  ghost_rate: 0.05
   rel_error_rate: 0.00001
   breakage_line: "c/y"
-  fragmentation_process: "random" #'random' or 'exact': In 'random', the fragment is split into (1,max_n_parts) randomly, while in 'exact', the fragment is always split into 'max_n_parts' parts
-  noise_distribution: "uniform" # 'normal' or 'uniform': The noise distribution for the fragmentation process
+  noise_distribution: "uniform" # 'normal' or 'uniform'
   mass_5_prime: 555.1294  # Standard START tag
   mass_3_prime: 455.1491  # Standard END tag
