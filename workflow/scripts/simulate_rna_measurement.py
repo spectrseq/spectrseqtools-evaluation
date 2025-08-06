@@ -2,7 +2,9 @@ import sys
 import polars as pl
 import random
 import re
+import yaml
 import numpy as np
+from pathlib import Path
 from scipy.stats import norm, uniform
 
 # Regex expression to separate given sequence into nucleosides
@@ -19,27 +21,39 @@ if "snakemake" in locals():
         random.seed(smk.config["fragmentation_params"]["random_seed"])
         np.random.seed(smk.config["fragmentation_params"]["random_seed"])
 
-        # Build dict with extra masses
-        element_masses = pl.read_csv(smk.input["elements"], separator="\t")
-        element_masses = {
-            row[element_masses.get_column_index("symbol")]: row[
-                element_masses.get_column_index("mass")
-            ]
-            for row in element_masses.iter_rows()
+        # Build meta dict
+        true_sequence = _NUCLEOSIDE_RE.findall(smk.wildcards.seq)
+        meta = {
+            "identity": "simulated data",
+            "label_mass_3T": smk.config["fragmentation_params"]["mass_3_prime"],
+            "label_mass_5T": smk.config["fragmentation_params"]["mass_5_prime"],
+            "true_sequence": "".join(true_sequence),
         }
 
+        # Build dict with extra masses
         extra_mass_dict = build_extra_mass_dict(
-            element_masses=element_masses,
+            element_mass_path=smk.input["elements"],
             breakage_line=smk.config["fragmentation_params"]["breakage_line"],
-            mass_5_prime=smk.config["fragmentation_params"]["mass_5_prime"],
-            mass_3_prime=smk.config["fragmentation_params"]["mass_3_prime"],
+            mass_5_prime=meta["label_mass_5T"],
+            mass_3_prime=meta["label_mass_3T"],
+        )
+
+        # Add sequence mass to meta dict
+        meta["sequence_mass"] = (
+            get_seq_weight(
+                seq=true_sequence,
+                masses=pl.read_csv(smk.input["bases"], separator="\t"),
+            )
+            + len(true_sequence) * extra_mass_dict["to_standard_unit"]
+            + extra_mass_dict["3_prime_terminal"]
+            + extra_mass_dict["5_prime_terminal"]
         )
 
         # Simulate fragments
         simulated_fragments = simulate(
             frag_process=smk.config["fragmentation_params"]["fragmentation_process"],
             max_n_parts=int(smk.config["fragmentation_params"]["max_n_parts"]),
-            true_sequence=_NUCLEOSIDE_RE.findall(smk.wildcards.seq),
+            true_sequence=true_sequence,
             nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
             n_fragments=int(smk.wildcards.n_fragments),
             ghost_rate=float(smk.config["fragmentation_params"]["ghost_rate"]),
@@ -49,13 +63,30 @@ if "snakemake" in locals():
         )
 
         # Write simulation data to file
-        simulated_fragments.write_csv(smk.output[0], separator="\t")
+        simulated_fragments.write_csv(smk.output["fragments"], separator="\t")
+
+        with open(smk.output["meta"], "w") as f:
+            yaml.safe_dump(meta, f)
 
 
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
 # fragment ends (either based on a tag or fragmentation/breakage).
-def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_prime):
+def build_extra_mass_dict(
+    breakage_line: str,
+    element_mass_path: Path,
+    mass_5_prime: float,
+    mass_3_prime: float,
+) -> dict:
+    # Build dict of elemental masses
+    element_masses = pl.read_csv(element_mass_path, separator="\t")
+    element_masses = {
+        row[element_masses.get_column_index("symbol")]: row[
+            element_masses.get_column_index("mass")
+        ]
+        for row in element_masses.iter_rows()
+    }
+
     # Initialize dict with universal masses
     extra_mass_dict = {
         # Mass needed to turn a nucleoside to a standard unit (SU)
@@ -105,6 +136,21 @@ def build_extra_mass_dict(breakage_line, element_masses, mass_5_prime, mass_3_pr
             )
 
     return extra_mass_dict
+
+
+def get_seq_weight(seq: list, masses: dict) -> float:
+    seq_df = pl.DataFrame(data=seq, schema=["name"])
+    seq_df = seq_df.with_columns(
+        pl.col("name")
+        .map_elements(
+            lambda x: masses.filter(pl.col("nucleoside") == x)
+            .get_column("monoisotopic_mass")
+            .to_list()[0],
+            return_dtype=pl.Float64,
+        )
+        .alias("mass")
+    )
+    return seq_df.select("mass").sum().item()
 
 
 # Divide the sequence into a given number of "max_n_parts".

@@ -2,8 +2,10 @@ rule simulate_measurement:
     input:
         nucleosides=workflow.source_path("../resources/masses_all.tsv"),
         elements=workflow.source_path("../resources/element_masses.tsv"),
+        bases=workflow.source_path("../resources/masses_all.tsv"),
     output:
-        "data/simulation/{seq}/{n_fragments}.tsv",
+        fragments="data/simulation/{seq}/{n_fragments}.tsv",
+        meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
     log:
         "logs/simulation/{seq}/{n_fragments}.log",
     conda:

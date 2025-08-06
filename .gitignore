@@ -2,7 +2,7 @@
 /.snakemake
 /results
 /logs
-/data/experiment/*/standard_unit_fragments.tsv
+/data/experiment/*/0.standard_unit_fragments.tsv
 /data/simulation
 /resources
 /gurobi.log
