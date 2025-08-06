@@ -10,6 +10,7 @@ from scipy.stats import norm, uniform
 # Regex expression to separate given sequence into nucleosides
 _NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
 GHOST_FRAGMENT_MAGNITUDE = 1000
+NO_FRAGMENTATION_PROBABILITY = 0.05
 
 if "snakemake" in locals():
     smk = snakemake
@@ -51,8 +52,6 @@ if "snakemake" in locals():
 
         # Simulate fragments
         simulated_fragments = simulate(
-            frag_process=smk.config["fragmentation_params"]["fragmentation_process"],
-            max_n_parts=int(smk.config["fragmentation_params"]["max_n_parts"]),
             true_sequence=true_sequence,
             nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
             n_fragments=int(smk.wildcards.n_fragments),
@@ -153,10 +152,7 @@ def get_seq_weight(seq: list, masses: dict) -> float:
     return seq_df.select("mass").sum().item()
 
 
-# Divide the sequence into a given number of "max_n_parts".
 def simulate(
-    frag_process,
-    max_n_parts,
     true_sequence,
     nucleoside_masses,
     n_fragments,
@@ -166,10 +162,9 @@ def simulate(
     extra_mass_dict,
 ):
     # Sample random fragments from true sequence
+    seq_len = len(true_sequence)
     frag_sites = [
-        select_fragmentation_sites(
-            select_num_of_breaks(frag_process, max_n_parts), len(true_sequence)
-        )
+        select_fragmentation_sites(select_num_breaks(seq_len=seq_len), seq_len)
         for _ in range(round(n_fragments * (1 + ghost_rate)))
     ]
 
@@ -296,49 +291,44 @@ def simulate(
     return fragments
 
 
-def select_num_of_breaks(frag_process, max_n_parts):
-    # Select how many parts the sequence gets broken into.
-    match frag_process:
-        case "random":
-            # At high energies the sequence can be divided into multiple parts! Sample uniformly how many parts it gets broken into.
-            # Each fragmentation process (n_fragments) results in (1,max_n_parts) number of fragments (uniformly).
-            # It can happen that the entire sequence remains intact.
-            return random.randint(1, max_n_parts)
-        case "exact":
-            # Each fragmentation process (n_fragments) results in exactly max_n_parts number of fragments.
-            return max_n_parts
-        case _:
-            raise NotImplementedError(
-                f"There is no option for the fragmentation process called '{frag_process}'."
-            )
+# METHOD: Consider fragments without any breakage, i.e. complete fragments,
+# separately (randomly select based on given probability); if the sequence
+# does break, use a geometric distribution to determine the number of breaks
+# while approximating the true distribution of fragment lengths observed in
+# experimental data (exponential distribution with many small and few larger
+# fragments, which gets sharper with increasing sequence length)
+def select_num_breaks(seq_len: int) -> int:
+    if np.random.rand() < NO_FRAGMENTATION_PROBABILITY:
+        return 0
+    # Note that p = factor/seq_len with factor = seq_len/alpha
+    # thus using p = seq_len/alpha/seq_len = 1/alpha
+    return min(np.random.geometric(p=0.3), seq_len - 1)
 
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
-def select_fragmentation_sites(num_parts, seq_len):
-    # Ensure there is a positive number of parts
-    if num_parts <= 0:
+def select_fragmentation_sites(num_breaks, seq_len):
+    # Ensure there is a positive number of parts (i.e. number of breaks + 1)
+    if num_breaks < 0:
         raise ValueError("The number of parts cannot be less than one!")
 
     # Ensure the number of parts is not greater than the sequence length
-    if num_parts > seq_len:
+    if num_breaks + 1 > seq_len:
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
 
-    # If the sequence "breaks" into one part, it remains intact
-    if num_parts == 1:
+    # If the sequence has zero breaks, it remains intact
+    if num_breaks == 0:
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    return sorted(random.sample(range(1, seq_len), num_parts - 1))
-    # LCK: I do not understand the comment below
-    # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
+    return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
 
 
-# Generate tuples of start and end index for each fragments
 def compute_fragment_tuples(frag_sites, seq_len):
     tuples = []
 
+    # Generate tuples of start and end index for each fragments
     for seq_copy in frag_sites:
         if seq_copy[0] != 0:
             seq_copy.insert(0, 0)
