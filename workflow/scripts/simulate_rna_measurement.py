@@ -168,7 +168,8 @@ def simulate(
     # Sample random fragments from true sequence
     frag_sites = [
         select_fragmentation_sites(
-            select_num_of_breaks(frag_process, max_n_parts), len(true_sequence)
+            select_num_of_breaks(frag_process, max_n_parts) - 1,
+            len(true_sequence)
         )
         for _ in range(round(n_fragments * (1 + ghost_rate)))
     ]
@@ -314,23 +315,23 @@ def select_num_of_breaks(frag_process, max_n_parts):
 
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
-def select_fragmentation_sites(num_parts, seq_len):
-    # Ensure there is a positive number of parts
-    if num_parts <= 0:
+def select_fragmentation_sites(num_breaks, seq_len):
+    # Ensure there is a positive number of parts (i.e. number of breaks + 1)
+    if num_breaks < 0:
         raise ValueError("The number of parts cannot be less than one!")
 
     # Ensure the number of parts is not greater than the sequence length
-    if num_parts > seq_len:
+    if num_breaks + 1 > seq_len:
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
 
-    # If the sequence "breaks" into one part, it remains intact
-    if num_parts == 1:
+    # If the sequence has zero breaks, it remains intact
+    if num_breaks == 0:
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    return sorted(random.sample(range(1, seq_len), num_parts - 1))
+    return sorted(random.sample(range(1, seq_len), num_breaks))
     # LCK: I do not understand the comment below
     # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
 
