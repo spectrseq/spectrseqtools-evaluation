@@ -312,9 +312,7 @@ def select_fragmentation_sites(num_breaks, seq_len):
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    return sorted(random.sample(range(1, seq_len), num_breaks))
-    # LCK: I do not understand the comment below
-    # Change this 1 to 2 if there are not enough statistics for the sequence breakage!
+    return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
 
 
 # Generate tuples of start and end index for each fragments
