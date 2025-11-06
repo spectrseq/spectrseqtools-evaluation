@@ -2,6 +2,8 @@
 /.snakemake
 /results
 /logs
+/data/experiment/*/0.raw
+/data/experiment/*/0.singletons.tsv
 /data/experiment/*/0.standard_unit_fragments.tsv
 /data/simulation
 /resources
