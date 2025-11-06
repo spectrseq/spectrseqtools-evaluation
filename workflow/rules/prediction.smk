@@ -16,7 +16,7 @@ rule lionelmssq_experiment:
     threads: 64
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
-        "--fragment-predictions {output.fragment_predictions} "
+        "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
         "--solver {params.solver} "
@@ -40,7 +40,7 @@ rule lionelmssq_simulation:
     threads: 64
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
-        "--fragment-predictions {output.fragment_predictions} "
+        "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
         "--solver {params.solver} "
