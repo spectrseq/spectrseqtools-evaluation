@@ -15,6 +15,7 @@ rule all_simulations:
             "results/plots/simulated_fragments/{seq}/{" "n_fragments}",
             "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html",
         ),
+        "results/plots/evaluation/simulation.html",
 
 
 rule all_experiments:
@@ -24,6 +25,7 @@ rule all_experiments:
             "results/lionelmssq/experiment/{seq}/{n_fragments}.tsv",
             "results/plots/lionelmssq_prediction/experiment/{seq}/{n_fragments}.html",
         ),
+        "results/plots/evaluation/experiment.html",
 
 
 rule all:
