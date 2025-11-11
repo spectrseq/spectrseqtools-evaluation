@@ -2,6 +2,7 @@ name: lionelmssq
 channels:
   - defaults
   - bioconda
+  - conda-forge
   - gurobi
 dependencies:
   # keep these in sync with the pyproject.toml of the software
