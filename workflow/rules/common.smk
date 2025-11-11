@@ -12,11 +12,7 @@ def get_seq_len(wildcards):
     return len(_NUCLEOSIDE_RE.findall(wildcards.seq))
 
 
-def generate_random_sequences(
-    seq_len, seed=0, mutation_rate=0, modified_nucleosides=None
-):
-    random.seed(seed)
-
+def generate_random_sequences(seq_len, mutation_rate=0, modified_nucleosides=None):
     if modified_nucleosides is not None:
         with open(modified_nucleosides, "r") as file:
             lines = file.readlines()[1:]
@@ -26,8 +22,8 @@ def generate_random_sequences(
             if line.split("\t")[0] not in ["U", "A", "G", "C"]
         ]
 
-        # The weights defined using the mutation rate  by defining the probabilities of the different bases (of course including the normal bases)
-        weights = [(1.0 - mutation_rate / len(modified_nucleoside_names)) / 4] * 4 + [
+        # Define probabilities for different bases (using mutation rate)
+        weights = [(1.0 - mutation_rate) / 4] * 4 + [
             mutation_rate / len(modified_nucleoside_names)
         ] * len(modified_nucleoside_names)
 
@@ -57,13 +53,13 @@ def collect_simulations(*patterns):
             for n_fragments in item["n_fragments"]
         ]
 
+    random.seed(lookup(dpath="simulation/random", within=config)["seed"])
     if lookup(dpath="simulation/random/strata", within=config) is not None:
         retval += [
             collect(
                 patterns,
                 seq=generate_random_sequences(
-                    seq_len=seq["seq_len"],
-                    seed=lookup(dpath="simulation/random", within=config)["seed"],
+                    seq_len=random.choice(range(10, 21)),
                     mutation_rate=lookup(dpath="simulation/random", within=config)[
                         "mutation_rate"
                     ],
@@ -75,6 +71,7 @@ def collect_simulations(*patterns):
             )
             for seq in lookup(dpath="simulation/random/strata", within=config)
             for n_fragments in seq["n_fragments"]
+            for _ in range(seq["num_seq"])
         ]
 
     if len(retval) == 0:

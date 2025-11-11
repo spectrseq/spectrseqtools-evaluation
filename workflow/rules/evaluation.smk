@@ -1,3 +1,6 @@
+include: "common.smk"
+
+
 rule plot_lionelmssq_prediction:
     input:
         pred_fragments="results/lionelmssq/{modus}/{seq}/{n_fragments}.tsv",
@@ -11,3 +14,29 @@ rule plot_lionelmssq_prediction:
         "../envs/lionelmssq.yaml"
     script:
         "../scripts/plot_lionelmssq_prediction.py"
+
+
+rule plot_evaluation_simulation:
+    input:
+        collect_simulations("results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"),
+    output:
+        "results/plots/evaluation/simulation.html",
+    log:
+        "logs/plots/evaluation/simulation.log",
+    conda:
+        "../envs/lionelmssq.yaml"
+    script:
+        "../scripts/plot_evaluation.py"
+
+
+rule plot_evaluation_experiment:
+    input:
+        collect_experiments("results/lionelmssq/experiment/{seq}/{n_fragments}.fasta"),
+    output:
+        "results/plots/evaluation/experiment.html",
+    log:
+        "logs/plots/evaluation/experiment.log",
+    conda:
+        "../envs/lionelmssq.yaml"
+    script:
+        "../scripts/plot_evaluation.py"

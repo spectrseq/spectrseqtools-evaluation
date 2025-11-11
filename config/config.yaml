@@ -5,15 +5,10 @@ simulation: # Sequence convention is 5' to 3'
     seed: 42325345
     mutation_rate: 0.1
     strata:
-#      - seq_len: 15
+#      - num_seq: 50
 #        n_fragments:
-#        - 30
-#      - seq_len: 20
-#        n_fragments:
-#        - 40
-#        - 100
-#        - 400
-#        - 800
+##          - 30
+#          - 50
 
   # Hardcodes the sequences
   custom:
@@ -105,8 +100,8 @@ solver: "cbc"
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
   random_seed: 1234
-  ghost_rate: 0.05
-  rel_error_rate: 0.00001
+  ghost_rate: 0.00
+  rel_error_rate: 0.000005
   breakage_line: "c/y"
   noise_distribution: "uniform" # 'normal' or 'uniform'
   mass_5_prime: 555.1294  # Standard START tag

@@ -1,5 +1,5 @@
 identity: 2025-04-16_SJH_10merRNA01_Inosine_ms2
-intensity_cutoff: 100000
+intensity_cutoff: 115000
 label_mass_3T: 587.2278
 label_mass_5T: 555.1294
 sequence_mass: 4274.781335681568
