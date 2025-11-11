@@ -1,12 +1,32 @@
 name: lionelmssq
 channels:
-  - defaults
+  - conda-forge
   - bioconda
   - gurobi
+  - nodefaults
 dependencies:
+  # keep these in sync with the pyproject.toml of the software
+  # Once the software is released on bioconda, remove all of these and just depend
+  # on it directly.
+  - python>=3.12,<3.14
+  - polars >=1.9.0,<2.0
+  - typed-argument-parser >=1.10.1,<2.0
+  - altair >=5.4.1,<6.0
+  - pyyaml >=6.0.2,<7.0
+  - loguru >=0.7.2,<0.8
+  - numpy >=2.2.3,<3.0
+  - platformdirs >=4.3.8,<5.0
+  - clr_loader >=0.2.7.post0,<0.3
+  - ms_deisotope >=0.0.60,<0.1
+  - pythonnet >=3.0.5,<4.0
+  - tqdm >=4.67.1,<5.0
+  - scikit-learn >=1.7.2,<2.0
+  - cython >=3.0.3,<4.0
+  - mono >=6.12.0.199,<7
   - gurobi
-  - python=3.12
   - pip
   - pip:
 #    - -e /home/laura/Uni/RNA/Git/lionelmssq
     - git+https://github.com/koesterlab/lionelmssq.git
+    - dbscan1d >=0.2.3,<0.3
+    - pulp >=2.3.0,<3.0

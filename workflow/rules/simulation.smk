@@ -1,8 +1,8 @@
 rule simulate_measurement:
     input:
-        nucleosides=workflow.source_path("../resources/masses_all.tsv"),
+        nucleosides=workflow.source_path("../resources/masses.tsv"),
         elements=workflow.source_path("../resources/element_masses.tsv"),
-        bases=workflow.source_path("../resources/masses_all.tsv"),
+        bases=workflow.source_path("../resources/masses.tsv"),
     output:
         fragments="data/simulation/{seq}/{n_fragments}.tsv",
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",

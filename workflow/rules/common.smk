@@ -68,7 +68,7 @@ def collect_simulations(*patterns):
                         "mutation_rate"
                     ],
                     modified_nucleosides=workflow.source_path(
-                        "../resources/masses_all.tsv"
+                        "../resources/masses.tsv"
                     ),
                 ),
                 n_fragments=n_fragments,
