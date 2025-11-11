@@ -10,7 +10,6 @@ dependencies:
   # on it directly.
   - python>=3.12,<3.14
   - polars >=1.9.0,<2.0
-  - pulp >=2.3.0,<3.0
   - typed-argument-parser >=1.10.1,<2.0
   - altair >=5.4.1,<6.0
   - pyyaml >=6.0.2,<7.0
@@ -30,3 +29,4 @@ dependencies:
 #    - -e /home/laura/Uni/RNA/Git/lionelmssq
     - git+https://github.com/koesterlab/lionelmssq.git
     - dbscan1d >=0.2.3,<0.3
+    - pulp >=2.3.0,<3.0
