@@ -5,15 +5,10 @@ simulation: # Sequence convention is 5' to 3'
     seed: 42325345
     mutation_rate: 0.1
     strata:
-#      - seq_len: 15
+#      - num_seq: 50
 #        n_fragments:
-#        - 30
-#      - seq_len: 20
-#        n_fragments:
-#        - 40
-#        - 100
-#        - 400
-#        - 800
+##          - 30
+#          - 50
 
   # Hardcodes the sequences
   custom:
@@ -87,6 +82,20 @@ experiment:
 #    fragments: "0"
 #    meta: "meta.yaml"
 #    name: "testcase_mod_07"
+
+# Self-labeled data
+#  - seq: CGAACCCUUCGCACUCAGCG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_NH_01"
+#  - seq: CGAGAGAGUUCAAUAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_NH_02"
+#  - seq: AGGAGCAACCACUACAGGGU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_NH_03"
 
 # Longer sequences (>20mer)
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
