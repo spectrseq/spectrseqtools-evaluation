@@ -22,10 +22,10 @@ dependencies:
   - pythonnet >=3.0.5,<4.0
   - tqdm >=4.67.1,<5.0
   - scikit-learn >=1.7.2,<2.0
-  - dbscan1d >=0.2.3,<0.3
   - cython >=3.0.3,<4.0
   - gurobi
   - pip
   - pip:
 #    - -e /home/laura/Uni/RNA/Git/lionelmssq
     - git+https://github.com/koesterlab/lionelmssq.git
+    - dbscan1d >=0.2.3,<0.3
