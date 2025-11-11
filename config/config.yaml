@@ -83,20 +83,6 @@ experiment:
 #    meta: "meta.yaml"
 #    name: "testcase_mod_07"
 
-# Self-labeled data
-#  - seq: CGAACCCUUCGCACUCAGCG
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "testcase_NH_01"
-#  - seq: CGAGAGAGUUCAAUAA
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "testcase_NH_02"
-#  - seq: AGGAGCAACCACUACAGGGU
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "testcase_NH_03"
-
 # Longer sequences (>20mer)
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
 #    fragments: "0"
@@ -114,8 +100,8 @@ solver: "cbc"
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
   random_seed: 1234
-  ghost_rate: 0.05
-  rel_error_rate: 0.00001
+  ghost_rate: 0.00
+  rel_error_rate: 0.000005
   breakage_line: "c/y"
   noise_distribution: "uniform" # 'normal' or 'uniform'
   mass_5_prime: 555.1294  # Standard START tag
