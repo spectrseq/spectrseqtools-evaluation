@@ -22,8 +22,8 @@ def generate_random_sequences(seq_len, mutation_rate=0, modified_nucleosides=Non
             if line.split("\t")[0] not in ["U", "A", "G", "C"]
         ]
 
-        # The weights defined using the mutation rate  by defining the probabilities of the different bases (of course including the normal bases)
-        weights = [(1.0 - mutation_rate / len(modified_nucleoside_names)) / 4] * 4 + [
+        # Define probabilities for different bases (using mutation rate)
+        weights = [(1.0 - mutation_rate) / 4] * 4 + [
             mutation_rate / len(modified_nucleoside_names)
         ] * len(modified_nucleoside_names)
 
