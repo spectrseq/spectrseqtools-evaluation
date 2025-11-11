@@ -8,7 +8,7 @@ dependencies:
   # keep these in sync with the pyproject.toml of the software
   # Once the software is released on bioconda, remove all of these and just depend
   # on it directly.
-  - python=3.12
+  - python>=3.12,<3.14
   - polars >=1.9.0,<2.0
   - pulp >=2.3.0,<3.0
   - typed-argument-parser >=1.10.1,<2.0
