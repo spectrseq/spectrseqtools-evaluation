@@ -1,9 +1,9 @@
 name: lionelmssq
 channels:
-  - defaults
-  - bioconda
   - conda-forge
+  - bioconda
   - gurobi
+  - nodefaults
 dependencies:
   # keep these in sync with the pyproject.toml of the software
   # Once the software is released on bioconda, remove all of these and just depend
