@@ -29,6 +29,21 @@ rule plot_evaluation_simulation:
         "../scripts/plot_evaluation.py"
 
 
+rule plot_evaluation_random_simulation:
+    input:
+        collect_random_simulations(
+            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
+        ),
+    output:
+        "results/plots/evaluation/random_simulation.html",
+    log:
+        "logs/plots/evaluation/random_simulation.log",
+    conda:
+        "../envs/lionelmssq.yaml"
+    script:
+        "../scripts/plot_evaluation.py"
+
+
 rule plot_evaluation_experiment:
     input:
         collect_experiments("results/lionelmssq/experiment/{seq}/{n_fragments}.fasta"),

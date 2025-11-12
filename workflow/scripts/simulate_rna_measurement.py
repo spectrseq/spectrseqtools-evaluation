@@ -1,4 +1,5 @@
 import sys
+import os
 import polars as pl
 import random
 import re
@@ -19,8 +20,14 @@ if "snakemake" in locals():
     def main() -> None:
         """Simulate mass-spectrometry data via Snakemake."""
         # Set random seeds
-        random.seed(smk.config["fragmentation_params"]["random_seed"])
-        np.random.seed(smk.config["fragmentation_params"]["random_seed"])
+        seed_path = "/".join(smk.output["meta"].split("/")[:-1] + ["seed.txt"])
+        if not os.path.isfile(seed_path):
+            seed = 0
+        else:
+            with open(seed_path, "r") as seed_file:
+                seed = int(seed_file.readline().rstrip("\n"))
+        random.seed(seed)
+        np.random.seed(seed)
 
         # Build meta dict
         true_sequence = _NUCLEOSIDE_RE.findall(smk.wildcards.seq)
