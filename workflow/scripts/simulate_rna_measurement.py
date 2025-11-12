@@ -50,7 +50,7 @@ if "snakemake" in locals():
         meta["sequence_mass"] = (
             get_seq_weight(
                 seq=true_sequence,
-                masses=pl.read_csv(smk.input["bases"], separator="\t"),
+                masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
             )
             + len(true_sequence) * extra_mass_dict["to_standard_unit"]
             + extra_mass_dict["3_prime_terminal"]
