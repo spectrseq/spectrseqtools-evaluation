@@ -11,6 +11,8 @@ rule lionelmssq_experiment:
         solver=config["solver"],
     log:
         "logs/lionelmssq/experiment/{seq}/{n_fragments}.log",
+    benchmark:
+        "benchmarks/lionelmssq/simulation/{seq}/{n_fragments}.tsv",
     conda:
         "../envs/lionelmssq.yaml"
     threads: 64
@@ -35,6 +37,8 @@ rule lionelmssq_simulation:
         solver=config["solver"],
     log:
         "logs/lionelmssq/simulation/{seq}/{n_fragments}.log",
+    benchmark:
+        "benchmarks/lionelmssq/simulation/{seq}/{n_fragments}.tsv",
     conda:
         "../envs/lionelmssq.yaml"
     threads: 64

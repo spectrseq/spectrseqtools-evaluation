@@ -7,6 +7,8 @@ rule simulate_measurement:
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
     log:
         "logs/simulation/{seq}/{n_fragments}.log",
+    benchmark:
+        "benchmarks/simulation/{seq}/{n_fragments}.tsv",
     conda:
         "../envs/pystats.yaml"
     script:
@@ -26,5 +28,7 @@ rule plot_simulated_fragments:
         ),
     log:
         "logs/plots/simulated_fragments/{seq}/{n_fragments}.log",
+    benchmark:
+        "benchmarks/plots/simulated_fragments/{seq}/{n_fragments}.tsv",
     wrapper:
         "v7.2.0/utils/datavzrd"
