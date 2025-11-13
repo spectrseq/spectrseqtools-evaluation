@@ -7,6 +7,7 @@ import yaml
 import numpy as np
 from pathlib import Path
 from scipy.stats import norm, uniform
+from typing import List
 
 # Regex expression to separate given sequence into nucleosides
 _NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
@@ -47,10 +48,11 @@ if "snakemake" in locals():
         )
 
         # Add sequence mass to meta dict
+        nucleosides = pl.read_csv(smk.input["nucleosides"], separator="\t")
         meta["sequence_mass"] = (
             get_seq_weight(
                 seq=true_sequence,
-                masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
+                masses=nucleosides,
             )
             + len(true_sequence) * extra_mass_dict["to_standard_unit"]
             + extra_mass_dict["3_prime_terminal"]
@@ -60,7 +62,7 @@ if "snakemake" in locals():
         # Simulate fragments
         simulated_fragments = simulate(
             true_sequence=true_sequence,
-            nucleoside_masses=pl.read_csv(smk.input["nucleosides"], separator="\t"),
+            nucleoside_masses=nucleosides,
             n_fragments=int(smk.wildcards.n_fragments),
             ghost_rate=float(smk.config["fragmentation_params"]["ghost_rate"]),
             rel_error_rate=smk.config["fragmentation_params"]["rel_error_rate"],
@@ -68,11 +70,46 @@ if "snakemake" in locals():
             extra_mass_dict=extra_mass_dict,
         )
 
+        # Simulate singletons selection
+        singletons = select_singletons(
+            seq=true_sequence,
+            nucleosides=nucleosides,
+            max_singletons=smk.config["fragmentation_params"]["max_singletons"],
+        )
+
         # Write simulation data to file
         simulated_fragments.write_csv(smk.output["fragments"], separator="\t")
 
+        # Write metadata to file
         with open(smk.output["meta"], "w") as f:
             yaml.safe_dump(meta, f)
+
+        # Write singleton data to file
+        singletons.write_csv(smk.output["singletons"], separator="\t")
+
+
+def select_singletons(
+    seq: List[str], nucleosides: pl.DataFrame, max_singletons: int = 15
+) -> pl.DataFrame:
+    # Select true nucleotides
+    true_nucs = list(set(seq))
+
+    num_additional_nucs = min(max_singletons, len(nucleosides)) - len(true_nucs)
+    random_nucs = (
+        []
+        if num_additional_nucs < 1
+        else np.random.choice(
+            [
+                nuc
+                for nuc in nucleosides.get_column("nucleoside").to_list()
+                if nuc not in true_nucs
+            ],
+            size=num_additional_nucs,
+            replace=False,
+        ).tolist()
+    )
+
+    return nucleosides.filter(pl.col("nucleoside").is_in(true_nucs + random_nucs))
 
 
 # METHOD: Consider each base in the form of a standard unit, which can be

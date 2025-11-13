@@ -4,6 +4,7 @@ rule simulate_measurement:
         elements=workflow.source_path("../resources/element_masses.tsv"),
     output:
         fragments="data/simulation/{seq}/{n_fragments}.tsv",
+        singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
     log:
         "logs/simulation/{seq}/{n_fragments}.log",
