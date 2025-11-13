@@ -24,7 +24,7 @@ rule all_experiments:
 
 rule all:
     input:
-        rules.all_simulations.input,
+        # rules.all_simulations.input,
         rules.all_experiments.input,
         rules.custom_simulation.input,
     default_target: True

@@ -11,7 +11,7 @@ rule plot_lionelmssq_prediction:
     log:
         "logs/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.log",
     benchmark:
-        "benchmarks/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.tsv",
+        "benchmarks/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
@@ -26,7 +26,7 @@ rule plot_evaluation_simulation:
     log:
         "logs/plots/evaluation/simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/simulation.tsv",
+        "benchmarks/plots/evaluation/simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
@@ -43,7 +43,7 @@ rule plot_evaluation_random_simulation:
     log:
         "logs/plots/evaluation/random_simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/random_simulation.tsv",
+        "benchmarks/plots/evaluation/random_simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
@@ -58,7 +58,7 @@ rule plot_evaluation_experiment:
     log:
         "logs/plots/evaluation/experiment.log",
     benchmark:
-        "benchmarks/plots/evaluation/experiment.tsv",
+        "benchmarks/plots/evaluation/experiment.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
