@@ -366,7 +366,16 @@ def select_fragmentation_sites(num_breaks, seq_len):
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
+    # return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
+    # return sorted(set(np.random.binomial(n=seq_len, p=0.5, size=num_breaks)))
+    return sorted(
+        set(
+            [
+                round(val * seq_len)
+                for val in np.random.default_rng().beta(a=2, b=2, size=num_breaks)
+            ]
+        )
+    )
 
 
 def compute_fragment_tuples(frag_sites, seq_len):
