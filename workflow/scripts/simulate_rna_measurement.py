@@ -1,12 +1,10 @@
 import sys
 import os
 import polars as pl
-import random
 import re
 import yaml
 import numpy as np
 from pathlib import Path
-from scipy.stats import norm, uniform
 from typing import List
 
 # Regex expression to separate given sequence into nucleosides
@@ -27,8 +25,9 @@ if "snakemake" in locals():
         else:
             with open(seed_path, "r") as seed_file:
                 seed = int(seed_file.readline().rstrip("\n"))
-        random.seed(seed)
-        np.random.seed(seed)
+
+        # Initialize random-number generator
+        rng = np.random.default_rng(seed=seed)
 
         # Build meta dict
         true_sequence = _NUCLEOSIDE_RE.findall(smk.wildcards.seq)
@@ -61,6 +60,7 @@ if "snakemake" in locals():
 
         # Simulate fragments
         simulated_fragments = simulate(
+            rng=rng,
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
             n_fragments=int(smk.wildcards.n_fragments),
@@ -72,6 +72,7 @@ if "snakemake" in locals():
 
         # Simulate singletons selection
         singletons = select_singletons(
+            rng=rng,
             seq=true_sequence,
             nucleosides=nucleosides,
             max_singletons=smk.config["fragmentation_params"]["max_singletons"],
@@ -89,7 +90,10 @@ if "snakemake" in locals():
 
 
 def select_singletons(
-    seq: List[str], nucleosides: pl.DataFrame, max_singletons: int = 15
+    rng: np.random.Generator,
+    seq: List[str],
+    nucleosides: pl.DataFrame,
+    max_singletons: int = 15,
 ) -> pl.DataFrame:
     # Select true nucleotides
     true_nucs = list(set(seq))
@@ -98,7 +102,7 @@ def select_singletons(
     random_nucs = (
         []
         if num_additional_nucs < 1
-        else np.random.choice(
+        else rng.choice(
             [
                 nuc
                 for nuc in nucleosides.get_column("nucleoside").to_list()
@@ -197,18 +201,23 @@ def get_seq_weight(seq: list, masses: dict) -> float:
 
 
 def simulate(
-    true_sequence,
-    nucleoside_masses,
-    n_fragments,
-    ghost_rate,
-    rel_error_rate,
-    noise_dist,
-    extra_mass_dict,
-):
+    rng: np.random.Generator,
+    true_sequence: List[str],
+    nucleoside_masses: pl.DataFrame,
+    n_fragments: int,
+    ghost_rate: float,
+    rel_error_rate: float,
+    noise_dist: str,
+    extra_mass_dict: dict,
+) -> pl.DataFrame:
     # Sample random fragments from true sequence
     seq_len = len(true_sequence)
     frag_sites = [
-        select_fragmentation_sites(select_num_breaks(seq_len=seq_len), seq_len)
+        select_fragmentation_sites(
+            num_breaks=select_num_breaks(seq_len=seq_len, rng=rng),
+            seq_len=seq_len,
+            rng=rng,
+        )
         for _ in range(round(n_fragments * (1 + ghost_rate)))
     ]
 
@@ -265,7 +274,10 @@ def simulate(
         pl.struct("*")
         .map_elements(
             lambda x: induce_noise(
-                noise_dist, rel_error_rate, x["true_nucleoside_mass"]
+                rng=rng,
+                distribution_method=noise_dist,
+                error_rate=rel_error_rate,
+                mass=x["true_nucleoside_mass"],
             ),
             return_dtype=float,
         )
@@ -292,7 +304,10 @@ def simulate(
         pl.struct("*")
         .map_elements(
             lambda x: induce_noise(
-                noise_dist, rel_error_rate, x["true_mass_with_backbone"]
+                rng=rng,
+                distribution_method=noise_dist,
+                error_rate=rel_error_rate,
+                mass=x["true_mass_with_backbone"],
             ),
             return_dtype=float,
         )
@@ -303,7 +318,7 @@ def simulate(
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
-            lambda x: True if uniform.rvs() < ghost_rate else False,
+            lambda x: True if rng.random() < ghost_rate else False,
             return_dtype=bool,
         )
         .alias("is_ghost_fragment")
@@ -323,9 +338,7 @@ def simulate(
         .map_elements(
             lambda x: x["observed_mass"]
             + int(x["is_ghost_fragment"])
-            * uniform.rvs(
-                loc=-GHOST_FRAGMENT_MAGNITUDE, scale=2 * GHOST_FRAGMENT_MAGNITUDE
-            ),
+            * (-GHOST_FRAGMENT_MAGNITUDE + 2 * GHOST_FRAGMENT_MAGNITUDE * rng.random()),
             return_dtype=float,
         )
         .alias("observed_mass")
@@ -341,16 +354,18 @@ def simulate(
 # while approximating the true distribution of fragment lengths observed in
 # experimental data (exponential distribution with many small and few larger
 # fragments, which gets sharper with increasing sequence length)
-def select_num_breaks(seq_len: int) -> int:
-    if np.random.rand() < NO_FRAGMENTATION_PROBABILITY:
+def select_num_breaks(seq_len: int, rng: np.random.Generator) -> int:
+    if rng.random() < NO_FRAGMENTATION_PROBABILITY:
         return 0
     # Note that p = factor/seq_len with factor = seq_len/alpha
     # thus using p = seq_len/alpha/seq_len = 1/alpha
-    return min(np.random.geometric(p=0.3), seq_len - 1)
+    return min(rng.geometric(p=0.3), seq_len - 1)
 
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
-def select_fragmentation_sites(num_breaks, seq_len):
+def select_fragmentation_sites(
+    num_breaks: int, seq_len: int, rng: np.random.Generator
+) -> List[int]:
     # Ensure there is a positive number of parts (i.e. number of breaks + 1)
     if num_breaks < 0:
         raise ValueError("The number of parts cannot be less than one!")
@@ -366,15 +381,10 @@ def select_fragmentation_sites(num_breaks, seq_len):
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    # return sorted(set(np.random.choice(range(1, seq_len), num_breaks)))
-    # return sorted(set(np.random.binomial(n=seq_len, p=0.5, size=num_breaks)))
+    # return sorted(set(rng.choice(range(1, seq_len), num_breaks)))
+    # return sorted(set(rng.binomial(n=seq_len, p=0.5, size=num_breaks)))
     return sorted(
-        set(
-            [
-                round(val * seq_len)
-                for val in np.random.default_rng().beta(a=2, b=2, size=num_breaks)
-            ]
-        )
+        set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_breaks)])
     )
 
 
@@ -393,12 +403,14 @@ def compute_fragment_tuples(frag_sites, seq_len):
     return tuples
 
 
-def induce_noise(distribution_method, error_rate, mass):
+def induce_noise(
+    rng: np.random.Generator, distribution_method: str, error_rate: float, mass: float
+) -> float:
     match distribution_method:
         case "normal":
-            noise = norm.rvs(scale=error_rate)
+            noise = rng.normal(scale=error_rate)
         case "uniform":
-            noise = uniform.rvs(loc=-error_rate, scale=2 * error_rate)
+            noise = -error_rate + 2 * error_rate * rng.random()
         case _:
             raise NotImplementedError(
                 f"There is no option for the noise distribution called '{distribution_method}'."
