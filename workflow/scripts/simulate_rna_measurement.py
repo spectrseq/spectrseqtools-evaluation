@@ -381,8 +381,7 @@ def select_fragmentation_sites(
         return [int(0)]
 
     # Return randomly sampled breakage positions in the sequence
-    # return sorted(set(rng.choice(range(1, seq_len), num_breaks)))
-    # return sorted(set(rng.binomial(n=seq_len, p=0.5, size=num_breaks)))
+    # Use beta distribution to avoid bias towards small terminal fragments (like e.g. for uniform one)
     return sorted(
         set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_breaks)])
     )
