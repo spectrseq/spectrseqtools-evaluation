@@ -1,5 +1,6 @@
 /.idea
 /.snakemake
+/benchmarks
 /results
 /logs
 /data/experiment/*/0.raw
