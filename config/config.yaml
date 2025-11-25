@@ -5,10 +5,10 @@ simulation: # Sequence convention is 5' to 3'
     seed: 42325345
     mutation_rate: 0.1
     strata:
-#      - num_seq: 50
-#        n_fragments:
-##          - 30
-#          - 50
+      - num_seq: 1
+        n_fragments:
+#          - 30
+          - 50
 
   # Hardcodes the sequences
   custom:

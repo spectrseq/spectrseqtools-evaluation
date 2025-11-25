@@ -11,7 +11,7 @@ rule simulate_measurement:
     benchmark:
         "benchmarks/simulation/{seq}/{n_fragments}.tsv"
     conda:
-        "../envs/pystats.yaml"
+        "../envs/lionelmssq.yaml"
     script:
         "../scripts/simulate_rna_measurement.py"
 

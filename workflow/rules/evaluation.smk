@@ -18,16 +18,18 @@ rule plot_lionelmssq_prediction:
         "../scripts/plot_lionelmssq_prediction.py"
 
 
-rule plot_evaluation_simulation:
+rule plot_evaluation_custom_simulation:
     input:
-        collect_simulations("results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"),
+        collect_custom_simulations(
+            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
+        ),
     output:
-        donut="results/plots/evaluation/simulation.donut.html",
-        bar="results/plots/evaluation/simulation.bar.html",
+        donut="results/plots/evaluation/custom_simulation.donut.html",
+        bar="results/plots/evaluation/custom_simulation.bar.html",
     log:
-        "logs/plots/evaluation/simulation.log",
+        "logs/plots/evaluation/custom_simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/simulation.tsv"
+        "benchmarks/plots/evaluation/custom_simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
