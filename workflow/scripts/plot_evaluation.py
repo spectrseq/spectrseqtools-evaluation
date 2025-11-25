@@ -27,6 +27,22 @@ STATUS_COLORS = {
     "no prediction": "black",
 }
 
+STATUS_ORDER = [
+    "identical",
+    "identical (minus 55U/G)",
+    "correct composition",
+    "failed prediction",
+    "wrong length",
+    "no prediction",
+]
+
+LEGEND_PARAMS = {
+    "padding": 10,
+    "strokeColor": "black",
+    "cornerRadius": 5,
+    "fillColor": "white",
+}
+
 
 if "snakemake" in locals():
     smk = snakemake
@@ -35,7 +51,10 @@ if "snakemake" in locals():
     def main() -> None:
         results = collect_results(smk.input)
         donut_chart = plot_results(results)
-        donut_chart.save(smk.output[0])
+        donut_chart.save(smk.output["donut"])
+
+        bar_chart = create_stacked_barplot(results)
+        bar_chart.save(smk.output["bar"])
 
 
 def plot_results(results):
@@ -44,25 +63,70 @@ def plot_results(results):
         alt.Chart(results)
         .mark_arc(innerRadius=32, outerRadius=50)
         .encode(
-            theta=alt.Theta("count(result):Q"),
+            theta=alt.Theta("count(result):Q", sort=STATUS_ORDER),
             color=alt.Color(
                 "result:N",
                 scale=alt.Scale(
-                    domain=STATUS_COLORS.keys(),
+                    domain=STATUS_ORDER,
                     range=[
                         STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
-                        for stat in STATUS_COLORS.keys()
+                        for stat in STATUS_ORDER
                     ],
                 ),
             ),
+            order=alt.Order("order:O", sort="descending"),
             tooltip=["result", "count(result)"],
         )
     )
 
 
+def create_stacked_barplot(data: pl.DataFrame) -> alt.Chart:
+    """Create stacked barplot over prediction status.
+
+    Parameters
+    ----------
+    data : polars.Dataframe
+        Dataframe containing prediction status data.
+
+    Returns
+    -------
+    altair.Chart
+        Stacked barplot over prediction status.
+
+    """
+    chart = (
+        alt.Chart(data, title="Status Assessment")
+        .mark_bar()
+        .encode(
+            x=alt.X("num_singletons:N", title="Maximum Number of Singletons"),
+            y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of Sequences"),
+            color=alt.Color(
+                "result:N",
+                scale=alt.Scale(
+                    domain=STATUS_ORDER,
+                    range=[
+                        STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
+                        for stat in STATUS_ORDER
+                    ],
+                ),
+                legend=alt.Legend(
+                    **LEGEND_PARAMS, orient="right", title="Prediction Status"
+                ),
+                sort=STATUS_ORDER,
+            ),
+            order=alt.Order("order:O", sort="descending"),
+            tooltip=["result", "count(result)"],
+        )
+    )
+    return chart
+
+
 def collect_results(files: List[str]) -> List[str]:
     results = []
-    sequences = []
+    true_sequences = []
+    pred_sequences = []
+    true_lengths = []
+    pred_lengths = []
     for file_path in files:
         true_seq = file_path.split("/")[-2]
         with open(file_path, "r") as f:
@@ -81,8 +145,21 @@ def collect_results(files: List[str]) -> List[str]:
         print("result:", result)
         print()
         results.append(result)
-        sequences.append(true_seq)
-    return pl.DataFrame({"sequence": sequences, "result": results})
+        true_sequences.append(true_seq)
+        pred_sequences.append(pred_seq)
+        true_lengths.append(len(parse_nucleosides(true_seq)))
+        pred_lengths.append(len(parse_nucleosides(pred_seq)))
+
+    return pl.DataFrame(
+        {
+            "true_sequence": true_sequences,
+            "pred_sequence": pred_sequences,
+            "true_len": true_lengths,
+            "pred_len": pred_lengths,
+            "result": results,
+            "order": [STATUS_ORDER.index(res) for res in results],
+        }
+    )
 
 
 def compare_sequences(true_seq: List[str], pred_seq: List[str]) -> str:
