@@ -4,10 +4,10 @@ import altair as alt
 import sys
 from typing import List
 
+from lionelmssq.common import parse_nucleosides
 from lionelmssq.masses import EXPLANATION_MASSES
 
 
-_NUCLEOSIDE_RE = re.compile(r"(\d*[ACGU])")
 _REP_IDX = EXPLANATION_MASSES.get_column_index("nucleoside")
 _LIST_IDX = EXPLANATION_MASSES.get_column_index("nucleoside_list")
 NUC_REPS = {
@@ -69,14 +69,14 @@ def collect_results(files: List[str]) -> List[str]:
             f.readline()
             pred_seq = f.readline().rstrip("\n")
         print(
-            len(re.findall(_NUCLEOSIDE_RE, true_seq)),
-            len(re.findall(_NUCLEOSIDE_RE, pred_seq)),
+            len(parse_nucleosides(true_seq)),
+            len(parse_nucleosides(pred_seq)),
         )
         print("true:", true_seq)
         print("pred:", pred_seq)
         result = compare_sequences(
-            re.findall(_NUCLEOSIDE_RE, true_seq),
-            re.findall(_NUCLEOSIDE_RE, pred_seq),
+            parse_nucleosides(true_seq),
+            parse_nucleosides(pred_seq),
         )
         print("result:", result)
         print()

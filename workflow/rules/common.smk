@@ -1,16 +1,9 @@
-import re, random
+import random
 import os
 
 
 wildcard_constraints:
     n_fragments="[0-9]+",
-
-
-_NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
-
-
-def get_seq_len(wildcards):
-    return len(_NUCLEOSIDE_RE.findall(wildcards.seq))
 
 
 def generate_random_sequence_and_seed_pair(
