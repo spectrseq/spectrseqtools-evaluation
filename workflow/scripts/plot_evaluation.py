@@ -1,6 +1,5 @@
-import re
-import pandas as pd
 import altair as alt
+import polars as pl
 import sys
 from typing import List
 
@@ -25,6 +24,7 @@ STATUS_COLORS = {
     # "failed prediction": "#be0a26",
     "failed prediction": "#990000",
     "wrong length": "gray",
+    "no prediction": "black",
 }
 
 
@@ -39,7 +39,7 @@ if "snakemake" in locals():
 
 
 def plot_results(results):
-    results = pd.DataFrame(results)
+    results = pl.DataFrame(results)
     return (
         alt.Chart(results)
         .mark_arc(innerRadius=32, outerRadius=50)
@@ -82,12 +82,14 @@ def collect_results(files: List[str]) -> List[str]:
         print()
         results.append(result)
         sequences.append(true_seq)
-    return pd.DataFrame({"sequence": sequences, "result": results})
+    return pl.DataFrame({"sequence": sequences, "result": results})
 
 
 def compare_sequences(true_seq: List[str], pred_seq: List[str]) -> str:
     true_seq = [NUC_REPS[nuc] if nuc in NUC_REPS else nuc for nuc in true_seq]
     pred_seq = [NUC_REPS[nuc] if nuc in NUC_REPS else nuc for nuc in pred_seq]
+    if len(pred_seq) < 1:
+        return "no prediction"
     if len(true_seq) != len(pred_seq):
         return "wrong length"
     if true_seq == pred_seq:
