@@ -1,6 +1,7 @@
 import sys
 import polars as pl
 
+from lionelmssq.common import parse_nucleosides
 from lionelmssq.plotting import plot_prediction
 from lionelmssq.prediction import Prediction
 
@@ -15,7 +16,7 @@ if "snakemake" in locals():
             fragments_path=smk.input.pred_fragments,
         )
 
-        true_seq = smk.wildcards.seq
+        true_seq = parse_nucleosides(smk.wildcards.seq)
         simulation = pl.read_csv(smk.input.sim, separator="\t")
 
         chart = plot_prediction(

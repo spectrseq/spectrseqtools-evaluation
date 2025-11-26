@@ -18,15 +18,18 @@ rule plot_lionelmssq_prediction:
         "../scripts/plot_lionelmssq_prediction.py"
 
 
-rule plot_evaluation_simulation:
+rule plot_evaluation_custom_simulation:
     input:
-        collect_simulations("results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"),
+        collect_custom_simulations(
+            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
+        ),
     output:
-        "results/plots/evaluation/simulation.html",
+        donut="results/plots/evaluation/custom_simulation.donut.html",
+        bar="results/plots/evaluation/custom_simulation.bar.html",
     log:
-        "logs/plots/evaluation/simulation.log",
+        "logs/plots/evaluation/custom_simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/simulation.tsv"
+        "benchmarks/plots/evaluation/custom_simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
     script:
@@ -39,7 +42,8 @@ rule plot_evaluation_random_simulation:
             "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
         ),
     output:
-        "results/plots/evaluation/random_simulation.html",
+        donut="results/plots/evaluation/random_simulation.donut.html",
+        bar="results/plots/evaluation/random_simulation.bar.html",
     log:
         "logs/plots/evaluation/random_simulation.log",
     benchmark:
@@ -54,7 +58,8 @@ rule plot_evaluation_experiment:
     input:
         collect_experiments("results/lionelmssq/experiment/{seq}/{n_fragments}.fasta"),
     output:
-        "results/plots/evaluation/experiment.html",
+        donut="results/plots/evaluation/experiment.donut.html",
+        bar="results/plots/evaluation/experiment.bar.html",
     log:
         "logs/plots/evaluation/experiment.log",
     benchmark:

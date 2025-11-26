@@ -1,14 +1,14 @@
 import sys
 import os
 import polars as pl
-import re
 import yaml
 import numpy as np
 from pathlib import Path
 from typing import List
 
-# Regex expression to separate given sequence into nucleosides
-_NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
+from lionelmssq.common import parse_nucleosides
+
+
 GHOST_FRAGMENT_MAGNITUDE = 1000
 NO_FRAGMENTATION_PROBABILITY = 0.05
 
@@ -30,7 +30,7 @@ if "snakemake" in locals():
         rng = np.random.default_rng(seed=seed)
 
         # Build meta dict
-        true_sequence = _NUCLEOSIDE_RE.findall(smk.wildcards.seq)
+        true_sequence = parse_nucleosides(smk.wildcards.seq)
         meta = {
             "identity": "simulated data",
             "label_mass_3T": smk.config["fragmentation_params"]["mass_3_prime"],

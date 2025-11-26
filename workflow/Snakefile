@@ -7,24 +7,35 @@ include: "rules/prediction.smk"
 include: "rules/evaluation.smk"
 
 
-rule all_simulations:
+rule all_custom_simulation:
     input:
-        "results/plots/evaluation/simulation.html",
+        "results/plots/evaluation/custom_simulation.bar.html",
 
 
-rule custom_simulation:
+rule all_random_simulation:
     input:
-        "results/plots/evaluation/random_simulation.html",
+        "results/plots/evaluation/random_simulation.bar.html",
 
 
 rule all_experiments:
     input:
-        "results/plots/evaluation/experiment.html",
+        "results/plots/evaluation/experiment.bar.html",
+
+
+rule all_plots:
+    input:
+        collect_experiments(
+            "results/plots/lionelmssq_prediction/experiment/{seq}/{n_fragments}.html"
+        ),
+        collect_simulations(
+            "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html"
+        ),
 
 
 rule all:
     input:
-        # rules.all_simulations.input,
+        rules.all_custom_simulation.input,
+        rules.all_random_simulation.input,
         rules.all_experiments.input,
-        rules.custom_simulation.input,
+        rules.all_plots.input,
     default_target: True

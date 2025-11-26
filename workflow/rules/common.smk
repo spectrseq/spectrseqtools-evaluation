@@ -1,16 +1,9 @@
-import re, random
+import random
 import os
 
 
 wildcard_constraints:
     n_fragments="[0-9]+",
-
-
-_NUCLEOSIDE_RE = re.compile(r"\d*[ACGU]")
-
-
-def get_seq_len(wildcards):
-    return len(_NUCLEOSIDE_RE.findall(wildcards.seq))
 
 
 def generate_random_sequence_and_seed_pair(
@@ -72,6 +65,22 @@ def generate_random_sequences(seq_len, mutation_rate=0, modified_nucleosides=Non
         return "".join([random.choice(["A", "U", "G", "C"]) for _ in range(seq_len)])
 
 
+def collect_custom_simulations(*patterns):
+    if lookup(dpath="simulation/custom", within=config) is None:
+        print("No custom simulation data given.")
+        return []
+
+    return [
+        collect(
+            patterns,
+            seq=item["seq"],
+            n_fragments=n_fragments,
+        )
+        for item in lookup(dpath="simulation/custom", within=config)
+        for n_fragments in item["n_fragments"]
+    ]
+
+
 def collect_random_simulations(*patterns):
     retval = []
 
@@ -113,58 +122,22 @@ def collect_random_simulations(*patterns):
 def collect_simulations(*patterns):
     retval = []
 
-    if lookup(dpath="simulation/custom", within=config) is not None:
-        retval += [
-            collect(
-                patterns,
-                seq=item["seq"],
-                n_fragments=n_fragments,
-            )
-            for item in lookup(dpath="simulation/custom", within=config)
-            for n_fragments in item["n_fragments"]
-        ]
-
-    random.seed(lookup(dpath="simulation/random", within=config)["seed"])
-    if lookup(dpath="simulation/random/strata", within=config) is not None:
-        retval += [
-            collect(
-                patterns,
-                seq=generate_random_sequences(
-                    seq_len=random.choice(range(10, 21)),
-                    mutation_rate=lookup(dpath="simulation/random", within=config)[
-                        "mutation_rate"
-                    ],
-                    modified_nucleosides=workflow.source_path(
-                        "../resources/masses.tsv"
-                    ),
-                ),
-                n_fragments=n_fragments,
-            )
-            for seq in lookup(dpath="simulation/random/strata", within=config)
-            for n_fragments in seq["n_fragments"]
-            for _ in range(seq["num_seq"])
-        ]
-
-    if len(retval) == 0:
-        print("No simulation data given.")
+    retval += collect_custom_simulations(*patterns)
+    retval += collect_random_simulations(*patterns)
 
     return retval
 
 
 def collect_experiments(*patterns):
-    retval = []
-
-    if lookup(dpath="experiment", within=config) is not None:
-        retval += [
-            collect(
-                patterns,
-                seq=item["seq"],
-                n_fragments=item["fragments"],
-            )
-            for item in lookup(dpath="experiment", within=config)
-        ]
-
-    if len(retval) == 0:
+    if lookup(dpath="experiment", within=config) is None:
         print("No experimental data given.")
+        return []
 
-    return retval
+    return [
+        collect(
+            patterns,
+            seq=item["seq"],
+            n_fragments=item["fragments"],
+        )
+        for item in lookup(dpath="experiment", within=config)
+    ]
