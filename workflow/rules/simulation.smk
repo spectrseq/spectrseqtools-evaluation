@@ -12,6 +12,7 @@ rule simulate_measurement:
         "benchmarks/simulation/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
+    threads: 1
     script:
         "../scripts/simulate_rna_measurement.py"
 
@@ -31,5 +32,6 @@ rule plot_simulated_fragments:
         "logs/plots/simulated_fragments/{seq}/{n_fragments}.log",
     benchmark:
         "benchmarks/plots/simulated_fragments/{seq}/{n_fragments}.tsv"
+    threads: 1
     wrapper:
         "v7.2.0/utils/datavzrd"

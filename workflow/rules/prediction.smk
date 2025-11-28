@@ -15,7 +15,7 @@ rule lionelmssq_experiment:
         "benchmarks/lionelmssq/experiment/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
-    threads: 64
+    threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
@@ -41,7 +41,7 @@ rule lionelmssq_simulation:
         "benchmarks/lionelmssq/simulation/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
-    threads: 64
+    threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "

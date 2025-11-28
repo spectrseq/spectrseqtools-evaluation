@@ -14,6 +14,7 @@ rule plot_lionelmssq_prediction:
         "benchmarks/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
+    threads: 1
     script:
         "../scripts/plot_lionelmssq_prediction.py"
 
@@ -32,6 +33,7 @@ rule plot_evaluation_custom_simulation:
         "benchmarks/plots/evaluation/custom_simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
+    threads: 1
     script:
         "../scripts/plot_evaluation.py"
 
@@ -50,6 +52,7 @@ rule plot_evaluation_random_simulation:
         "benchmarks/plots/evaluation/random_simulation.tsv"
     conda:
         "../envs/lionelmssq.yaml"
+    threads: 1
     script:
         "../scripts/plot_evaluation.py"
 
@@ -66,5 +69,6 @@ rule plot_evaluation_experiment:
         "benchmarks/plots/evaluation/experiment.tsv"
     conda:
         "../envs/lionelmssq.yaml"
+    threads: 1
     script:
         "../scripts/plot_evaluation.py"
