@@ -1,0 +1,13 @@
+# Sequence convention is 5' to 3'
+
+# Random sequence generation with given length which is fragmented
+# "n_fragments" times, the mutation rate for base-pairs is also given
+simulation:
+  random:
+    seed: 42325345
+    mutation_rate: 0.1
+    strata:
+      - num_seq: 1
+        n_fragments:
+#          - 30
+          - 50

@@ -1,0 +1,53 @@
+# Sequence convention is 5' to 3'
+
+experiment:
+  - seq: GAUUGUCGUG
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "testcase_03"
+#  - seq: CAACAAGCGAGAGGUUCGAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_04"
+#  - seq: AGAGGCUAAUAGUAAGUUAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_05"
+#  - seq: GAU0CUAGAUC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_01"
+#  - seq: UUAGCCCG0GA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_02"
+#  - seq: UAAAUC9AGGU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_03"
+#  - seq: UCGA9AUUGAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_04"
+#  - seq: GGUU0CUUCGGAUAUCGGCGG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_05"
+#  - seq: CCA0AGUGCUAA0UAAAUUGCC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_06"
+#  - seq: UGCCUCACCAC9AUCAUCCUG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_mod_07"
+
+#  Longer sequences (>20mer)
+#  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_25mer_01"
+#  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "testcase_08"
