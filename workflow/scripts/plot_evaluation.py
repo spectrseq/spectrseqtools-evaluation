@@ -6,7 +6,7 @@ import sys
 STATUS_COLORS = {
     "identical": "#8cb110",
     "identical (minus 55U/G)": "yellow",
-    "correct composition": "purple",
+    "correct composition": "orange",
     # "failed prediction": "#be0a26",
     "failed prediction": "#990000",
     "wrong length": "gray",
