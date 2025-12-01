@@ -30,24 +30,27 @@ if "snakemake" in locals():
 
     def main() -> None:
         results = collect_results(smk.input)
-        # results = results.with_columns(pl.lit(0.1).alias("mutation_rate"))
-        # num_copies = smk.input[0].split("/")[-1].split(".")[0]
-        # results = results.with_columns(pl.lit(num_copies).alias("num_copies"))
-        # num_mods = smk.config["fragmentation_params"]["max_singletons"]
-        # results = results.with_columns(pl.lit(num_mods).alias("num_singletons"))
-        # print(results)
-        # results.write_csv(f"results.{num_copies}copies.{num_mods}mods.tsv",
-        #                   separator="\t")
+
+        if smk.wildcards:
+            params = smk.config["comparison"]["studies"][smk.wildcards.parameter]
+            for key in params:
+                if key == smk.wildcards.parameter:
+                    continue
+                results = results.with_columns(pl.lit(params[key][0]).alias(key))
+            results = results.rename({"comp_val": smk.wildcards.parameter})
+
         results.write_csv(smk.output[0], separator="\t")
 
 
 def collect_results(files: List[str]) -> List[str]:
+    comp_values = []
     results = []
     true_sequences = []
     pred_sequences = []
     true_lengths = []
     pred_lengths = []
     for file_path in files:
+        comp_value = file_path.split("/")[-3]
         true_seq = file_path.split("/")[-2]
         with open(file_path, "r") as f:
             f.readline()
@@ -69,6 +72,7 @@ def collect_results(files: List[str]) -> List[str]:
         pred_sequences.append(pred_seq)
         true_lengths.append(len(parse_nucleosides(true_seq)))
         pred_lengths.append(len(parse_nucleosides(pred_seq)))
+        comp_values.append(comp_value)
 
     return pl.DataFrame(
         {
@@ -76,6 +80,7 @@ def collect_results(files: List[str]) -> List[str]:
             "pred_sequence": pred_sequences,
             "true_len": true_lengths,
             "pred_len": pred_lengths,
+            "comp_val": comp_values,
             "result": results,
             "order": [STATUS_ORDER.index(res) for res in results],
         }

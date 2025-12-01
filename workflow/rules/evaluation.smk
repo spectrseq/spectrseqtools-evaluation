@@ -75,7 +75,7 @@ rule evaluate_parameter_comparison:
 
 rule plot_evaluation_parameter_study:
     input:
-        "results/comparison_study/{parameter}.tsv",
+        "results/comparison_study/{parameter}/evaluation.tsv",
     output:
         donut="results/plots/comparison_study/{parameter}.donut.html",
         bar="results/plots/comparison_study/{parameter}.bar.html",

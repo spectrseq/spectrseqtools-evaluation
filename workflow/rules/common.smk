@@ -146,11 +146,11 @@ def collect_comparison_studies(param: str, *patterns):
                 f.write(str(seq[1]))
 
             retval += collect(
-                    patterns,
-                    parameter=param,
-                    value=value,
-                    seq=seq[0],
-                )
+                patterns,
+                parameter=param,
+                value=value,
+                seq=seq[0],
+            )
 
     return retval
 

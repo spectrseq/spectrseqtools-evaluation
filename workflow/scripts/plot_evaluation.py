@@ -37,17 +37,18 @@ if "snakemake" in locals():
     def main() -> None:
         results = pl.read_csv(smk.input[0], separator="\t")
 
-        donut_chart = create_donut_plot(results)
+        donut_chart = create_donut_plot(data=results)
         donut_chart.save(smk.output["donut"])
 
-        bar_chart = create_stacked_barplot(results)
+        bar_chart = create_stacked_barplot(
+            data=results, param=smk.wildcards.parameter if smk.wildcards else ""
+        )
         bar_chart.save(smk.output["bar"])
 
 
-def create_donut_plot(results):
-    results = pl.DataFrame(results)
+def create_donut_plot(data: pl.DataFrame) -> alt.Chart:
     return (
-        alt.Chart(results)
+        alt.Chart(data)
         .mark_arc(innerRadius=32, outerRadius=50)
         .encode(
             theta=alt.Theta("count(result):Q", sort=STATUS_ORDER),
@@ -67,13 +68,15 @@ def create_donut_plot(results):
     )
 
 
-def create_stacked_barplot(data: pl.DataFrame) -> alt.Chart:
+def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
     """Create stacked barplot over prediction status.
 
     Parameters
     ----------
     data : polars.Dataframe
         Dataframe containing prediction status data.
+    param: str
+        Column name for studied parameter.
 
     Returns
     -------
@@ -85,8 +88,7 @@ def create_stacked_barplot(data: pl.DataFrame) -> alt.Chart:
         alt.Chart(data, title="Status Assessment")
         .mark_bar()
         .encode(
-            x=alt.X("true_len:N", title="Sequence Length"),
-            # x=alt.X("num_singletons:N", title="Maximum Number of Singletons"),
+            x=select_x_axis(param=param),
             y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of Sequences"),
             color=alt.Color(
                 "result:N",
@@ -107,6 +109,22 @@ def create_stacked_barplot(data: pl.DataFrame) -> alt.Chart:
         )
     )
     return chart
+
+
+def select_x_axis(param: str):
+    match param:
+        case "mutation_rate":
+            return alt.X("mutation_rate:N", title="Mutation Rate")
+        case "num_copies":
+            return alt.X("num_copies:N", title="Number of Sequence Copies")
+        case "max_singletons":
+            return alt.X("max_singletons:N", title="Maximum Number of Singletons")
+        case "ghost_rate":
+            return alt.X("ghost_rate:N", title="Ghost Rate")
+        case "rel_error_rate":
+            return alt.X("rel_error_rate:N", title="Relative Error Rate")
+        case _:
+            return alt.X("true_len:N", title="Sequence Length")
 
 
 if __name__ == "__main__":
