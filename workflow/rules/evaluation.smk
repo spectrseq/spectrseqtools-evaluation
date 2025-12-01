@@ -19,11 +19,27 @@ rule plot_lionelmssq_prediction:
         "../scripts/plot_lionelmssq_prediction.py"
 
 
-rule plot_evaluation_custom_simulation:
+rule evaluate_custom_simulation:
     input:
         collect_custom_simulations(
             "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
         ),
+    output:
+        "results/evaluation/custom_simulation.tsv",
+    log:
+        "logs/evaluation/custom_simulation.log",
+    benchmark:
+        "benchmarks/evaluation/custom_simulation.tsv"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_prediction.py"
+
+
+rule plot_evaluation_custom_simulation:
+    input:
+        "results/evaluation/custom_simulation.tsv",
     output:
         donut="results/plots/evaluation/custom_simulation.donut.html",
         bar="results/plots/evaluation/custom_simulation.bar.html",
@@ -38,11 +54,27 @@ rule plot_evaluation_custom_simulation:
         "../scripts/plot_evaluation.py"
 
 
-rule plot_evaluation_random_simulation:
+rule evaluate_random_simulation:
     input:
         collect_random_simulations(
             "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
         ),
+    output:
+        "results/evaluation/random_simulation.tsv",
+    log:
+        "logs/evaluation/random_simulation.log",
+    benchmark:
+        "benchmarks/evaluation/random_simulation.tsv"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_prediction.py"
+
+
+rule plot_evaluation_random_simulation:
+    input:
+        "results/evaluation/random_simulation.tsv",
     output:
         donut="results/plots/evaluation/random_simulation.donut.html",
         bar="results/plots/evaluation/random_simulation.bar.html",
@@ -57,9 +89,25 @@ rule plot_evaluation_random_simulation:
         "../scripts/plot_evaluation.py"
 
 
-rule plot_evaluation_experiment:
+rule evaluate_experiment:
     input:
         collect_experiments("results/lionelmssq/experiment/{seq}/{n_fragments}.fasta"),
+    output:
+        "results/evaluation/experiment.tsv",
+    log:
+        "logs/evaluation/experiment.log",
+    benchmark:
+        "benchmarks/evaluation/experiment.tsv"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_prediction.py"
+
+
+rule plot_evaluation_experiment:
+    input:
+        "results/evaluation/experiment.tsv",
     output:
         donut="results/plots/evaluation/experiment.donut.html",
         bar="results/plots/evaluation/experiment.bar.html",

@@ -24,9 +24,9 @@ rule all_plots:
         collect_experiments(
             "results/plots/lionelmssq_prediction/experiment/{seq}/{n_fragments}.html"
         ),
-        collect_simulations(
-            "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html"
-        ),
+        # collect_simulations(
+        #     "results/plots/lionelmssq_prediction/simulation/{seq}/{n_fragments}.html"
+        # ),
 
 
 rule all:
