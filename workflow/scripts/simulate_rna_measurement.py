@@ -63,9 +63,9 @@ if "snakemake" in locals():
             rng=rng,
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
-            n_fragments=int(smk.wildcards.n_fragments),
-            ghost_rate=float(smk.config["fragmentation_params"]["ghost_rate"]),
-            rel_error_rate=smk.config["fragmentation_params"]["rel_error_rate"],
+            n_fragments=int(smk.params["num_copies"]),
+            ghost_rate=float(smk.params["ghost_rate"]),
+            rel_error_rate=float(smk.params["rel_error_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
             extra_mass_dict=extra_mass_dict,
         )
@@ -75,7 +75,7 @@ if "snakemake" in locals():
             rng=rng,
             seq=true_sequence,
             nucleosides=nucleosides,
-            max_singletons=smk.config["fragmentation_params"]["max_singletons"],
+            max_singletons=int(smk.params["max_singletons"]),
         )
 
         # Write simulation data to file

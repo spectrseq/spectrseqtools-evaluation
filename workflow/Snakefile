@@ -29,10 +29,18 @@ rule all_plots:
         # ),
 
 
+rule all_comparisons:
+    input:
+        collect("results/plots/comparison_study/{parameter}.bar.html",
+            parameter=lookup(dpath="comparison/studies", within=config)
+        ),
+
+
 rule all:
     input:
-        rules.all_custom_simulation.input,
-        rules.all_random_simulation.input,
-        rules.all_experiments.input,
-        rules.all_plots.input,
+        # rules.all_custom_simulation.input,
+        # rules.all_random_simulation.input,
+        # rules.all_experiments.input,
+        # rules.all_plots.input,
+        rules.all_comparisons.input,
     default_target: True

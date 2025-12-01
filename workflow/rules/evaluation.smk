@@ -54,6 +54,42 @@ rule plot_evaluation_custom_simulation:
         "../scripts/plot_evaluation.py"
 
 
+rule evaluate_parameter_comparison:
+    input:
+        lambda wildcards: collect_comparison_studies(
+            wildcards.parameter,
+            "results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
+        ),
+    output:
+        "results/comparison_study/{parameter}/evaluation.tsv",
+    log:
+        "logs/comparison_study/{parameter}/evaluation.log",
+    benchmark:
+        "benchmarks/comparison_study/{parameter}/evaluation.log"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_prediction.py"
+
+
+rule plot_evaluation_parameter_study:
+    input:
+        "results/comparison_study/{parameter}.tsv",
+    output:
+        donut="results/plots/comparison_study/{parameter}.donut.html",
+        bar="results/plots/comparison_study/{parameter}.bar.html",
+    log:
+        "logs/plots/comparison_study/{parameter}.log",
+    benchmark:
+        "benchmarks/plots/comparison_study/{parameter}.tsv"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_evaluation.py"
+
+
 rule evaluate_random_simulation:
     input:
         collect_random_simulations(
