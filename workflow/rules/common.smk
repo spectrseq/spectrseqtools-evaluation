@@ -119,6 +119,42 @@ def collect_random_simulations(*patterns):
     return retval
 
 
+def collect_comparison_studies(param: str, *patterns):
+    retval = []
+
+    if lookup(dpath="comparison/studies", within=config) is None:
+        print("No random simulation data given.")
+        return retval
+
+    sim = lookup(dpath=f"comparison/studies/{param}", within=config)
+    for mutation_rate in sim["mutation_rate"]:
+        random.seed(lookup(dpath="comparison/seed", within=config))
+        sequences = [
+            generate_random_sequence_and_seed_pair(
+                seq_len=random.choice(range(10, 21)),
+                mutation_rate=mutation_rate,
+                modifications=workflow.source_path("../resources/masses.tsv"),
+            )
+            for _ in range(lookup(dpath="comparison/num_sequences", within=config))
+        ]
+
+    for seq in sequences:
+        for value in sim[param]:
+            file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
+            os.makedirs(os.path.dirname(file_name), exist_ok=True)
+            with open(file_name, "w") as f:
+                f.write(str(seq[1]))
+
+            retval += collect(
+                patterns,
+                parameter=param,
+                value=value,
+                seq=seq[0],
+            )
+
+    return retval
+
+
 def collect_simulations(*patterns):
     retval = []
 

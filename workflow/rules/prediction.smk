@@ -15,7 +15,7 @@ rule lionelmssq_experiment:
         "benchmarks/lionelmssq/experiment/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
-    threads: 64
+    threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
@@ -41,7 +41,33 @@ rule lionelmssq_simulation:
         "benchmarks/lionelmssq/simulation/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/lionelmssq.yaml"
-    threads: 64
+    threads: 1
+    shell:
+        "lionelmssq --fragments {input.fragments} --meta {input.meta} "
+        "--fragment-predictions {output.predictions} "
+        "--sequence-prediction {output.sequence} "
+        "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
+        "--solver {params.solver} "
+        "--threads {threads} "
+        "2> {log}"
+
+
+rule lionelmssq_comparison_study:
+    input:
+        fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
+        meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+    output:
+        predictions="results/comparison_study/{parameter}/{value}/{seq}/sample.tsv",
+        sequence="results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
+    params:
+        solver=config["solver"],
+    log:
+        "logs/comparison_study/{parameter}/{value}/{seq}/sample.log",
+    benchmark:
+        "benchmarks/comparison_study/{parameter}/{value}/{seq}/sample.tsv"
+    conda:
+        "../envs/lionelmssq.yaml"
+    threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "

@@ -1,6 +1,7 @@
 /.idea
 /.snakemake
 /benchmarks
+/comparison_study
 /results
 /logs
 /data/experiment/*/0.raw
