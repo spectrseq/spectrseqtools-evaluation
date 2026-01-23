@@ -138,19 +138,20 @@ def collect_comparison_studies(param: str, *patterns):
             for _ in range(lookup(dpath="comparison/num_sequences", within=config))
         ]
 
-    for seq in sequences:
-        for value in sim[param]:
-            file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
-            os.makedirs(os.path.dirname(file_name), exist_ok=True)
-            with open(file_name, "w") as f:
-                f.write(str(seq[1]))
+        for seq in sequences:
+            values = sim[param] if param != "mutation_rate" else [mutation_rate]
+            for value in values:
+                file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
+                os.makedirs(os.path.dirname(file_name), exist_ok=True)
+                with open(file_name, "w") as f:
+                    f.write(str(seq[1]))
 
-            retval += collect(
-                patterns,
-                parameter=param,
-                value=value,
-                seq=seq[0],
-            )
+                retval += collect(
+                    patterns,
+                    parameter=param,
+                    value=value,
+                    seq=seq[0],
+                )
 
     return retval
 
