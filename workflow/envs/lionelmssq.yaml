@@ -26,7 +26,7 @@ dependencies:
   - gurobi <13.0
   - pip
   - pip:
-#    - -e /home/laura/Uni/RNA/Git/lionelmssq
-    - git+https://github.com/koesterlab/lionelmssq.git
+#    - -e /home/laura/Uni/RNA/Git/spectrseqtools
+    - git+https://github.com/spectrseq/spectrseqtools.git
     - dbscan1d >=0.2.3,<0.3
     - pulp >=2.3.0,<3.0
