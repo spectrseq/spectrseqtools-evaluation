@@ -1,0 +1,13 @@
+cores: 28
+
+rerun-incomplete: True
+
+configfile:
+  - 'config/config.yaml'
+  - 'config/data/experiment.yaml'
+  - 'config/data/simulation.yaml'
+  - 'config/data/comparison_study.yaml'
+
+use-conda: True
+
+default-storage-prefix: 's3://koesterlab/spectrseq/paper_evaluation'
