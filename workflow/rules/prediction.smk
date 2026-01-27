@@ -30,6 +30,7 @@ rule lionelmssq_simulation:
     input:
         fragments="data/simulation/{seq}/{n_fragments}.tsv",
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
+        singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
     output:
         predictions="results/lionelmssq/simulation/{seq}/{n_fragments}.tsv",
         sequence="results/lionelmssq/simulation/{seq}/{n_fragments}.fasta",
