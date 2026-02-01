@@ -26,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_SNAKEMAKE_SNAKEFMT: true
 
-  # TODO activate linting once lionelmssq is a proper package
+  # TODO activate linting once spectrseqtools is a proper package
   # linting:
   #   runs-on: ubuntu-latest
   #   steps:

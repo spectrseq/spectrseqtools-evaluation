@@ -1,28 +1,28 @@
 include: "common.smk"
 
 
-rule plot_lionelmssq_prediction:
+rule plot_prediction:
     input:
-        pred_fragments="results/lionelmssq/{modus}/{seq}/{n_fragments}.tsv",
-        pred_seq="results/lionelmssq/{modus}/{seq}/{n_fragments}.fasta",
+        pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
+        pred_seq="results/prediction/{modus}/{seq}/{n_fragments}.fasta",
         sim="data/{modus}/{seq}/{n_fragments}.tsv",
     output:
-        "results/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.html",
+        "results/plots/prediction/{modus}/{seq}/{n_fragments}.html",
     log:
-        "logs/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.log",
+        "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
     benchmark:
-        "benchmarks/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.tsv"
+        "benchmarks/plots/prediction/{modus}/{seq}/{n_fragments}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
     script:
-        "../scripts/plot_lionelmssq_prediction.py"
+        "../scripts/plot_prediction.py"
 
 
 rule evaluate_custom_simulation:
     input:
         collect_custom_simulations(
-            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
+            "results/prediction/simulation/{seq}/{n_fragments}.fasta"
         ),
     output:
         "results/evaluation/custom_simulation.tsv",
@@ -93,7 +93,7 @@ rule plot_evaluation_parameter_study:
 rule evaluate_random_simulation:
     input:
         collect_random_simulations(
-            "results/lionelmssq/simulation/{seq}/{n_fragments}.fasta"
+            "results/prediction/simulation/{seq}/{n_fragments}.fasta"
         ),
     output:
         "results/evaluation/random_simulation.tsv",
@@ -127,7 +127,7 @@ rule plot_evaluation_random_simulation:
 
 rule evaluate_experiment:
     input:
-        collect_experiments("results/lionelmssq/experiment/{seq}/{n_fragments}.fasta"),
+        collect_experiments("results/prediction/experiment/{seq}/{n_fragments}.fasta"),
     output:
         "results/evaluation/experiment.tsv",
     log:

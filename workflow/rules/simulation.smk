@@ -39,7 +39,7 @@ rule simulate_for_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     script:
-        "../scripts/simulate_rna_measurement.py"
+        "../scripts/simulate_fragments.py"
 
 
 rule simulate_measurement:
@@ -72,7 +72,7 @@ rule simulate_measurement:
         "../envs/spectrseqtools.yaml"
     threads: 1
     script:
-        "../scripts/simulate_rna_measurement.py"
+        "../scripts/simulate_fragments.py"
 
 
 rule plot_simulated_fragments:
