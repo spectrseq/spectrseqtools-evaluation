@@ -36,7 +36,7 @@ rule simulate_for_comparison_study:
     benchmark:
         "benchmarks/comparison_study/{parameter}/{value}/{seq}/sample.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/simulate_rna_measurement.py"
@@ -69,7 +69,7 @@ rule simulate_measurement:
     benchmark:
         "benchmarks/simulation/{seq}/{n_fragments}.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/simulate_rna_measurement.py"

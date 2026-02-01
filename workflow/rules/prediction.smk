@@ -14,7 +14,7 @@ rule lionelmssq_experiment:
     benchmark:
         "benchmarks/lionelmssq/experiment/{seq}/{n_fragments}.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
@@ -41,7 +41,7 @@ rule lionelmssq_simulation:
     benchmark:
         "benchmarks/lionelmssq/simulation/{seq}/{n_fragments}.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "
@@ -67,7 +67,7 @@ rule lionelmssq_comparison_study:
     benchmark:
         "benchmarks/comparison_study/{parameter}/{value}/{seq}/sample.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
         "lionelmssq --fragments {input.fragments} --meta {input.meta} "

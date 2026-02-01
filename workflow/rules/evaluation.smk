@@ -13,7 +13,7 @@ rule plot_lionelmssq_prediction:
     benchmark:
         "benchmarks/plots/lionelmssq_prediction/{modus}/{seq}/{n_fragments}.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/plot_lionelmssq_prediction.py"
@@ -31,7 +31,7 @@ rule evaluate_custom_simulation:
     benchmark:
         "benchmarks/evaluation/custom_simulation.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/evaluate_prediction.py"
@@ -48,7 +48,7 @@ rule plot_evaluation_custom_simulation:
     benchmark:
         "benchmarks/plots/evaluation/custom_simulation.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/plot_evaluation.py"
@@ -67,7 +67,7 @@ rule evaluate_parameter_comparison:
     benchmark:
         "benchmarks/comparison_study/{parameter}/evaluation.log"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/evaluate_prediction.py"
@@ -84,7 +84,7 @@ rule plot_evaluation_parameter_study:
     benchmark:
         "benchmarks/plots/comparison_study/{parameter}.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/plot_evaluation.py"
@@ -102,7 +102,7 @@ rule evaluate_random_simulation:
     benchmark:
         "benchmarks/evaluation/random_simulation.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/evaluate_prediction.py"
@@ -119,7 +119,7 @@ rule plot_evaluation_random_simulation:
     benchmark:
         "benchmarks/plots/evaluation/random_simulation.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/plot_evaluation.py"
@@ -135,7 +135,7 @@ rule evaluate_experiment:
     benchmark:
         "benchmarks/evaluation/experiment.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/evaluate_prediction.py"
@@ -152,7 +152,7 @@ rule plot_evaluation_experiment:
     benchmark:
         "benchmarks/plots/evaluation/experiment.tsv"
     conda:
-        "../envs/lionelmssq.yaml"
+        "../envs/spectrseqtools.yaml"
     threads: 1
     script:
         "../scripts/plot_evaluation.py"
