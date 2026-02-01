@@ -2,8 +2,8 @@ import polars as pl
 import sys
 from typing import List
 
-from lionelmssq.common import parse_nucleosides
-from lionelmssq.masses import EXPLANATION_MASSES
+from spectrseqtools.common import parse_nucleosides
+from spectrseqtools.masses import EXPLANATION_MASSES
 
 
 NUC_REPS = {

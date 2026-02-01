@@ -17,7 +17,7 @@ rule lionelmssq_experiment:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "lionelmssq --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
@@ -44,7 +44,7 @@ rule lionelmssq_simulation:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "lionelmssq --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "
@@ -70,7 +70,7 @@ rule lionelmssq_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "lionelmssq --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'lionelmssq_prediction_from_sim_{wildcards.seq}' "

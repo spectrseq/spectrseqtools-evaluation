@@ -1,9 +1,9 @@
 import sys
 import polars as pl
 
-from lionelmssq.common import parse_nucleosides
-from lionelmssq.plotting import plot_prediction
-from lionelmssq.prediction import Prediction
+from spectrseqtools.common import parse_nucleosides
+from spectrseqtools.plotting import plot_prediction
+from spectrseqtools.prediction import Prediction
 
 
 if "snakemake" in locals():

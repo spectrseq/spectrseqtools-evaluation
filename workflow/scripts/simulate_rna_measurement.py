@@ -6,7 +6,7 @@ import numpy as np
 from pathlib import Path
 from typing import List
 
-from lionelmssq.common import parse_nucleosides
+from spectrseqtools.common import parse_nucleosides
 
 
 GHOST_FRAGMENT_MAGNITUDE = 1000
