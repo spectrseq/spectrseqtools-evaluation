@@ -77,3 +77,55 @@ rule prediction_comparison_study:
         "--solver {params.solver} "
         "--threads {threads} "
         "2> {log}"
+
+
+rule prediction_optimization_study:
+    input:
+        fragments="data/experiment/{seq}/0.raw",
+        meta="data/experiment/{seq}/0.meta.yaml",
+    output:
+        meta="results/optimization/{parameter}/{value}/{seq}/0.preprocessed.meta.yaml",
+        fragments="results/optimization/{parameter}/{value}/{seq}/0.tsv",
+        singletons="results/optimization/{parameter}/{value}/{seq}/0.singletons.tsv",
+        predictions="results/optimization/{parameter}/{value}/{seq}/sample.tsv",
+        sequence="results/optimization/{parameter}/{value}/{seq}/sample.fasta",
+    params:
+        solver=config["solver"],
+        intensity_cutoff=lambda wildcards: wildcards.value
+        if wildcards.parameter == "intensity_cutoff"
+        else lookup(
+            dpath=f"optimization/{wildcards.parameter}/intensity_cutoff",
+            within=config,
+        )[0],
+        lp_timeout_long=lambda wildcards: wildcards.value
+        if wildcards.parameter == "lp_timeout_long"
+        else lookup(
+            dpath=f"optimization/{wildcards.parameter}/lp_timeout_long",
+            within=config,
+        )[0],
+        lp_timeout_short=lambda wildcards: wildcards.value
+        if wildcards.parameter == "lp_timeout_short"
+        else lookup(
+            dpath=f"optimization/{wildcards.parameter}/lp_timeout_short",
+            within=config,
+        )[0],
+        dir="results/optimization/{parameter}/{value}/{seq}/",
+    log:
+        "logs/optimization/{parameter}/{value}/{seq}/sample.log",
+    benchmark:
+        "benchmarks/optimization/{parameter}/{value}/{seq}/sample.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    shell:
+        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
+        "--fragment-predictions {output.predictions} "
+        "--sequence-prediction {output.sequence} "
+        "--sequence-name 'spectrseqtools_prediction_{wildcards.seq}' "
+        "--solver {params.solver} "
+        "--threads {threads} "
+        "--cutoff-percentile {params.intensity_cutoff} "
+        "--lp-timeout-long {params.lp_timeout_long} "
+        "--lp-timeout-short {params.lp_timeout_short} "
+        "--output-dir {params.dir} "
+        "2> {log}"

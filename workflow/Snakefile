@@ -37,6 +37,14 @@ rule all_comparisons:
         ),
 
 
+rule all_optimizations:
+    input:
+        collect(
+            "results/plots/optimization/{parameter}.bar.html",
+            parameter=lookup(dpath="optimization", within=config),
+        ),
+
+
 rule all:
     input:
         rules.all_custom_simulation.input,
@@ -44,4 +52,5 @@ rule all:
         rules.all_experiments.input,
         # rules.all_plots.input,
         # rules.all_comparisons.input,
+        rules.all_optimizations.input,
     default_target: True

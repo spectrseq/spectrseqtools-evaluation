@@ -65,6 +65,8 @@ rule evaluate_parameter_comparison:
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
+    params:
+        mode="simulation",
     log:
         "logs/comparison_study/{parameter}/evaluation.log",
     benchmark:
@@ -86,6 +88,44 @@ rule plot_evaluation_parameter_study:
         "logs/plots/comparison_study/{parameter}.log",
     benchmark:
         "benchmarks/plots/comparison_study/{parameter}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_evaluation.py"
+
+
+rule evaluate_optimization_study:
+    input:
+        lambda wildcards: collect_optimizations(
+            wildcards.parameter,
+            "results/optimization/{parameter}/{value}/{seq}/sample.fasta",
+        ),
+    output:
+        "results/optimization/{parameter}/evaluation.tsv",
+    params:
+        mode="optimization",
+    log:
+        "logs/optimization/{parameter}/evaluation.log",
+    benchmark:
+        "benchmarks/optimization/{parameter}/evaluation.log"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_prediction.py"
+
+
+rule plot_optimization_study:
+    input:
+        "results/optimization/{parameter}/evaluation.tsv",
+    output:
+        donut="results/plots/optimization/{parameter}.donut.html",
+        bar="results/plots/optimization/{parameter}.bar.html",
+    log:
+        "logs/plots/optimization/{parameter}.log",
+    benchmark:
+        "benchmarks/plots/optimization/{parameter}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1

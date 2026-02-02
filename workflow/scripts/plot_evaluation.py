@@ -44,7 +44,7 @@ if "snakemake" in locals():
             data=results, param=smk.wildcards.parameter if smk.wildcards else ""
         )
 
-        if len(results) > 1:
+        if smk.wildcards:
             layer |= create_heatmap(
                 data=results, param=smk.wildcards.parameter if smk.wildcards else ""
             )
@@ -165,15 +165,23 @@ def select_x_axis(param: str):
         case "mutation_rate":
             return alt.X("mutation_rate:N", title="Mutation Rate")
         case "num_copies":
-            return alt.X("num_copies:N", title="Number of Sequence Copies")
+            return alt.X("num_copies:N", title="Number of sequence replicates")
         case "max_singletons":
-            return alt.X("max_singletons:N", title="Maximum Number of Singletons")
+            return alt.X(
+                "max_singletons:N", title="Maximum number of false positive singletons"
+            )
         case "ghost_rate":
-            return alt.X("ghost_rate:N", title="Ghost Rate")
+            return alt.X("ghost_rate:N", title="Phantom rate")
         case "rel_error_rate":
-            return alt.X("rel_error_rate:N", title="Relative Error Rate")
+            return alt.X("rel_error_rate:N", title="Relative error rate")
+        case "intensity_cutoff":
+            return alt.X("intensity_cutoff:N", title="Intensity cutoff percentile")
+        case "lp_timeout_long":
+            return alt.X("lp_timeout_long:N", title="Timeout (full LP) ")
+        case "lp_timeout_short":
+            return alt.X("lp_timeout_short:N", title="Timeout (reduced LP) ")
         case _:
-            return alt.X("true_len:N", title="Sequence Length")
+            return alt.X("true_len:N", title="Sequence length")
 
 
 if __name__ == "__main__":

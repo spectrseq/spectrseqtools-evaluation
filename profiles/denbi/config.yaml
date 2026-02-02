@@ -7,6 +7,7 @@ configfile:
   - 'config/data/experiment.yaml'
   - 'config/data/simulation.yaml'
   - 'config/data/comparison_study.yaml'
+  - 'config/data/optimization.yaml'
 
 use-conda: True
 
