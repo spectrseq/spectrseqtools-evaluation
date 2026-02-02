@@ -19,13 +19,16 @@ if "snakemake" in locals():
         true_seq = parse_nucleosides(smk.wildcards.seq)
         simulation = pl.read_csv(smk.input.sim, separator="\t")
 
-        chart = plot_prediction(
+        charts = plot_prediction(
             prediction,
             true_seq,
             simulation if smk.wildcards.modus == "simulation" else None,
         )
 
-        chart.save(smk.output[0])
+        charts[0].save(smk.output["start"])
+        charts[1].save(smk.output["end"])
+        charts[2].save(smk.output["internal"])
+        charts[3].save(smk.output["all"])
 
 
 if __name__ == "__main__":
