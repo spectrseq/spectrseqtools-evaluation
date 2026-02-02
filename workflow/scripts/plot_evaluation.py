@@ -40,10 +40,16 @@ if "snakemake" in locals():
         donut_chart = create_donut_plot(data=results)
         donut_chart.save(smk.output["donut"])
 
-        bar_chart = create_stacked_barplot(
+        layer = create_stacked_barplot(
             data=results, param=smk.wildcards.parameter if smk.wildcards else ""
         )
-        bar_chart.save(smk.output["bar"])
+
+        if len(results) > 1:
+            layer |= create_heatmap(
+                data=results, param=smk.wildcards.parameter if smk.wildcards else ""
+            )
+
+        layer.save(smk.output["bar"])
 
 
 def create_donut_plot(data: pl.DataFrame) -> alt.Chart:
@@ -109,6 +115,46 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
         )
     )
     return chart
+
+
+def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
+    """Create heatmaps over given column.
+
+    Parameters
+    ----------
+    data : polars.Dataframe
+        Dataframe containing prediction data.
+    param : str
+        Column name of chosen parameter.
+
+    Returns
+    -------
+    altair.Chart
+        Heatmap layer over chosen column.
+
+    """
+    heatmap = (
+        alt.Chart(data)
+        .mark_rect()
+        .encode(
+            alt.X("true_sequence:N", title="Sequence"),
+            alt.Y(f"{param}:N", title=param, sort="descending"),
+            alt.Color(
+                "result:N",
+                scale=alt.Scale(
+                    domain=STATUS_ORDER,
+                    range=[
+                        STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
+                        for stat in STATUS_ORDER
+                    ],
+                ),
+                legend=alt.Legend(orient="left"),
+            ),
+            tooltip=["true_sequence", param, "result"],
+        )
+    )
+
+    return heatmap
 
 
 def select_x_axis(param: str):
