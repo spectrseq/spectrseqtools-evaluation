@@ -23,7 +23,7 @@ if "snakemake" in locals():
             prediction,
             true_seq,
             # simulation if smk.wildcards.modus == "simulation" else None,
-            None
+            None,
         )
 
         charts[0].save(smk.output["start"])
