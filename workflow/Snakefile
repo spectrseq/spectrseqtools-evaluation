@@ -21,6 +21,7 @@ rule all_experiments:
 
 rule all_plots:
     input:
+        collect_experiments("results/plots/spectra/experiment/{seq}/{n_fragments}.html"),
         collect_experiments(
             "results/plots/prediction/experiment/{seq}/{n_fragments}.html"
         ),
@@ -50,7 +51,7 @@ rule all:
         rules.all_custom_simulation.input,
         # rules.all_random_simulation.input,
         rules.all_experiments.input,
-        # rules.all_plots.input,
+        rules.all_plots.input,
         # rules.all_comparisons.input,
         rules.all_optimizations.input,
     default_target: True

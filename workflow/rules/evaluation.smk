@@ -199,3 +199,20 @@ rule plot_evaluation_experiment:
     threads: 1
     script:
         "../scripts/plot_evaluation.py"
+
+
+rule plot_spectra:
+    input:
+        raw_fragments="data/{modus}/{seq}/{n_fragments}.standard_unit_fragments.tsv",
+        pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
+    output:
+        "results/plots/spectra/{modus}/{seq}/{n_fragments}.html",
+    log:
+        "logs/plots/spectra/{modus}/{seq}/{n_fragments}.log",
+    benchmark:
+        "benchmarks/plots/spectra/{modus}/{seq}/{n_fragments}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_spectra.py"
