@@ -1,0 +1,12 @@
+optimization:
+  intensity_cutoff:
+    intensity_cutoff: [00, 75, 95]
+#    intensity_cutoff: [00, 05, 10, 15, 20, 25, 30, 35, 40, 45,
+#                       50, 55, 60, 65, 70, 75, 80, 85, 90, 95]
+    lp_timeout_long: [60]
+    lp_timeout_short: [5]
+#  lp_timeout_long:
+#    intensity_cutoff: [75]
+#    lp_timeout_long: [15, 30, 60, 90, 120, 150, 180, 240, 300, 600]
+#    lp_timeout_short: [5]
+

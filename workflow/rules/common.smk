@@ -178,3 +178,26 @@ def collect_experiments(*patterns):
         )
         for item in lookup(dpath="experiment", within=config)
     ]
+
+
+def collect_optimizations(param: str, *patterns):
+    if lookup(dpath="experiment", within=config) is None:
+        print("No evaluation data given.")
+        return []
+
+    if lookup(dpath=f"optimization/{param}", within=config) is None:
+        print("No optimization studies given.")
+        return []
+
+    retval = []
+    for value in lookup(dpath=f"optimization/{param}/{param}", within=config):
+        for item in lookup(dpath="experiment", within=config):
+            retval += collect(
+                patterns,
+                parameter=param,
+                value=value,
+                seq=item["seq"],
+                n_fragments=item["fragments"],
+            )
+
+    return retval

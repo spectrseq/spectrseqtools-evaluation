@@ -32,7 +32,7 @@ if "snakemake" in locals():
         results = collect_results(smk.input)
 
         if smk.wildcards:
-            params = smk.config["comparison"]["studies"][smk.wildcards.parameter]
+            params = select_params(smk)
             for key in params:
                 if key == smk.wildcards.parameter:
                     continue
@@ -40,6 +40,16 @@ if "snakemake" in locals():
             results = results.rename({"comp_val": smk.wildcards.parameter})
 
         results.write_csv(smk.output[0], separator="\t")
+
+
+def select_params(smk) -> dict:
+    match smk.params["mode"]:
+        case "optimization":
+            return smk.config["optimization"][smk.wildcards.parameter]
+        case "simulation":
+            return smk.config["comparison"]["studies"][smk.wildcards.parameter]
+        case _:
+            return {}
 
 
 def collect_results(files: List[str]) -> List[str]:

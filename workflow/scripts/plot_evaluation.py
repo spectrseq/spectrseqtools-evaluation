@@ -40,10 +40,16 @@ if "snakemake" in locals():
         donut_chart = create_donut_plot(data=results)
         donut_chart.save(smk.output["donut"])
 
-        bar_chart = create_stacked_barplot(
+        layer = create_stacked_barplot(
             data=results, param=smk.wildcards.parameter if smk.wildcards else ""
         )
-        bar_chart.save(smk.output["bar"])
+
+        if smk.wildcards:
+            layer |= create_heatmap(
+                data=results, param=smk.wildcards.parameter if smk.wildcards else ""
+            )
+
+        layer.save(smk.output["bar"])
 
 
 def create_donut_plot(data: pl.DataFrame) -> alt.Chart:
@@ -85,11 +91,13 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
 
     """
     chart = (
-        alt.Chart(data, title="Status Assessment")
+        alt.Chart(
+            data,  # title="Status Assessment"
+        )
         .mark_bar()
         .encode(
             x=select_x_axis(param=param),
-            y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of Sequences"),
+            y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of sequences"),
             color=alt.Color(
                 "result:N",
                 scale=alt.Scale(
@@ -100,7 +108,8 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                     ],
                 ),
                 legend=alt.Legend(
-                    **LEGEND_PARAMS, orient="right", title="Prediction Status"
+                    **LEGEND_PARAMS,
+                    orient="right",  # title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
@@ -111,20 +120,68 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
     return chart
 
 
+def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
+    """Create heatmaps over given column.
+
+    Parameters
+    ----------
+    data : polars.Dataframe
+        Dataframe containing prediction data.
+    param : str
+        Column name of chosen parameter.
+
+    Returns
+    -------
+    altair.Chart
+        Heatmap layer over chosen column.
+
+    """
+    heatmap = (
+        alt.Chart(data)
+        .mark_rect()
+        .encode(
+            alt.X("true_sequence:N", title="Sequence"),
+            alt.Y(f"{param}:N", title=param, sort="descending"),
+            alt.Color(
+                "result:N",
+                scale=alt.Scale(
+                    domain=STATUS_ORDER,
+                    range=[
+                        STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
+                        for stat in STATUS_ORDER
+                    ],
+                ),
+                legend=alt.Legend(orient="left"),
+            ),
+            tooltip=["true_sequence", param, "result"],
+        )
+    )
+
+    return heatmap
+
+
 def select_x_axis(param: str):
     match param:
         case "mutation_rate":
             return alt.X("mutation_rate:N", title="Mutation Rate")
         case "num_copies":
-            return alt.X("num_copies:N", title="Number of Sequence Copies")
+            return alt.X("num_copies:N", title="Number of sequence replicates")
         case "max_singletons":
-            return alt.X("max_singletons:N", title="Maximum Number of Singletons")
+            return alt.X(
+                "max_singletons:N", title="Maximum number of false positive singletons"
+            )
         case "ghost_rate":
-            return alt.X("ghost_rate:N", title="Ghost Rate")
+            return alt.X("ghost_rate:N", title="Phantom rate")
         case "rel_error_rate":
-            return alt.X("rel_error_rate:N", title="Relative Error Rate")
+            return alt.X("rel_error_rate:N", title="Relative error rate")
+        case "intensity_cutoff":
+            return alt.X("intensity_cutoff:N", title="Intensity cutoff percentile")
+        case "lp_timeout_long":
+            return alt.X("lp_timeout_long:N", title="Timeout (full LP) ")
+        case "lp_timeout_short":
+            return alt.X("lp_timeout_short:N", title="Timeout (reduced LP) ")
         case _:
-            return alt.X("true_len:N", title="Sequence Length")
+            return alt.X("true_len:N", title="Sequence length")
 
 
 if __name__ == "__main__":

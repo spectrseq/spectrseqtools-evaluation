@@ -32,9 +32,9 @@ rule simulate_for_comparison_study:
             within=config,
         )[0],
     log:
-        "logs/comparison_study/{parameter}/{value}/{seq}/sample.log",
+        "logs/comparison_study/{parameter}/{value}/{seq}/simulation.log",
     benchmark:
-        "benchmarks/comparison_study/{parameter}/{value}/{seq}/sample.tsv"
+        "benchmarks/comparison_study/{parameter}/{value}/{seq}/simulation.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
