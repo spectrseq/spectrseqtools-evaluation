@@ -63,9 +63,9 @@ rule prediction_comparison_study:
     params:
         solver=config["solver"],
     log:
-        "logs/comparison_study/{parameter}/{value}/{seq}/sample.log",
+        "logs/comparison_study/{parameter}/{value}/{seq}/prediction.log",
     benchmark:
-        "benchmarks/comparison_study/{parameter}/{value}/{seq}/sample.tsv"
+        "benchmarks/comparison_study/{parameter}/{value}/{seq}/prediction.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
