@@ -5,6 +5,7 @@ rule prediction_experiment:
     output:
         fragments="data/experiment/{seq}/{n_fragments}.tsv",
         singletons="data/experiment/{seq}/{n_fragments}.singletons.tsv",
+        su_fragments="data/experiment/{seq}/{n_fragments}.standard_unit_fragments.tsv",
         predictions="results/prediction/experiment/{seq}/{n_fragments}.tsv",
         sequence="results/prediction/experiment/{seq}/{n_fragments}.fasta",
     params:
@@ -32,6 +33,7 @@ rule prediction_simulation:
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
         singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
     output:
+        su_fragments="data/simulation/{seq}/{n_fragments}.standard_unit_fragments.tsv",
         predictions="results/prediction/simulation/{seq}/{n_fragments}.tsv",
         sequence="results/prediction/simulation/{seq}/{n_fragments}.fasta",
     params:
