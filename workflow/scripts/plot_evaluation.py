@@ -91,11 +91,13 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
 
     """
     chart = (
-        alt.Chart(data, title="Status Assessment")
+        alt.Chart(
+            data,  # title="Status Assessment"
+        )
         .mark_bar()
         .encode(
             x=select_x_axis(param=param),
-            y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of Sequences"),
+            y=alt.Y("count(result):Q", sort=STATUS_ORDER, title="Number of sequences"),
             color=alt.Color(
                 "result:N",
                 scale=alt.Scale(
@@ -106,7 +108,8 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                     ],
                 ),
                 legend=alt.Legend(
-                    **LEGEND_PARAMS, orient="right", title="Prediction Status"
+                    **LEGEND_PARAMS,
+                    orient="right",  # title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
