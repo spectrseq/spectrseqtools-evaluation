@@ -44,10 +44,10 @@ if "snakemake" in locals():
             data=results, param=smk.wildcards.parameter if smk.wildcards else ""
         )
 
-        if smk.wildcards:
-            layer |= create_heatmap(
-                data=results, param=smk.wildcards.parameter if smk.wildcards else ""
-            )
+        layer |= create_heatmap(
+            data=results, param=smk.wildcards.parameter if smk.wildcards
+            else "true_len"
+        )
 
         layer.save(smk.output["bar"])
 
