@@ -19,6 +19,7 @@ rule plot_prediction:
                 "sequence": "{seq}",
                 "type": "alignment"
             },
+            caption="../report/quality_control.alignment.rst",
         )
     log:
         "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
@@ -60,6 +61,7 @@ rule plot_evaluation_custom_simulation:
             labels={
                 "type": "simulation data"
             },
+            caption="../report/robustness.data.rst",
         ),
     log:
         "logs/plots/evaluation/custom_simulation.log",
@@ -105,6 +107,7 @@ rule plot_evaluation_parameter_study:
                 "type": "comparison",
                 "parameter": "{parameter}"
             },
+            caption="../report/robustness.comparison.rst",
         ),
     log:
         "logs/plots/comparison_study/{parameter}.log",
@@ -150,6 +153,7 @@ rule plot_optimization_study:
                 "type": "optimization",
                 "parameter": "{parameter}"
             },
+            caption="../report/robustness.optimization.rst",
         ),
     log:
         "logs/plots/optimization/{parameter}.log",
@@ -224,6 +228,7 @@ rule plot_evaluation_experiment:
             labels={
                 "type": "experiment data"
             },
+            caption="../report/robustness.data.rst",
         ),
     log:
         "logs/plots/evaluation/experiment.log",
@@ -249,6 +254,7 @@ rule plot_spectra:
                 "sequence": "{seq}",
                 "type": "spectrum",
             },
+            caption="../report/quality_control.spectrum.rst",
         ),
     log:
         "logs/plots/spectra/{modus}/{seq}/{n_fragments}.log",

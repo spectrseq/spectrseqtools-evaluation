@@ -3,6 +3,7 @@ include: "rules/simulation.smk"
 include: "rules/prediction.smk"
 include: "rules/evaluation.smk"
 
+report: "report/general.rst"
 
 rule all_custom_simulation:
     input:
@@ -25,7 +26,7 @@ rule all_plots:
         collect_experiments(
             "results/plots/prediction/experiment/{seq}/{n_fragments}.html"
         ),
-        collect_simulations(
+        collect_custom_simulations(
             "results/plots/prediction/simulation/{seq}/{n_fragments}.html"
         ),
 
@@ -53,5 +54,5 @@ rule all:
         rules.all_experiments.input,
         rules.all_plots.input,
         # rules.all_comparisons.input,
-        rules.all_optimizations.input,
+        # rules.all_optimizations.input,
     default_target: True
