@@ -11,7 +11,8 @@ rule plot_prediction:
         start="results/plots/prediction/{modus}/{seq}/{n_fragments}.start.html",
         end="results/plots/prediction/{modus}/{seq}/{n_fragments}.end.html",
         internal="results/plots/prediction/{modus}/{seq}/{n_fragments}.internal.html",
-        all="results/plots/prediction/{modus}/{seq}/{n_fragments}.all.html",
+        all=report("results/plots/prediction/{modus}/{seq}/{n_fragments}.all.html",
+        )
     log:
         "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
     benchmark:
@@ -46,7 +47,8 @@ rule plot_evaluation_custom_simulation:
         "results/evaluation/custom_simulation.tsv",
     output:
         donut="results/plots/evaluation/custom_simulation.donut.html",
-        bar="results/plots/evaluation/custom_simulation.bar.html",
+        bar=report("results/plots/evaluation/custom_simulation.bar.html",
+        ),
     log:
         "logs/plots/evaluation/custom_simulation.log",
     benchmark:
@@ -84,7 +86,8 @@ rule plot_evaluation_parameter_study:
         "results/comparison_study/{parameter}/evaluation.tsv",
     output:
         donut="results/plots/comparison_study/{parameter}.donut.html",
-        bar="results/plots/comparison_study/{parameter}.bar.html",
+        bar=report("results/plots/comparison_study/{parameter}.bar.html",
+        ),
     log:
         "logs/plots/comparison_study/{parameter}.log",
     benchmark:
@@ -122,7 +125,8 @@ rule plot_optimization_study:
         "results/optimization/{parameter}/evaluation.tsv",
     output:
         donut="results/plots/optimization/{parameter}.donut.html",
-        bar="results/plots/optimization/{parameter}.bar.html",
+        bar=report("results/plots/optimization/{parameter}.bar.html",
+        ),
     log:
         "logs/plots/optimization/{parameter}.log",
     benchmark:
@@ -190,7 +194,8 @@ rule plot_evaluation_experiment:
         "results/evaluation/experiment.tsv",
     output:
         donut="results/plots/evaluation/experiment.donut.html",
-        bar="results/plots/evaluation/experiment.bar.html",
+        bar=report("results/plots/evaluation/experiment.bar.html",
+        ),
     log:
         "logs/plots/evaluation/experiment.log",
     benchmark:
@@ -207,7 +212,8 @@ rule plot_spectra:
         raw_fragments="data/{modus}/{seq}/{n_fragments}.standard_unit_fragments.tsv",
         pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
     output:
-        "results/plots/spectra/{modus}/{seq}/{n_fragments}.html",
+        report("results/plots/spectra/{modus}/{seq}/{n_fragments}.html",
+        ),
     log:
         "logs/plots/spectra/{modus}/{seq}/{n_fragments}.log",
     benchmark:
