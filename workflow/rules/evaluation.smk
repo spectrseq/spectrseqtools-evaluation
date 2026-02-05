@@ -12,6 +12,13 @@ rule plot_prediction:
         end="results/plots/prediction/{modus}/{seq}/{n_fragments}.end.html",
         internal="results/plots/prediction/{modus}/{seq}/{n_fragments}.internal.html",
         all=report("results/plots/prediction/{modus}/{seq}/{n_fragments}.all.html",
+            htmlindex="index.html",
+            category="Quality control",
+            subcategory="{modus} data",
+            labels={
+                "sequence": "{seq}",
+                "type": "alignment"
+            },
         )
     log:
         "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
@@ -48,6 +55,11 @@ rule plot_evaluation_custom_simulation:
     output:
         donut="results/plots/evaluation/custom_simulation.donut.html",
         bar=report("results/plots/evaluation/custom_simulation.bar.html",
+            htmlindex="index.html",
+            category="Robustness",
+            labels={
+                "type": "simulation data"
+            },
         ),
     log:
         "logs/plots/evaluation/custom_simulation.log",
@@ -87,6 +99,12 @@ rule plot_evaluation_parameter_study:
     output:
         donut="results/plots/comparison_study/{parameter}.donut.html",
         bar=report("results/plots/comparison_study/{parameter}.bar.html",
+            htmlindex="index.html",
+            category="Robustness",
+            labels={
+                "type": "comparison",
+                "parameter": "{parameter}"
+            },
         ),
     log:
         "logs/plots/comparison_study/{parameter}.log",
@@ -126,6 +144,12 @@ rule plot_optimization_study:
     output:
         donut="results/plots/optimization/{parameter}.donut.html",
         bar=report("results/plots/optimization/{parameter}.bar.html",
+            htmlindex="index.html",
+            category="Robustness",
+            labels={
+                "type": "optimization",
+                "parameter": "{parameter}"
+            },
         ),
     log:
         "logs/plots/optimization/{parameter}.log",
@@ -195,6 +219,11 @@ rule plot_evaluation_experiment:
     output:
         donut="results/plots/evaluation/experiment.donut.html",
         bar=report("results/plots/evaluation/experiment.bar.html",
+            htmlindex="index.html",
+            category="Robustness",
+            labels={
+                "type": "experiment data"
+            },
         ),
     log:
         "logs/plots/evaluation/experiment.log",
@@ -213,6 +242,13 @@ rule plot_spectra:
         pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
     output:
         report("results/plots/spectra/{modus}/{seq}/{n_fragments}.html",
+            htmlindex="index.html",
+            category="Quality control",
+            subcategory="{modus} data",
+            labels={
+                "sequence": "{seq}",
+                "type": "spectrum",
+            },
         ),
     log:
         "logs/plots/spectra/{modus}/{seq}/{n_fragments}.log",
