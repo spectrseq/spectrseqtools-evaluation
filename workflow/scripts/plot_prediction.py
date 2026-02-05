@@ -29,7 +29,9 @@ if "snakemake" in locals():
         charts[0].save(smk.output["start"])
         charts[1].save(smk.output["end"])
         charts[2].save(smk.output["internal"])
-        charts[3].save(smk.output["all"])
+        charts[3].save(smk.output["any"])
+
+        (charts[0] | charts[1] | charts[2]).save(smk.output["all"])
 
 
 if __name__ == "__main__":

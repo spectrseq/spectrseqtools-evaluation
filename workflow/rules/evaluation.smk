@@ -7,10 +7,11 @@ rule plot_prediction:
         pred_seq="results/prediction/{modus}/{seq}/{n_fragments}.fasta",
         sim="data/{modus}/{seq}/{n_fragments}.tsv",
     output:
-        all="results/plots/prediction/{modus}/{seq}/{n_fragments}.html",
+        any="results/plots/prediction/{modus}/{seq}/{n_fragments}.html",
         start="results/plots/prediction/{modus}/{seq}/{n_fragments}.start.html",
         end="results/plots/prediction/{modus}/{seq}/{n_fragments}.end.html",
         internal="results/plots/prediction/{modus}/{seq}/{n_fragments}.internal.html",
+        all="results/plots/prediction/{modus}/{seq}/{n_fragments}.all.html",
     log:
         "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
     benchmark:
