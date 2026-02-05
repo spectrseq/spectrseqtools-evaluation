@@ -45,8 +45,7 @@ if "snakemake" in locals():
         )
 
         layer |= create_heatmap(
-            data=results, param=smk.wildcards.parameter if smk.wildcards
-            else "true_len"
+            data=results, param=smk.wildcards.parameter if smk.wildcards else "true_len"
         )
 
         layer.save(smk.output["bar"])
