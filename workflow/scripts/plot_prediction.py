@@ -1,5 +1,4 @@
 import sys
-import polars as pl
 
 from spectrseqtools.common import parse_nucleosides
 from spectrseqtools.plotting import plot_prediction
