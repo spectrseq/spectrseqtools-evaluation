@@ -44,10 +44,9 @@ if "snakemake" in locals():
             data=results, param=smk.wildcards.parameter if smk.wildcards else ""
         )
 
-        if smk.wildcards:
-            layer |= create_heatmap(
-                data=results, param=smk.wildcards.parameter if smk.wildcards else ""
-            )
+        layer |= create_heatmap(
+            data=results, param=smk.wildcards.parameter if smk.wildcards else "true_len"
+        )
 
         layer.save(smk.output["bar"])
 
@@ -109,7 +108,7 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                 ),
                 legend=alt.Legend(
                     **LEGEND_PARAMS,
-                    orient="right",  # title="Prediction status"
+                    orient="left",  # title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
@@ -151,7 +150,6 @@ def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
                         for stat in STATUS_ORDER
                     ],
                 ),
-                legend=alt.Legend(orient="left"),
             ),
             tooltip=["true_sequence", param, "result"],
         )

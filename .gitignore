@@ -12,6 +12,7 @@
 /resources
 /gurobi.log
 /report
+/report.html
 /report.zip
 __pycache__
 .pytest_cache
