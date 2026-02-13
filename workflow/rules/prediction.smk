@@ -111,7 +111,8 @@ rule prediction_optimization_study:
             dpath=f"optimization/{wildcards.parameter}/lp_timeout_short",
             within=config,
         )[0],
-        dir="results/optimization/{parameter}/{value}/{seq}/",
+        dir=subpath(output.fragments, parent=True),
+        # dir="results/optimization/{parameter}/{value}/{seq}/",
     log:
         "logs/optimization/{parameter}/{value}/{seq}/sample.log",
     benchmark:
