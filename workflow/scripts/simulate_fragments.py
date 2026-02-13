@@ -1,5 +1,4 @@
 import sys
-import os
 import polars as pl
 import yaml
 import numpy as np

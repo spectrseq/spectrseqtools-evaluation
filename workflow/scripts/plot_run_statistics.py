@@ -39,19 +39,19 @@ if "snakemake" in locals():
         mode = smk.params["mode"]
 
         sim_results = pl.read_csv(smk.input["sim"], separator="\t")
-        sim_chart = create_scatterplot(data=sim_results, color="#990000",
-                                       mode=mode)
+        sim_chart = create_scatterplot(data=sim_results, color="#990000", mode=mode)
 
         exp_results = pl.read_csv(smk.input["exp"], separator="\t")
-        exp_chart = create_scatterplot(data=exp_results, color="purple",
-                                       size=25, mode=mode)
+        exp_chart = create_scatterplot(
+            data=exp_results, color="purple", size=25, mode=mode
+        )
 
         chart = sim_chart + exp_chart
 
         chart.save(smk.output[0])
 
 
-def create_scatterplot(data: pl.DataFrame, color: str, mode: str, size: int=10):
+def create_scatterplot(data: pl.DataFrame, color: str, mode: str, size: int = 10):
     base_chart = (
         alt.Chart(data)
         .encode(
@@ -74,11 +74,23 @@ def create_scatterplot(data: pl.DataFrame, color: str, mode: str, size: int=10):
 def select_y_axis(mode: str):
     match mode:
         case "runtime":
-            return alt.Y("s:Q", title="Runtime (in sec)", scale=alt.Scale(type="linear"),)
+            return alt.Y(
+                "s:Q",
+                title="Runtime (in sec)",
+                scale=alt.Scale(type="linear"),
+            )
         case "memory":
-            return alt.Y("max_rss:Q", title="Memory", scale=alt.Scale(type="linear"),)
+            return alt.Y(
+                "max_rss:Q",
+                title="Memory",
+                scale=alt.Scale(type="linear"),
+            )
         case _:
-            return alt.Y("s:Q", title="Runtime (in sec)", scale=alt.Scale(type="linear"),)
+            return alt.Y(
+                "s:Q",
+                title="Runtime (in sec)",
+                scale=alt.Scale(type="linear"),
+            )
 
 
 def select_tooltip(mode: str):
@@ -89,7 +101,6 @@ def select_tooltip(mode: str):
             return ["max_rss", "num_frag"]
         case _:
             return ["s", "num_frag"]
-
 
 
 if __name__ == "__main__":
