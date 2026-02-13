@@ -151,7 +151,7 @@ def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
                     ],
                 ),
             ),
-            tooltip=["true_sequence", param, "result"],
+            tooltip=["true_sequence", "pred_sequence", param, "result"],
         )
     )
 
