@@ -13,6 +13,19 @@ STATUS_COLORS = {
     "no prediction": "black",
 }
 
+STATUS_COLORS = {
+    "identical": "#35607A",
+    # "identical": "#2B73B5",
+    # "identical (minus 55U/G)": "#2B73B5",
+    # "correct composition": "#639FD3",
+    "identical (minus 55U/G)": "#639FD3",
+    "correct composition": "#F9BD77",
+    # "failed prediction": "#F9BD77",
+    "failed prediction": "#E54A26",
+    "wrong length": "#990000",
+    "no prediction": "#808285",
+}
+
 STATUS_ORDER = [
     "identical",
     "identical (minus 55U/G)",
@@ -108,7 +121,7 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                 ),
                 legend=alt.Legend(
                     **LEGEND_PARAMS,
-                    orient="left",  # title="Prediction status"
+                    orient="left",  title="",# title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
@@ -161,7 +174,7 @@ def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
 def select_x_axis(param: str):
     match param:
         case "mutation_rate":
-            return alt.X("mutation_rate:N", title="Mutation Rate")
+            return alt.X("mutation_rate:N", title="Modification Rate")
         case "num_copies":
             return alt.X("num_copies:N", title="Number of sequence replicates")
         case "max_singletons":
