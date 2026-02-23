@@ -56,6 +56,23 @@ def collect_results(input_dict: dict) -> List[str]:
     results = []
     for benchmark, fragments in zip(input_dict["benchmarks"], input_dict["fragments"]):
         new_data = pl.read_csv(benchmark, separator="\t")
+        for col in new_data.columns:
+            if col == "h:m:s":
+                continue
+            new_data = new_data.with_columns(
+                pl.when(pl.col(col).cast(str) == "NA")
+                .then(None)
+                .otherwise(pl.col(col))
+                .name.keep()
+                .cast(pl.Float64)
+            )
+            new_data = new_data.with_columns(
+                pl.when(pl.col(col) < 5)
+                .then(None)
+                .otherwise(pl.col(col))
+                .name.keep()
+                .cast(pl.Float64)
+            )
         # frag = pl.read_csv(fragments, separator="\t")
         # if "ppm_group" in frag.columns:
         #      num_entries = len(frag.select("ppm_group").unique())
