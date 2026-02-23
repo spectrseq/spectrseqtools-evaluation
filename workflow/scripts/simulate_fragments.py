@@ -1,5 +1,4 @@
 import sys
-import os
 import polars as pl
 import yaml
 import numpy as np
@@ -18,12 +17,10 @@ if "snakemake" in locals():
 
     def main() -> None:
         """Simulate mass-spectrometry data via Snakemake."""
-        # Set random seeds
-        seed_path = "/".join(smk.output["meta"].split("/")[:-1] + ["seed.txt"])
-        if not os.path.isfile(seed_path):
+        if smk.params["dir"] is None:
             seed = 0
         else:
-            with open(seed_path, "r") as seed_file:
+            with open(smk.params["dir"] + "/seed.txt", "r") as seed_file:
                 seed = int(seed_file.readline().rstrip("\n"))
 
         # Initialize random-number generator

@@ -13,7 +13,7 @@ simulation:
           - 50
 
 comparison:
-  num_sequences: 3
+  num_sequences: 100
   seed: 1234
   studies:
     mutation_rate:
@@ -24,7 +24,7 @@ comparison:
       rel_error_rate: [0.000005]
     num_copies:
       mutation_rate: [0.1]
-      num_copies: [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
+      num_copies: [10, 20, 30, 50, 75, 100, 150, 200, 250, 300]
       max_singletons: [10]
       ghost_rate: [0.0]
       rel_error_rate: [0.000005]

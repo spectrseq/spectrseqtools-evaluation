@@ -258,3 +258,97 @@ rule plot_spectra:
     threads: 1
     script:
         "../scripts/plot_spectra.py"
+
+
+rule evaluate_runtime:
+    input:
+        benchmarks=collect_comparison_studies(
+            "num_copies",
+            "benchmarks/comparison_study/num_copies/{value}/{seq}/prediction.tsv",
+        ),
+        fragments=collect_comparison_studies(
+            "num_copies",
+            "comparison_study/num_copies/{value}/{seq}/sample.tsv",
+        ),
+    output:
+        "results/comparison_study/stats.tsv",
+    log:
+        "logs/comparison_study/stats.log",
+    benchmark:
+        "benchmarks/comparison_study/stats.log"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_run_statistics.py"
+
+
+rule evaluate_runtime_experiments:
+    input:
+        benchmarks=collect_experiments(
+            "benchmarks/prediction/experiment/{seq}/{n_fragments}.tsv"
+        ),
+        fragments=collect_experiments(
+            "data/experiment/{seq}/{n_fragments}.tsv",
+        ),
+    output:
+        "results/comparison_study/experients.stats.tsv",
+    log:
+        "logs/comparison_study/experiments.stats.log",
+    benchmark:
+        "benchmarks/comparison_study/experiments.stats.log"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/evaluate_run_statistics.py"
+
+
+rule plot_runtime:
+    input:
+        sim="results/comparison_study/stats.tsv",
+        exp="results/comparison_study/experients.stats.tsv",
+    output:
+        report(
+            "results/plots/evaluation/runtime.html",
+            htmlindex="index.html",
+        category="Robustness",
+        labels={"type": "runtime"},
+        # caption="../report/robustness.data.rst",
+        ),
+    params:
+        mode="runtime",
+    log:
+        "logs/plots/evaluation/runtime.log",
+    benchmark:
+        "benchmarks/plots/evaluation/runtime.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_run_statistics.py"
+
+
+rule plot_memory:
+    input:
+        sim="results/comparison_study/stats.tsv",
+        exp="results/comparison_study/experients.stats.tsv",
+    output:
+        report(
+            "results/plots/evaluation/memory.html",
+            htmlindex="index.html",
+        category="Robustness",
+        labels={"type": "memory"},
+        # caption="../report/robustness.data.rst",
+        ),
+    params:
+        mode="memory",
+    log:
+        "logs/plots/evaluation/memory.log",
+    benchmark:
+        "benchmarks/plots/evaluation/memory.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_run_statistics.py"

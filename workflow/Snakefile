@@ -57,4 +57,6 @@ rule all:
         rules.all_plots.input,
         # rules.all_comparisons.input,
         # rules.all_optimizations.input,
+        # "results/plots/evaluation/runtime.html",
+        # "results/plots/evaluation/memory.html",
     default_target: True

@@ -6,7 +6,7 @@ import sys
 STATUS_COLORS = {
     "true": "#990000",
     # "true": "#2b73b5",
-    "false": "gray",
+    "false": "#808285",
 }
 
 LEGEND_PARAMS = {

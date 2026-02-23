@@ -126,6 +126,14 @@ def collect_comparison_studies(param: str, *patterns):
         print("No random simulation data given.")
         return retval
 
+    if param not in lookup(dpath="comparison/studies", within=config):
+        print(f"No data for {param} given.")
+        return retval
+
+    if lookup(dpath=f"comparison/studies/{param}", within=config) is None:
+        print("No comparison studies given.")
+        return []
+
     sim = lookup(dpath=f"comparison/studies/{param}", within=config)
     for mutation_rate in sim["mutation_rate"]:
         random.seed(lookup(dpath="comparison/seed", within=config))
@@ -183,6 +191,10 @@ def collect_experiments(*patterns):
 def collect_optimizations(param: str, *patterns):
     if lookup(dpath="experiment", within=config) is None:
         print("No evaluation data given.")
+        return []
+
+    if param not in lookup(dpath="optimization", within=config):
+        print(f"No data for {param} given.")
         return []
 
     if lookup(dpath=f"optimization/{param}", within=config) is None:

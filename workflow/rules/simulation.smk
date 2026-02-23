@@ -7,6 +7,7 @@ rule simulate_for_comparison_study:
         singletons="comparison_study/{parameter}/{value}/{seq}/sample.singletons.tsv",
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
     params:
+        dir="comparison_study/{parameter}/{value}/{seq}",
         num_copies=lambda wildcards: wildcards.value
         if wildcards.parameter == "num_copies"
         else lookup(
@@ -51,6 +52,7 @@ rule simulate_measurement:
         singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
     params:
+        dir=None,
         num_copies=lambda wildcards: wildcards.n_fragments,
         max_singletons=lookup(
             dpath="fragmentation_params/max_singletons",
