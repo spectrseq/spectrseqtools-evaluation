@@ -309,7 +309,13 @@ rule plot_runtime:
         sim="results/comparison_study/stats.tsv",
         exp="results/comparison_study/experients.stats.tsv",
     output:
-        "results/plots/evaluation/runtime.html",
+        report(
+            "results/plots/evaluation/runtime.html",
+            htmlindex="index.html",
+        category="Robustness",
+        labels={"type": "runtime"},
+        # caption="../report/robustness.data.rst",
+        ),
     params:
         mode="runtime",
     log:
@@ -328,7 +334,13 @@ rule plot_memory:
         sim="results/comparison_study/stats.tsv",
         exp="results/comparison_study/experients.stats.tsv",
     output:
-        "results/plots/evaluation/memory.html",
+        report(
+            "results/plots/evaluation/memory.html",
+            htmlindex="index.html",
+        category="Robustness",
+        labels={"type": "memory"},
+        # caption="../report/robustness.data.rst",
+        ),
     params:
         mode="memory",
     log:
