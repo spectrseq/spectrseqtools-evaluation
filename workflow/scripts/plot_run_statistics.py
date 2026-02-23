@@ -4,23 +4,12 @@ import sys
 
 
 STATUS_COLORS = {
-    "identical": "#8cb110",
-    "identical (minus 55U/G)": "yellow",
-    "correct composition": "orange",
-    # "failed prediction": "#be0a26",
-    "failed prediction": "#990000",
-    "wrong length": "gray",
-    "no prediction": "black",
+    "experiment": "#990000",
+    # "true": "#2b73b5",
+    "simulation": "#808285",
 }
 
-STATUS_ORDER = [
-    "identical",
-    "identical (minus 55U/G)",
-    "correct composition",
-    "failed prediction",
-    "wrong length",
-    "no prediction",
-]
+STATUS_ORDER = ["simulation", "experiment"]
 
 LEGEND_PARAMS = {
     "padding": 10,
@@ -39,24 +28,25 @@ if "snakemake" in locals():
         mode = smk.params["mode"]
 
         sim_results = pl.read_csv(smk.input["sim"], separator="\t")
-        sim_chart = create_scatterplot(data=sim_results, color="#990000", mode=mode)
+        sim_results = sim_results.with_columns(pl.lit("simulation").alias("type"))
+        sim_chart = create_scatterplot(data=sim_results,mode=mode)
 
         exp_results = pl.read_csv(smk.input["exp"], separator="\t")
-        exp_chart = create_scatterplot(
-            data=exp_results, color="purple", size=25, mode=mode
-        )
+        exp_results = exp_results.with_columns(pl.lit("experiment").alias("type"))
+        exp_chart = create_scatterplot(data=exp_results, size=50, mode=mode)
 
-        chart = sim_chart + exp_chart
+        chart = alt.layer(sim_chart, exp_chart).configure_view(
+            strokeWidth=0).configure_axis(grid=False)
 
         chart.save(smk.output[0])
 
 
-def create_scatterplot(data: pl.DataFrame, color: str, mode: str, size: int = 10):
+def create_scatterplot(data: pl.DataFrame, mode: str, size: int=20):
     base_chart = (
         alt.Chart(data)
         .encode(
             x=alt.X(
-                "num_frag:Q", title="Number of fragments", scale=alt.Scale(padding=0)
+                "num_frag:Q", title="Number of fragments", scale=alt.Scale(padding=0),
             ),
             y=select_y_axis(mode=mode),
         )
@@ -64,8 +54,20 @@ def create_scatterplot(data: pl.DataFrame, color: str, mode: str, size: int = 10
     )
 
     scatterplot = base_chart.mark_circle(size=size).encode(
-        color=alt.value(color),
-        tooltip=["s", "num_frag"],
+        # color=alt.value(STATUS_COLORS[kind]),
+        color=alt.Color("type:N",
+            scale=alt.Scale(
+                domain=STATUS_ORDER,
+                range=[
+                    STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
+                    for stat in STATUS_ORDER
+                ],),
+            legend = alt.Legend(
+                **LEGEND_PARAMS,
+                orient="top-left", title="",
+            ),
+            ),
+        tooltip=select_tooltip(mode=mode),
     )
 
     return scatterplot
