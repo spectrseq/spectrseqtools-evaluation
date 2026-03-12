@@ -1,11 +1,11 @@
 # Sequence convention is 5' to 3'
 
 # Random sequence generation with given length which is fragmented
-# "n_fragments" times, the mutation rate for base-pairs is also given
+# "n_fragments" times, the modification rate for base-pairs is also given
 simulation:
   random:
     seed: 42325345
-    mutation_rate: 0.1
+    modification_rate: 0.1
     strata:
       - num_seq: 1
         n_fragments:
@@ -16,26 +16,26 @@ comparison:
   num_sequences: 100
   seed: 1234
   studies:
-    mutation_rate:
-      mutation_rate: [0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2, 0.25, 0.5]
+    modification_rate:
+      modification_rate: [0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2, 0.25, 0.5]
       num_copies: [100]
       max_singletons: [10]
       ghost_rate: [0.0]
       rel_error_rate: [0.000005]
     num_copies:
-      mutation_rate: [0.1]
+      modification_rate: [0.1]
       num_copies: [10, 20, 30, 50, 75, 100, 150, 200, 250, 300]
       max_singletons: [10]
       ghost_rate: [0.0]
       rel_error_rate: [0.000005]
     max_singletons:
-      mutation_rate: [0.1]
+      modification_rate: [0.1]
       num_copies: [100]
       max_singletons: [0, 10, 15, 20, 25, 30, 50, 75, 100, 150]
       ghost_rate: [0.0]
       rel_error_rate: [0.000005]
     ghost_rate:
-      mutation_rate: [0.1]
+      modification_rate: [0.1]
       num_copies: [100]
       max_singletons: [10]
       ghost_rate: [0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3]

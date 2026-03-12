@@ -21,7 +21,7 @@ rule prediction_experiment:
         "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
-        "--sequence-name 'spectrseqtools_prediction_from_sim_{wildcards.seq}' "
+        "--sequence-name 'spectrseqtools_prediction_{wildcards.seq}' "
         "--solver {params.solver} "
         "--threads {threads} "
         "2> {log}"

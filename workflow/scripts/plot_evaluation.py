@@ -173,8 +173,8 @@ def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
 
 def select_x_axis(param: str):
     match param:
-        case "mutation_rate":
-            return alt.X("mutation_rate:N", title="Modification Rate")
+        case "modification_rate":
+            return alt.X("modification_rate:N", title="Modification rate")
         case "num_copies":
             return alt.X("num_copies:N", title="Number of sequence replicates")
         case "max_singletons":
