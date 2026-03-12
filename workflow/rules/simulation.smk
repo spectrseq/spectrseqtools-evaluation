@@ -20,10 +20,10 @@ rule simulate_for_comparison_study:
             dpath=f"comparison/studies/{wildcards.parameter}/max_singletons",
             within=config,
         )[0],
-        ghost_rate=lambda wildcards: wildcards.value
-        if wildcards.parameter == "ghost_rate"
+        phantom_rate=lambda wildcards: wildcards.value
+        if wildcards.parameter == "phantom_rate"
         else lookup(
-            dpath=f"comparison/studies/{wildcards.parameter}/ghost_rate",
+            dpath=f"comparison/studies/{wildcards.parameter}/phantom_rate",
             within=config,
         )[0],
         rel_error_rate=lambda wildcards: wildcards.value
@@ -58,8 +58,8 @@ rule simulate_measurement:
             dpath="fragmentation_params/max_singletons",
             within=config,
         ),
-        ghost_rate=lookup(
-            dpath="fragmentation_params/ghost_rate",
+        phantom_rate=lookup(
+            dpath="fragmentation_params/phantom_rate",
             within=config,
         ),
         rel_error_rate=lookup(

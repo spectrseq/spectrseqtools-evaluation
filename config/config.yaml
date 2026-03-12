@@ -5,7 +5,7 @@ solver: "cbc"
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
   max_singletons: 15
-  ghost_rate: 0.00
+  phantom_rate: 0.00
   rel_error_rate: 0.000005
   breakage_line: "c/y"
   noise_distribution: "uniform" # 'normal' or 'uniform'

@@ -181,8 +181,8 @@ def select_x_axis(param: str):
             return alt.X(
                 "max_singletons:N", title="Maximum number of false positive singletons"
             )
-        case "ghost_rate":
-            return alt.X("ghost_rate:N", title="Phantom rate")
+        case "phantom_rate":
+            return alt.X("phantom_rate:N", title="Phantom rate")
         case "rel_error_rate":
             return alt.X("rel_error_rate:N", title="Relative error rate")
         case "intensity_cutoff":

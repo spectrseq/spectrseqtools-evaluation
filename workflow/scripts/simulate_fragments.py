@@ -8,7 +8,7 @@ from typing import List
 from spectrseqtools.common import parse_nucleosides
 
 
-GHOST_FRAGMENT_MAGNITUDE = 1000
+PHANTOM_FRAGMENT_MAGNITUDE = 1000
 NO_FRAGMENTATION_PROBABILITY = 0.05
 
 if "snakemake" in locals():
@@ -61,7 +61,7 @@ if "snakemake" in locals():
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
             n_fragments=int(smk.params["num_copies"]),
-            ghost_rate=float(smk.params["ghost_rate"]),
+            phantom_rate=float(smk.params["phantom_rate"]),
             rel_error_rate=float(smk.params["rel_error_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
             extra_mass_dict=extra_mass_dict,
@@ -202,7 +202,7 @@ def simulate(
     true_sequence: List[str],
     nucleoside_masses: pl.DataFrame,
     n_fragments: int,
-    ghost_rate: float,
+    phantom_rate: float,
     rel_error_rate: float,
     noise_dist: str,
     extra_mass_dict: dict,
@@ -215,7 +215,7 @@ def simulate(
             seq_len=seq_len,
             rng=rng,
         )
-        for _ in range(round(n_fragments * (1 + ghost_rate)))
+        for _ in range(round(n_fragments * (1 + phantom_rate)))
     ]
 
     # Build fragment dataframe
@@ -311,31 +311,31 @@ def simulate(
         .alias("observed_mass")
     )
 
-    # Select ghost (i.e. invalid) fragments
+    # Select phantom (i.e. invalid) fragments
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
-            lambda x: True if rng.random() < ghost_rate else False,
+            lambda x: True if rng.random() < phantom_rate else False,
             return_dtype=bool,
         )
-        .alias("is_ghost_fragment")
+        .alias("is_phantom_fragment")
     )
 
-    # Update classification for ghost fragments by setting all to internal
+    # Update classification for phantom fragments by setting all to internal
     fragments = fragments.with_columns(
-        (pl.col("is_start") & ~pl.col("is_ghost_fragment")).alias("is_start"),
-        (pl.col("is_end") & ~pl.col("is_ghost_fragment")).alias("is_end"),
-        (pl.col("is_start_end") & ~pl.col("is_ghost_fragment")).alias("is_start_end"),
-        (pl.col("is_internal") | pl.col("is_ghost_fragment")).alias("is_internal"),
+        (pl.col("is_start") & ~pl.col("is_phantom_fragment")).alias("is_start"),
+        (pl.col("is_end") & ~pl.col("is_phantom_fragment")).alias("is_end"),
+        (pl.col("is_start_end") & ~pl.col("is_phantom_fragment")).alias("is_start_end"),
+        (pl.col("is_internal") | pl.col("is_phantom_fragment")).alias("is_internal"),
     )
 
-    # Update observed mass for ghost fragments by adjusting it randomly
+    # Update observed mass for phantom fragments by adjusting it randomly
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
             lambda x: x["observed_mass"]
-            + int(x["is_ghost_fragment"])
-            * (-GHOST_FRAGMENT_MAGNITUDE + 2 * GHOST_FRAGMENT_MAGNITUDE * rng.random()),
+            + int(x["is_phantom_fragment"])
+            * (-PHANTOM_FRAGMENT_MAGNITUDE + 2 * PHANTOM_FRAGMENT_MAGNITUDE * rng.random()),
             return_dtype=float,
         )
         .alias("observed_mass")
