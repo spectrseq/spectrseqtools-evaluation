@@ -38,7 +38,7 @@ if "snakemake" in locals():
         # Build dict with extra masses
         extra_mass_dict = build_extra_mass_dict(
             element_mass_path=smk.input["elements"],
-            breakage_line=smk.config["fragmentation_params"]["breakage_line"],
+            fragmentation_type=smk.config["fragmentation_params"]["fragmentation_type"],
             mass_5_prime=meta["label_mass_5T"],
             mass_3_prime=meta["label_mass_3T"],
         )
@@ -115,9 +115,9 @@ def select_singletons(
 
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
-# fragment ends (either based on a tag or fragmentation/breakage).
+# fragment ends (either based on a tag or fragmentation).
 def build_extra_mass_dict(
-    breakage_line: str,
+    fragmentation_type: str,
     element_mass_path: Path,
     mass_5_prime: float,
     mass_3_prime: float,
@@ -148,8 +148,8 @@ def build_extra_mass_dict(
         ),
     }
 
-    # Add breakage-specific masses for 5'- and 3'-ends of a fragment to dict
-    match breakage_line:
+    # Add fragmentation-specific masses for 5'- and 3'-ends of a fragment to dict
+    match fragmentation_type:
         case "a/w":  # assuming double bond for 3'-end
             extra_mass_dict["5_prime_internal"] = (
                 element_masses["P"] + 3 * element_masses["O"] + 2 * element_masses["H+"]
@@ -176,7 +176,7 @@ def build_extra_mass_dict(
             )
         case _:
             raise NotImplementedError(
-                f"There is no breakage option called '{breakage_line}'."
+                f"There is no fragmentation type called '{fragmentation_type}'."
             )
 
     return extra_mass_dict
@@ -213,7 +213,7 @@ def simulate(
     seq_len = len(true_sequence)
     frag_sites = [
         select_fragmentation_sites(
-            num_breaks=select_num_breaks(seq_len=seq_len, rng=rng),
+            num_sites=select_num_sites(seq_len=seq_len, rng=rng),
             seq_len=seq_len,
             rng=rng,
         )
@@ -352,13 +352,13 @@ def simulate(
     return fragments
 
 
-# METHOD: Consider fragments without any breakage, i.e. complete fragments,
-# separately (randomly select based on given probability); if the sequence
-# does break, use a geometric distribution to determine the number of breaks
-# while approximating the true distribution of fragment lengths observed in
-# experimental data (exponential distribution with many small and few larger
-# fragments, which gets sharper with increasing sequence length)
-def select_num_breaks(seq_len: int, rng: np.random.Generator) -> int:
+# METHOD: Consider fragments without any fragmentation, i.e. complete
+# fragments, separately (randomly select based on given probability); if the
+# sequence does fragment, use a geometric distribution to determine the
+# number of sites while approximating the true distribution of fragment lengths
+# observed in experimental data (exponential distribution with many small and
+# few larger fragments, which gets sharper with increasing sequence length)
+def select_num_sites(seq_len: int, rng: np.random.Generator) -> int:
     if rng.random() < NO_FRAGMENTATION_PROBABILITY:
         return 0
     # Note that p = factor/seq_len with factor = seq_len/alpha
@@ -368,26 +368,26 @@ def select_num_breaks(seq_len: int, rng: np.random.Generator) -> int:
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 def select_fragmentation_sites(
-    num_breaks: int, seq_len: int, rng: np.random.Generator
+    num_sites: int, seq_len: int, rng: np.random.Generator
 ) -> List[int]:
-    # Ensure there is a positive number of parts (i.e. number of breaks + 1)
-    if num_breaks < 0:
+    # Ensure there is a positive number of parts (i.e. number of sites + 1)
+    if num_sites < 0:
         raise ValueError("The number of parts cannot be less than one!")
 
     # Ensure the number of parts is not greater than the sequence length
-    if num_breaks + 1 > seq_len:
+    if num_sites + 1 > seq_len:
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
 
-    # If the sequence has zero breaks, it remains intact
-    if num_breaks == 0:
+    # If the sequence has zero sites, it remains intact
+    if num_sites == 0:
         return [int(0)]
 
-    # Return randomly sampled breakage positions in the sequence
+    # Return randomly sampled fragmentation sites in the sequence
     # Use beta distribution to avoid bias towards small terminal fragments (like e.g. for uniform one)
     return sorted(
-        set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_breaks)])
+        set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_sites)])
     )
 
 

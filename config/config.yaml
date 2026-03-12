@@ -7,7 +7,7 @@ fragmentation_params:
   max_singletons: 15
   phantom_rate: 0.00
   rel_error_rate: 0.000005
-  breakage_line: "c/y"
+  fragmentation_type: "c/y"
   noise_distribution: "uniform" # 'normal' or 'uniform'
   mass_5_prime: 555.1294  # Standard START tag
   mass_3_prime: 455.1491  # Standard END tag
