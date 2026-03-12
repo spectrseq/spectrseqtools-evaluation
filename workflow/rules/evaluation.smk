@@ -312,9 +312,9 @@ rule plot_runtime:
         report(
             "results/plots/evaluation/runtime.html",
             htmlindex="index.html",
-        category="Robustness",
-        labels={"type": "runtime"},
-        # caption="../report/robustness.data.rst",
+            category="Robustness",
+            labels={"type": "runtime"},
+            # caption="../report/robustness.data.rst",
         ),
     params:
         mode="runtime",
@@ -337,9 +337,9 @@ rule plot_memory:
         report(
             "results/plots/evaluation/memory.html",
             htmlindex="index.html",
-        category="Robustness",
-        labels={"type": "memory"},
-        # caption="../report/robustness.data.rst",
+            category="Robustness",
+            labels={"type": "memory"},
+            # caption="../report/robustness.data.rst",
         ),
     params:
         mode="memory",

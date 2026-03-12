@@ -8,30 +8,38 @@ rule simulate_for_comparison_study:
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
     params:
         dir="comparison_study/{parameter}/{value}/{seq}",
-        num_copies=lambda wildcards: wildcards.value
-        if wildcards.parameter == "num_copies"
-        else lookup(
-            dpath=f"comparison/studies/{wildcards.parameter}/num_copies",
-            within=config,
-        )[0],
-        max_singletons=lambda wildcards: wildcards.value
-        if wildcards.parameter == "max_singletons"
-        else lookup(
-            dpath=f"comparison/studies/{wildcards.parameter}/max_singletons",
-            within=config,
-        )[0],
-        phantom_rate=lambda wildcards: wildcards.value
-        if wildcards.parameter == "phantom_rate"
-        else lookup(
-            dpath=f"comparison/studies/{wildcards.parameter}/phantom_rate",
-            within=config,
-        )[0],
-        rel_error_rate=lambda wildcards: wildcards.value
-        if wildcards.parameter == "rel_error_rate"
-        else lookup(
-            dpath=f"comparison/studies/{wildcards.parameter}/rel_error_rate",
-            within=config,
-        )[0],
+        num_copies=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "num_copies"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/num_copies",
+                within=config,
+            )[0]
+        ),
+        max_singletons=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "max_singletons"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/max_singletons",
+                within=config,
+            )[0]
+        ),
+        phantom_rate=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "phantom_rate"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/phantom_rate",
+                within=config,
+            )[0]
+        ),
+        rel_error_rate=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "rel_error_rate"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/rel_error_rate",
+                within=config,
+            )[0]
+        ),
     log:
         "logs/comparison_study/{parameter}/{value}/{seq}/simulation.log",
     benchmark:

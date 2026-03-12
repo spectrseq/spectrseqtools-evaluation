@@ -38,7 +38,7 @@ def generate_random_sequence_and_seed_pair(
     ), random.choice(range(10000))
 
 
-def generate_random_sequences(seq_len, modification_rate=0,  modified_nucleosides=None):
+def generate_random_sequences(seq_len, modification_rate=0, modified_nucleosides=None):
     if modified_nucleosides is not None:
         with open(modified_nucleosides, "r") as file:
             lines = file.readlines()[1:]

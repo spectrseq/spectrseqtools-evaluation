@@ -93,24 +93,30 @@ rule prediction_optimization_study:
         sequence="results/optimization/{parameter}/{value}/{seq}/sample.fasta",
     params:
         solver=config["solver"],
-        intensity_cutoff=lambda wildcards: wildcards.value
-        if wildcards.parameter == "intensity_cutoff"
-        else lookup(
-            dpath=f"optimization/{wildcards.parameter}/intensity_cutoff",
-            within=config,
-        )[0],
-        lp_timeout_long=lambda wildcards: wildcards.value
-        if wildcards.parameter == "lp_timeout_long"
-        else lookup(
-            dpath=f"optimization/{wildcards.parameter}/lp_timeout_long",
-            within=config,
-        )[0],
-        lp_timeout_short=lambda wildcards: wildcards.value
-        if wildcards.parameter == "lp_timeout_short"
-        else lookup(
-            dpath=f"optimization/{wildcards.parameter}/lp_timeout_short",
-            within=config,
-        )[0],
+        intensity_cutoff=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "intensity_cutoff"
+            else lookup(
+                dpath=f"optimization/{wildcards.parameter}/intensity_cutoff",
+                within=config,
+            )[0]
+        ),
+        lp_timeout_long=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "lp_timeout_long"
+            else lookup(
+                dpath=f"optimization/{wildcards.parameter}/lp_timeout_long",
+                within=config,
+            )[0]
+        ),
+        lp_timeout_short=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "lp_timeout_short"
+            else lookup(
+                dpath=f"optimization/{wildcards.parameter}/lp_timeout_short",
+                within=config,
+            )[0]
+        ),
         dir=subpath(output.fragments, parent=True),
         # dir="results/optimization/{parameter}/{value}/{seq}/",
     log:
