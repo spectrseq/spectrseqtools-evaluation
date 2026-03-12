@@ -102,7 +102,7 @@ def select_singletons(
         else rng.choice(
             [
                 nuc
-                for nuc in nucleosides.get_column("nucleoside").to_list()
+                for nuc in nucleosides.get_column("id").to_list()
                 if nuc not in true_nucs
             ],
             size=num_additional_nucs,
@@ -110,7 +110,7 @@ def select_singletons(
         ).tolist()
     )
 
-    return nucleosides.filter(pl.col("nucleoside").is_in(true_nucs + random_nucs))
+    return nucleosides.filter(pl.col("id").is_in(true_nucs + random_nucs))
 
 
 # METHOD: Consider each base in the form of a standard unit, which can be
@@ -187,7 +187,7 @@ def get_seq_weight(seq: list, masses: dict) -> float:
     seq_df = seq_df.with_columns(
         pl.col("name")
         .map_elements(
-            lambda x: masses.filter(pl.col("nucleoside") == x)
+            lambda x: masses.filter(pl.col("id") == x)
             .get_column("monoisotopic_mass")
             .to_list()[0],
             return_dtype=pl.Float64,
@@ -256,7 +256,7 @@ def simulate(
         pl.struct("left", "right")
         .map_elements(
             lambda x: sum(
-                nucleoside_masses.filter(pl.col("nucleoside") == base)
+                nucleoside_masses.filter(pl.col("id") == base)
                 .select(pl.col("monoisotopic_mass"))
                 .item()
                 for base in true_sequence[x["left"] : x["right"]]
