@@ -187,9 +187,11 @@ def get_seq_weight(seq: list, masses: dict) -> float:
     seq_df = seq_df.with_columns(
         pl.col("name")
         .map_elements(
-            lambda x: masses.filter(pl.col("id") == x)
-            .get_column("monoisotopic_mass")
-            .to_list()[0],
+            lambda x: (
+                masses.filter(pl.col("id") == x)
+                .get_column("monoisotopic_mass")
+                .to_list()[0]
+            ),
             return_dtype=pl.Float64,
         )
         .alias("mass")
@@ -333,9 +335,14 @@ def simulate(
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
-            lambda x: x["observed_mass"]
-            + int(x["is_phantom_fragment"])
-            * (-PHANTOM_FRAGMENT_MAGNITUDE + 2 * PHANTOM_FRAGMENT_MAGNITUDE * rng.random()),
+            lambda x: (
+                x["observed_mass"]
+                + int(x["is_phantom_fragment"])
+                * (
+                    -PHANTOM_FRAGMENT_MAGNITUDE
+                    + 2 * PHANTOM_FRAGMENT_MAGNITUDE * rng.random()
+                )
+            ),
             return_dtype=float,
         )
         .alias("observed_mass")

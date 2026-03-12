@@ -121,7 +121,8 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                 ),
                 legend=alt.Legend(
                     **LEGEND_PARAMS,
-                    orient="left",  title="",# title="Prediction status"
+                    orient="left",
+                    title="",  # title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
