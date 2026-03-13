@@ -8,11 +8,11 @@ rule simulate_for_comparison_study:
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
     params:
         dir="comparison_study/{parameter}/{value}/{seq}",
-        num_copies=lambda wildcards: (
+        num_replicates=lambda wildcards: (
             wildcards.value
-            if wildcards.parameter == "num_copies"
+            if wildcards.parameter == "num_replicates"
             else lookup(
-                dpath=f"comparison/studies/{wildcards.parameter}/num_copies",
+                dpath=f"comparison/studies/{wildcards.parameter}/num_replicates",
                 within=config,
             )[0]
         ),
@@ -61,7 +61,7 @@ rule simulate_measurement:
         meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
     params:
         dir=None,
-        num_copies=lambda wildcards: wildcards.n_fragments,
+        num_replicates=lambda wildcards: wildcards.n_fragments,
         max_singletons=lookup(
             dpath="fragmentation_params/max_singletons",
             within=config,

@@ -18,25 +18,25 @@ comparison:
   studies:
     modification_rate:
       modification_rate: [0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2, 0.25, 0.5]
-      num_copies: [100]
+      num_replicates: [100]
       max_singletons: [10]
       phantom_rate: [0.0]
       rel_error_rate: [0.000005]
-    num_copies:
+    num_replicates:
       modification_rate: [0.1]
-      num_copies: [10, 20, 30, 50, 75, 100, 150, 200, 250, 300]
+      num_replicates: [10, 20, 30, 50, 75, 100, 150, 200, 250, 300]
       max_singletons: [10]
       phantom_rate: [0.0]
       rel_error_rate: [0.000005]
     max_singletons:
       modification_rate: [0.1]
-      num_copies: [100]
+      num_replicates: [100]
       max_singletons: [0, 10, 15, 20, 25, 30, 50, 75, 100, 150]
       phantom_rate: [0.0]
       rel_error_rate: [0.000005]
     phantom_rate:
       modification_rate: [0.1]
-      num_copies: [100]
+      num_replicates: [100]
       max_singletons: [10]
       phantom_rate: [0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3]
       rel_error_rate: [0.000005]

@@ -263,12 +263,12 @@ rule plot_spectra:
 rule evaluate_runtime:
     input:
         benchmarks=collect_comparison_studies(
-            "num_copies",
-            "benchmarks/comparison_study/num_copies/{value}/{seq}/prediction.tsv",
+            "num_replicates",
+            "benchmarks/comparison_study/num_replicates/{value}/{seq}/prediction.tsv",
         ),
         fragments=collect_comparison_studies(
-            "num_copies",
-            "comparison_study/num_copies/{value}/{seq}/sample.tsv",
+            "num_replicates",
+            "comparison_study/num_replicates/{value}/{seq}/sample.tsv",
         ),
     output:
         "results/comparison_study/stats.tsv",

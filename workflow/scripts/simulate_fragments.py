@@ -60,7 +60,7 @@ if "snakemake" in locals():
             rng=rng,
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
-            n_fragments=int(smk.params["num_copies"]),
+            n_fragments=int(smk.params["num_replicates"]),
             phantom_rate=float(smk.params["phantom_rate"]),
             rel_error_rate=float(smk.params["rel_error_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
@@ -395,13 +395,13 @@ def compute_fragment_tuples(frag_sites, seq_len):
     tuples = []
 
     # Generate tuples of start and end index for each fragments
-    for seq_copy in frag_sites:
-        if seq_copy[0] != 0:
-            seq_copy.insert(0, 0)
-        if seq_copy[-1] != seq_len:
-            seq_copy.append(seq_len)
+    for seq_replicate in frag_sites:
+        if seq_replicate[0] != 0:
+            seq_replicate.insert(0, 0)
+        if seq_replicate[-1] != seq_len:
+            seq_replicate.append(seq_len)
 
-        tuples += list(zip(seq_copy[:-1], seq_copy[1:]))
+        tuples += list(zip(seq_replicate[:-1], seq_replicate[1:]))
 
     return tuples
 
