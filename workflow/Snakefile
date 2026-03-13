@@ -24,12 +24,12 @@ rule all_experiments:
 
 rule all_plots:
     input:
-        collect_experiments("results/plots/spectra/experiment/{seq}/{n_fragments}.html"),
+        collect_experiments("results/plots/spectra/experiment/{seq}/{num_replicates}.html"),
         collect_experiments(
-            "results/plots/prediction/experiment/{seq}/{n_fragments}.html"
+            "results/plots/prediction/experiment/{seq}/{num_replicates}.html"
         ),
         collect_custom_simulations(
-            "results/plots/prediction/simulation/{seq}/{n_fragments}.html"
+            "results/plots/prediction/simulation/{seq}/{num_replicates}.html"
         ),
 
 

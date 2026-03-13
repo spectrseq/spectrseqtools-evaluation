@@ -1,14 +1,14 @@
 # Sequence convention is 5' to 3'
 
-# Random sequence generation with given length which is fragmented
-# "n_fragments" times, the modification rate for base-pairs is also given
+# Random sequence generation with given length, for which "num_replicates"
+# copies are fragmented; the modification rate for base-pairs is also given
 simulation:
   random:
     seed: 42325345
     modification_rate: 0.1
     strata:
       - num_seq: 1
-        n_fragments:
+        num_replicates:
 #          - 30
           - 50
 

@@ -1,19 +1,19 @@
 rule prediction_experiment:
     input:
-        fragments="data/experiment/{seq}/{n_fragments}.raw",
-        meta="data/experiment/{seq}/{n_fragments}.meta.yaml",
+        fragments="data/experiment/{seq}/{num_replicates}.raw",
+        meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
     output:
-        fragments="data/experiment/{seq}/{n_fragments}.tsv",
-        singletons="data/experiment/{seq}/{n_fragments}.singletons.tsv",
-        su_fragments="data/experiment/{seq}/{n_fragments}.standard_unit_fragments.tsv",
-        predictions="results/prediction/experiment/{seq}/{n_fragments}.tsv",
-        sequence="results/prediction/experiment/{seq}/{n_fragments}.fasta",
+        fragments="data/experiment/{seq}/{num_replicates}.tsv",
+        singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
+        su_fragments="data/experiment/{seq}/{num_replicates}.standard_unit_fragments.tsv",
+        predictions="results/prediction/experiment/{seq}/{num_replicates}.tsv",
+        sequence="results/prediction/experiment/{seq}/{num_replicates}.fasta",
     params:
         solver=config["solver"],
     log:
-        "logs/prediction/experiment/{seq}/{n_fragments}.log",
+        "logs/prediction/experiment/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/prediction/experiment/{seq}/{n_fragments}.tsv"
+        "benchmarks/prediction/experiment/{seq}/{num_replicates}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -29,19 +29,19 @@ rule prediction_experiment:
 
 rule prediction_simulation:
     input:
-        fragments="data/simulation/{seq}/{n_fragments}.tsv",
-        meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
-        singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
+        fragments="data/simulation/{seq}/{num_replicates}.tsv",
+        meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
+        singletons="data/simulation/{seq}/{num_replicates}.singletons.tsv",
     output:
-        su_fragments="data/simulation/{seq}/{n_fragments}.standard_unit_fragments.tsv",
-        predictions="results/prediction/simulation/{seq}/{n_fragments}.tsv",
-        sequence="results/prediction/simulation/{seq}/{n_fragments}.fasta",
+        su_fragments="data/simulation/{seq}/{num_replicates}.standard_unit_fragments.tsv",
+        predictions="results/prediction/simulation/{seq}/{num_replicates}.tsv",
+        sequence="results/prediction/simulation/{seq}/{num_replicates}.fasta",
     params:
         solver=config["solver"],
     log:
-        "logs/prediction/simulation/{seq}/{n_fragments}.log",
+        "logs/prediction/simulation/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/prediction/simulation/{seq}/{n_fragments}.tsv"
+        "benchmarks/prediction/simulation/{seq}/{num_replicates}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1

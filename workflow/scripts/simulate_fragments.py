@@ -60,7 +60,7 @@ if "snakemake" in locals():
             rng=rng,
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
-            n_fragments=int(smk.params["num_replicates"]),
+            num_replicates=int(smk.params["num_replicates"]),
             phantom_rate=float(smk.params["phantom_rate"]),
             rel_error_rate=float(smk.params["rel_error_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
@@ -203,7 +203,7 @@ def simulate(
     rng: np.random.Generator,
     true_sequence: List[str],
     nucleoside_masses: pl.DataFrame,
-    n_fragments: int,
+    num_replicates: int,
     phantom_rate: float,
     rel_error_rate: float,
     noise_dist: str,
@@ -217,7 +217,7 @@ def simulate(
             seq_len=seq_len,
             rng=rng,
         )
-        for _ in range(round(n_fragments * (1 + phantom_rate)))
+        for _ in range(round(num_replicates * (1 + phantom_rate)))
     ]
 
     # Build fragment dataframe

@@ -56,12 +56,12 @@ rule simulate_measurement:
         nucleosides=workflow.source_path("../resources/masses.tsv"),
         elements=workflow.source_path("../resources/element_masses.tsv"),
     output:
-        fragments="data/simulation/{seq}/{n_fragments}.tsv",
-        singletons="data/simulation/{seq}/{n_fragments}.singletons.tsv",
-        meta="data/simulation/{seq}/{n_fragments}.meta.yaml",
+        fragments="data/simulation/{seq}/{num_replicates}.tsv",
+        singletons="data/simulation/{seq}/{num_replicates}.singletons.tsv",
+        meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
     params:
         dir=None,
-        num_replicates=lambda wildcards: wildcards.n_fragments,
+        num_replicates=lambda wildcards: wildcards.num_replicates,
         max_singletons=lookup(
             dpath="fragmentation_params/max_singletons",
             within=config,
@@ -75,9 +75,9 @@ rule simulate_measurement:
             within=config,
         ),
     log:
-        "logs/simulation/{seq}/{n_fragments}.log",
+        "logs/simulation/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/simulation/{seq}/{n_fragments}.tsv"
+        "benchmarks/simulation/{seq}/{num_replicates}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -88,18 +88,18 @@ rule simulate_measurement:
 rule plot_simulated_fragments:
     input:
         config=workflow.source_path("../resources/datavzrd/simulation.yaml"),
-        simulation="data/simulation/{seq}/{n_fragments}.tsv",
+        simulation="data/simulation/{seq}/{num_replicates}.tsv",
     output:
         report(
-            directory("results/plots/simulated_fragments/{seq}/{n_fragments}"),
+            directory("results/plots/simulated_fragments/{seq}/{num_replicates}"),
             htmlindex="index.html",
             category="Simulation",
-            labels={"seq": "{seq}", "n_fragments": "{n_fragments}"},
+            labels={"seq": "{seq}", "num_replicates": "{num_replicates}"},
         ),
     log:
-        "logs/plots/simulated_fragments/{seq}/{n_fragments}.log",
+        "logs/plots/simulated_fragments/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/plots/simulated_fragments/{seq}/{n_fragments}.tsv"
+        "benchmarks/plots/simulated_fragments/{seq}/{num_replicates}.tsv"
     threads: 1
     wrapper:
         "v7.2.0/utils/datavzrd"

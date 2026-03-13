@@ -3,16 +3,16 @@ include: "common.smk"
 
 rule plot_prediction:
     input:
-        pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
-        pred_seq="results/prediction/{modus}/{seq}/{n_fragments}.fasta",
-        sim="data/{modus}/{seq}/{n_fragments}.tsv",
+        pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
+        pred_seq="results/prediction/{modus}/{seq}/{num_replicates}.fasta",
+        sim="data/{modus}/{seq}/{num_replicates}.tsv",
     output:
-        any="results/plots/prediction/{modus}/{seq}/{n_fragments}.html",
-        start="results/plots/prediction/{modus}/{seq}/{n_fragments}.start.html",
-        end="results/plots/prediction/{modus}/{seq}/{n_fragments}.end.html",
-        internal="results/plots/prediction/{modus}/{seq}/{n_fragments}.internal.html",
+        any="results/plots/prediction/{modus}/{seq}/{num_replicates}.html",
+        start="results/plots/prediction/{modus}/{seq}/{num_replicates}.start.html",
+        end="results/plots/prediction/{modus}/{seq}/{num_replicates}.end.html",
+        internal="results/plots/prediction/{modus}/{seq}/{num_replicates}.internal.html",
         all=report(
-            "results/plots/prediction/{modus}/{seq}/{n_fragments}.all.html",
+            "results/plots/prediction/{modus}/{seq}/{num_replicates}.all.html",
             htmlindex="index.html",
             category="Quality control",
             subcategory="{modus} data",
@@ -20,9 +20,9 @@ rule plot_prediction:
             caption="../report/quality_control.alignment.rst",
         ),
     log:
-        "logs/plots/prediction/{modus}/{seq}/{n_fragments}.log",
+        "logs/plots/prediction/{modus}/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/plots/prediction/{modus}/{seq}/{n_fragments}.tsv"
+        "benchmarks/plots/prediction/{modus}/{seq}/{num_replicates}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -33,7 +33,7 @@ rule plot_prediction:
 rule evaluate_custom_simulation:
     input:
         collect_custom_simulations(
-            "results/prediction/simulation/{seq}/{n_fragments}.fasta"
+            "results/prediction/simulation/{seq}/{num_replicates}.fasta"
         ),
     output:
         "results/evaluation/custom_simulation.tsv",
@@ -162,7 +162,7 @@ rule plot_optimization_study:
 rule evaluate_random_simulation:
     input:
         collect_random_simulations(
-            "results/prediction/simulation/{seq}/{n_fragments}.fasta"
+            "results/prediction/simulation/{seq}/{num_replicates}.fasta"
         ),
     output:
         "results/evaluation/random_simulation.tsv",
@@ -196,7 +196,7 @@ rule plot_evaluation_random_simulation:
 
 rule evaluate_experiment:
     input:
-        collect_experiments("results/prediction/experiment/{seq}/{n_fragments}.fasta"),
+        collect_experiments("results/prediction/experiment/{seq}/{num_replicates}.fasta"),
     output:
         "results/evaluation/experiment.tsv",
     log:
@@ -235,11 +235,11 @@ rule plot_evaluation_experiment:
 
 rule plot_spectra:
     input:
-        raw_fragments="data/{modus}/{seq}/{n_fragments}.standard_unit_fragments.tsv",
-        pred_fragments="results/prediction/{modus}/{seq}/{n_fragments}.tsv",
+        raw_fragments="data/{modus}/{seq}/{num_replicates}.standard_unit_fragments.tsv",
+        pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
     output:
         report(
-            "results/plots/spectra/{modus}/{seq}/{n_fragments}.html",
+            "results/plots/spectra/{modus}/{seq}/{num_replicates}.html",
             htmlindex="index.html",
             category="Quality control",
             subcategory="{modus} data",
@@ -250,9 +250,9 @@ rule plot_spectra:
             caption="../report/quality_control.spectrum.rst",
         ),
     log:
-        "logs/plots/spectra/{modus}/{seq}/{n_fragments}.log",
+        "logs/plots/spectra/{modus}/{seq}/{num_replicates}.log",
     benchmark:
-        "benchmarks/plots/spectra/{modus}/{seq}/{n_fragments}.tsv"
+        "benchmarks/plots/spectra/{modus}/{seq}/{num_replicates}.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -286,10 +286,10 @@ rule evaluate_runtime:
 rule evaluate_runtime_experiments:
     input:
         benchmarks=collect_experiments(
-            "benchmarks/prediction/experiment/{seq}/{n_fragments}.tsv"
+            "benchmarks/prediction/experiment/{seq}/{num_replicates}.tsv"
         ),
         fragments=collect_experiments(
-            "data/experiment/{seq}/{n_fragments}.tsv",
+            "data/experiment/{seq}/{num_replicates}.tsv",
         ),
     output:
         "results/comparison_study/experients.stats.tsv",

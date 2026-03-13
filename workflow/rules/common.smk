@@ -3,7 +3,7 @@ import os
 
 
 wildcard_constraints:
-    n_fragments="[0-9]+",
+    num_replicates="[0-9]+",
 
 
 def generate_random_sequence_and_seed_pair(
@@ -74,10 +74,10 @@ def collect_custom_simulations(*patterns):
         collect(
             patterns,
             seq=item["seq"],
-            n_fragments=n_fragments,
+            num_replicates=num_replicates,
         )
         for item in lookup(dpath="simulation/custom", within=config)
-        for n_fragments in item["n_fragments"]
+        for num_replicates in item["num_replicates"]
     ]
 
 
@@ -111,9 +111,9 @@ def collect_random_simulations(*patterns):
                 collect(
                     patterns,
                     seq=seq[0],
-                    n_fragments=n_fragments,
+                    num_replicates=num_replicates,
                 )
-                for n_fragments in sim["n_fragments"]
+                for num_replicates in sim["num_replicates"]
             ]
 
     return retval
@@ -182,7 +182,7 @@ def collect_experiments(*patterns):
         collect(
             patterns,
             seq=item["seq"],
-            n_fragments=item["fragments"],
+            num_replicates=item["fragments"],
         )
         for item in lookup(dpath="experiment", within=config)
     ]
@@ -209,7 +209,7 @@ def collect_optimizations(param: str, *patterns):
                 parameter=param,
                 value=value,
                 seq=item["seq"],
-                n_fragments=item["fragments"],
+                num_replicates=item["fragments"],
             )
 
     return retval
