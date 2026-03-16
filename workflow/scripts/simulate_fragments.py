@@ -62,7 +62,7 @@ if "snakemake" in locals():
             nucleoside_masses=nucleosides,
             num_replicates=int(smk.params["num_replicates"]),
             phantom_rate=float(smk.params["phantom_rate"]),
-            rel_error_rate=float(smk.params["rel_error_rate"]),
+            noise_rate=float(smk.params["noise_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
             extra_mass_dict=extra_mass_dict,
         )
@@ -205,7 +205,7 @@ def simulate(
     nucleoside_masses: pl.DataFrame,
     num_replicates: int,
     phantom_rate: float,
-    rel_error_rate: float,
+    noise_rate: float,
     noise_dist: str,
     extra_mass_dict: dict,
 ) -> pl.DataFrame:
@@ -275,7 +275,7 @@ def simulate(
             lambda x: induce_noise(
                 rng=rng,
                 distribution_method=noise_dist,
-                error_rate=rel_error_rate,
+                noise_rate=noise_rate,
                 mass=x["true_nucleoside_mass"],
             ),
             return_dtype=float,
@@ -305,7 +305,7 @@ def simulate(
             lambda x: induce_noise(
                 rng=rng,
                 distribution_method=noise_dist,
-                error_rate=rel_error_rate,
+                noise_rate=noise_rate,
                 mass=x["true_mass_with_backbone"],
             ),
             return_dtype=float,
@@ -407,13 +407,13 @@ def compute_fragment_tuples(frag_sites, seq_len):
 
 
 def induce_noise(
-    rng: np.random.Generator, distribution_method: str, error_rate: float, mass: float
+    rng: np.random.Generator, distribution_method: str, noise_rate: float, mass: float
 ) -> float:
     match distribution_method:
         case "normal":
-            noise = rng.normal(scale=error_rate)
+            noise = rng.normal(scale=noise_rate)
         case "uniform":
-            noise = -error_rate + 2 * error_rate * rng.random()
+            noise = -noise_rate + 2 * noise_rate * rng.random()
         case _:
             raise NotImplementedError(
                 f"There is no option for the noise distribution called '{distribution_method}'."

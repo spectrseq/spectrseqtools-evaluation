@@ -184,8 +184,8 @@ def select_x_axis(param: str):
             )
         case "phantom_rate":
             return alt.X("phantom_rate:N", title="Phantom rate")
-        case "rel_error_rate":
-            return alt.X("rel_error_rate:N", title="Relative error rate")
+        case "noise_rate":
+            return alt.X("noise_rate:N", title="Noise rate")
         case "intensity_cutoff":
             return alt.X("intensity_cutoff:N", title="Intensity cutoff percentile")
         case "lp_timeout_long":

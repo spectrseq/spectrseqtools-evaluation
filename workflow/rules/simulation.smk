@@ -32,11 +32,11 @@ rule simulate_for_comparison_study:
                 within=config,
             )[0]
         ),
-        rel_error_rate=lambda wildcards: (
+        noise_rate=lambda wildcards: (
             wildcards.value
-            if wildcards.parameter == "rel_error_rate"
+            if wildcards.parameter == "noise_rate"
             else lookup(
-                dpath=f"comparison/studies/{wildcards.parameter}/rel_error_rate",
+                dpath=f"comparison/studies/{wildcards.parameter}/noise_rate",
                 within=config,
             )[0]
         ),
@@ -70,8 +70,8 @@ rule simulate_measurement:
             dpath="fragmentation_params/phantom_rate",
             within=config,
         ),
-        rel_error_rate=lookup(
-            dpath="fragmentation_params/rel_error_rate",
+        noise_rate=lookup(
+            dpath="fragmentation_params/noise_rate",
             within=config,
         ),
     log:
