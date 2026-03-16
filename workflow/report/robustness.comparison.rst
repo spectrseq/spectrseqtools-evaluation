@@ -2,8 +2,8 @@ Comparison of Simulated Data over {{snakemake.wildcards.parameter}}
 
 Prediction results for stratified simulation over different parameters. Default settings are a
 phantom rate of 0%, 100 replicates per sequence, a maximum of 10 false positive singletons, and a
-modification rate of 10%. For the simulation, all parameters are set to their
-default value except the one being evaluated.
+modification rate of 10%.
+All parameters are set to their default value except the one being evaluated.
 
 The results are divided into six categories: fully correct prediction ("identical"),
 correct except switches between G and 55U, which are within the allowed
