@@ -24,7 +24,9 @@ rule all_experiments:
 
 rule all_plots:
     input:
-        collect_experiments("results/plots/spectra/experiment/{seq}/{num_replicates}.html"),
+        collect_experiments(
+            "results/plots/spectra/experiment/{seq}/{num_replicates}.html"
+        ),
         collect_experiments(
             "results/plots/prediction/experiment/{seq}/{num_replicates}.html"
         ),

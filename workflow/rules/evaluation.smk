@@ -196,7 +196,9 @@ rule plot_evaluation_for_random_simulation:
 
 rule evaluate_experiment:
     input:
-        collect_experiments("results/prediction/experiment/{seq}/{num_replicates}.fasta"),
+        collect_experiments(
+            "results/prediction/experiment/{seq}/{num_replicates}.fasta"
+        ),
     output:
         "results/evaluation/experiment.tsv",
     log:
