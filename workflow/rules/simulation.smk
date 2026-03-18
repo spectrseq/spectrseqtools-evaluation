@@ -51,7 +51,7 @@ rule simulate_for_comparison_study:
         "../scripts/simulate_fragments.py"
 
 
-rule simulate_measurement:
+rule simulate_custom_fragments:
     input:
         nucleosides=workflow.source_path("../resources/masses.tsv"),
         elements=workflow.source_path("../resources/element_masses.tsv"),

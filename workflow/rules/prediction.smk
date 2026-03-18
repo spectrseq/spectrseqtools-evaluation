@@ -1,4 +1,4 @@
-rule prediction_experiment:
+rule predict_experimental_sequence:
     input:
         fragments="data/experiment/{seq}/{num_replicates}.raw",
         meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
@@ -27,7 +27,7 @@ rule prediction_experiment:
         "2> {log}"
 
 
-rule prediction_simulation:
+rule predict_simulated_sequence:
     input:
         fragments="data/simulation/{seq}/{num_replicates}.tsv",
         meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
@@ -55,7 +55,7 @@ rule prediction_simulation:
         "2> {log}"
 
 
-rule prediction_comparison_study:
+rule predict_sequence_for_comparison_study:
     input:
         fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
@@ -81,7 +81,7 @@ rule prediction_comparison_study:
         "2> {log}"
 
 
-rule prediction_optimization_study:
+rule predict_sequence_for_optimization_study:
     input:
         fragments="data/experiment/{seq}/0.raw",
         meta="data/experiment/{seq}/0.meta.yaml",

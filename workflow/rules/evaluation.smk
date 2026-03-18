@@ -48,7 +48,7 @@ rule evaluate_custom_simulation:
         "../scripts/evaluate_prediction.py"
 
 
-rule plot_evaluation_custom_simulation:
+rule plot_evaluation_for_custom_simulation:
     input:
         "results/evaluation/custom_simulation.tsv",
     output:
@@ -71,7 +71,7 @@ rule plot_evaluation_custom_simulation:
         "../scripts/plot_evaluation.py"
 
 
-rule evaluate_parameter_comparison:
+rule evaluate_comparison_study:
     input:
         lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
@@ -92,7 +92,7 @@ rule evaluate_parameter_comparison:
         "../scripts/evaluate_prediction.py"
 
 
-rule plot_evaluation_parameter_study:
+rule plot_evaluation_for_comparison_study:
     input:
         "results/comparison_study/{parameter}/evaluation.tsv",
     output:
@@ -136,7 +136,7 @@ rule evaluate_optimization_study:
         "../scripts/evaluate_prediction.py"
 
 
-rule plot_optimization_study:
+rule plot_evaluation_for_optimization_study:
     input:
         "results/optimization/{parameter}/evaluation.tsv",
     output:
@@ -177,7 +177,7 @@ rule evaluate_random_simulation:
         "../scripts/evaluate_prediction.py"
 
 
-rule plot_evaluation_random_simulation:
+rule plot_evaluation_for_random_simulation:
     input:
         "results/evaluation/random_simulation.tsv",
     output:
@@ -210,7 +210,7 @@ rule evaluate_experiment:
         "../scripts/evaluate_prediction.py"
 
 
-rule plot_evaluation_experiment:
+rule plot_evaluation_for_experiment:
     input:
         "results/evaluation/experiment.tsv",
     output:
@@ -260,7 +260,7 @@ rule plot_spectra:
         "../scripts/plot_spectra.py"
 
 
-rule evaluate_runtime:
+rule evaluate_run_statistics_for_simulations:
     input:
         benchmarks=collect_comparison_studies(
             "num_replicates",
@@ -283,7 +283,7 @@ rule evaluate_runtime:
         "../scripts/evaluate_run_statistics.py"
 
 
-rule evaluate_runtime_experiments:
+rule evaluate_run_statistics_for_experiments:
     input:
         benchmarks=collect_experiments(
             "benchmarks/prediction/experiment/{seq}/{num_replicates}.tsv"
