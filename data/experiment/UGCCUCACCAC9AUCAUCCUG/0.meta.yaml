@@ -2,5 +2,5 @@ identity: 2025-04-16_SJH_20merRNA01_Inosine_ms2
 intensity_cutoff: 115000
 3_prime_tag: 587.2278
 5_prime_tag: 555.1294
-sequence_mass: 7327.164873087387
+intact_mass: 7327.164873087387
 true_sequence: UGCCUCACCAC9AUCAUCCUG

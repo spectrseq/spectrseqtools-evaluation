@@ -3,5 +3,5 @@ intensity_cutoff: 115000
 3_prime_tag: 455.1491
 5_prime_tag: 555.1294
 predicted_sequence: CAACAAGCGAGAGGUUCGAA
-sequence_mass: 7447.186265
+intact_mass: 7447.186265
 true_sequence: CAACAAGCGAGAGGUUCGAA

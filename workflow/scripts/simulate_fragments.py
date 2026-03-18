@@ -45,7 +45,7 @@ if "snakemake" in locals():
 
         # Add sequence mass to meta dict
         nucleosides = pl.read_csv(smk.input["nucleosides"], separator="\t")
-        meta["sequence_mass"] = (
+        meta["intact_mass"] = (
             get_seq_weight(
                 seq=true_sequence,
                 masses=nucleosides,
