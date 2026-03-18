@@ -30,8 +30,8 @@ if "snakemake" in locals():
         true_sequence = parse_nucleosides(smk.wildcards.seq)
         meta = {
             "identity": "simulated data",
-            "label_mass_3T": smk.config["fragmentation_params"]["mass_3_prime"],
-            "label_mass_5T": smk.config["fragmentation_params"]["mass_5_prime"],
+            "3_prime_tag": smk.config["fragmentation_params"]["3_prime_tag"],
+            "5_prime_tag": smk.config["fragmentation_params"]["5_prime_tag"],
             "true_sequence": "".join(true_sequence),
         }
 
@@ -39,8 +39,8 @@ if "snakemake" in locals():
         extra_mass_dict = build_extra_mass_dict(
             element_mass_path=smk.input["elements"],
             fragmentation_type=smk.config["fragmentation_params"]["fragmentation_type"],
-            mass_5_prime=meta["label_mass_5T"],
-            mass_3_prime=meta["label_mass_3T"],
+            start_tag=meta["5_prime_tag"],
+            end_tag=meta["3_prime_tag"],
         )
 
         # Add sequence mass to meta dict
@@ -119,8 +119,8 @@ def select_singletons(
 def build_extra_mass_dict(
     fragmentation_type: str,
     element_mass_path: Path,
-    mass_5_prime: float,
-    mass_3_prime: float,
+    start_tag: float,
+    end_tag: float,
 ) -> dict:
     # Build dict of elemental masses
     element_masses = pl.read_csv(element_mass_path, separator="\t")
@@ -138,10 +138,10 @@ def build_extra_mass_dict(
             element_masses["P"] + 2 * element_masses["O"] - element_masses["H+"]
         ),
         # Remove O from SU and add START tag (-H) for 5'-end of terminal fragments
-        "5_prime_terminal": mass_5_prime - element_masses["O"] - element_masses["H+"],
+        "5_prime_terminal": start_tag - element_masses["O"] - element_masses["H+"],
         # Remove PO3H from SU and add END tag (-H) for 3'-end of terminal fragments
         "3_prime_terminal": (
-            mass_3_prime
+            end_tag
             - element_masses["P"]
             - 3 * element_masses["O"]
             - 2 * element_masses["H+"]

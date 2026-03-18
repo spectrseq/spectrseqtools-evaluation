@@ -9,5 +9,5 @@ fragmentation_params:
   noise_rate: 5e-6
   fragmentation_type: "c/y"
   noise_distribution: "uniform"  # 'normal' or 'uniform'
-  mass_5_prime: 555.1294  # Standard START tag
-  mass_3_prime: 455.1491  # Standard END tag
+  5_prime_tag: 555.1294  # Standard START tag
+  3_prime_tag: 455.1491  # Standard END tag
