@@ -2,14 +2,14 @@ import polars as pl
 import sys
 from typing import List
 
-from spectrseqtools.masses import EXPLANATION_MASSES
+from spectrseqtools.masses import NUCLEOTIDE_DF
 
 
 NUC_REPS = {
     **{
-        nuc: row[EXPLANATION_MASSES.get_column_index("nucleoside")]
-        for row in EXPLANATION_MASSES.rows()
-        for nuc in row[EXPLANATION_MASSES.get_column_index("nucleoside_list")]
+        nuc: row[NUCLEOTIDE_DF.get_column_index("representative")]
+        for row in NUCLEOTIDE_DF.rows()
+        for nuc in row[NUCLEOTIDE_DF.get_column_index("id_list")]
     }
 }
 

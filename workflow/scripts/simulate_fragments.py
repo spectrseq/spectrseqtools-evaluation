@@ -8,7 +8,7 @@ from typing import List
 from spectrseqtools.common import parse_nucleosides
 
 
-GHOST_FRAGMENT_MAGNITUDE = 1000
+PHANTOM_FRAGMENT_MAGNITUDE = 1000
 NO_FRAGMENTATION_PROBABILITY = 0.05
 
 if "snakemake" in locals():
@@ -30,22 +30,22 @@ if "snakemake" in locals():
         true_sequence = parse_nucleosides(smk.wildcards.seq)
         meta = {
             "identity": "simulated data",
-            "label_mass_3T": smk.config["fragmentation_params"]["mass_3_prime"],
-            "label_mass_5T": smk.config["fragmentation_params"]["mass_5_prime"],
+            "3_prime_tag": smk.config["fragmentation_params"]["3_prime_tag"],
+            "5_prime_tag": smk.config["fragmentation_params"]["5_prime_tag"],
             "true_sequence": "".join(true_sequence),
         }
 
         # Build dict with extra masses
         extra_mass_dict = build_extra_mass_dict(
             element_mass_path=smk.input["elements"],
-            breakage_line=smk.config["fragmentation_params"]["breakage_line"],
-            mass_5_prime=meta["label_mass_5T"],
-            mass_3_prime=meta["label_mass_3T"],
+            fragmentation_type=smk.config["fragmentation_params"]["fragmentation_type"],
+            start_tag=meta["5_prime_tag"],
+            end_tag=meta["3_prime_tag"],
         )
 
         # Add sequence mass to meta dict
         nucleosides = pl.read_csv(smk.input["nucleosides"], separator="\t")
-        meta["sequence_mass"] = (
+        meta["intact_mass"] = (
             get_seq_weight(
                 seq=true_sequence,
                 masses=nucleosides,
@@ -60,9 +60,9 @@ if "snakemake" in locals():
             rng=rng,
             true_sequence=true_sequence,
             nucleoside_masses=nucleosides,
-            n_fragments=int(smk.params["num_copies"]),
-            ghost_rate=float(smk.params["ghost_rate"]),
-            rel_error_rate=float(smk.params["rel_error_rate"]),
+            num_replicates=int(smk.params["num_replicates"]),
+            phantom_rate=float(smk.params["phantom_rate"]),
+            noise_rate=float(smk.params["noise_rate"]),
             noise_dist=smk.config["fragmentation_params"]["noise_distribution"],
             extra_mass_dict=extra_mass_dict,
         )
@@ -102,7 +102,7 @@ def select_singletons(
         else rng.choice(
             [
                 nuc
-                for nuc in nucleosides.get_column("nucleoside").to_list()
+                for nuc in nucleosides.get_column("id").to_list()
                 if nuc not in true_nucs
             ],
             size=num_additional_nucs,
@@ -110,17 +110,17 @@ def select_singletons(
         ).tolist()
     )
 
-    return nucleosides.filter(pl.col("nucleoside").is_in(true_nucs + random_nucs))
+    return nucleosides.filter(pl.col("id").is_in(true_nucs + random_nucs))
 
 
 # METHOD: Consider each base in the form of a standard unit, which can be
 # combined arbitrarily to build any sequence, and only adapt the masses of the
-# fragment ends (either based on a tag or fragmentation/breakage).
+# fragment ends (either based on a tag or fragmentation).
 def build_extra_mass_dict(
-    breakage_line: str,
+    fragmentation_type: str,
     element_mass_path: Path,
-    mass_5_prime: float,
-    mass_3_prime: float,
+    start_tag: float,
+    end_tag: float,
 ) -> dict:
     # Build dict of elemental masses
     element_masses = pl.read_csv(element_mass_path, separator="\t")
@@ -138,18 +138,18 @@ def build_extra_mass_dict(
             element_masses["P"] + 2 * element_masses["O"] - element_masses["H+"]
         ),
         # Remove O from SU and add START tag (-H) for 5'-end of terminal fragments
-        "5_prime_terminal": mass_5_prime - element_masses["O"] - element_masses["H+"],
+        "5_prime_terminal": start_tag - element_masses["O"] - element_masses["H+"],
         # Remove PO3H from SU and add END tag (-H) for 3'-end of terminal fragments
         "3_prime_terminal": (
-            mass_3_prime
+            end_tag
             - element_masses["P"]
             - 3 * element_masses["O"]
             - 2 * element_masses["H+"]
         ),
     }
 
-    # Add breakage-specific masses for 5'- and 3'-ends of a fragment to dict
-    match breakage_line:
+    # Add fragmentation-specific masses for 5'- and 3'-ends of a fragment to dict
+    match fragmentation_type:
         case "a/w":  # assuming double bond for 3'-end
             extra_mass_dict["5_prime_internal"] = (
                 element_masses["P"] + 3 * element_masses["O"] + 2 * element_masses["H+"]
@@ -176,7 +176,7 @@ def build_extra_mass_dict(
             )
         case _:
             raise NotImplementedError(
-                f"There is no breakage option called '{breakage_line}'."
+                f"There is no fragmentation type called '{fragmentation_type}'."
             )
 
     return extra_mass_dict
@@ -187,9 +187,11 @@ def get_seq_weight(seq: list, masses: dict) -> float:
     seq_df = seq_df.with_columns(
         pl.col("name")
         .map_elements(
-            lambda x: masses.filter(pl.col("nucleoside") == x)
-            .get_column("monoisotopic_mass")
-            .to_list()[0],
+            lambda x: (
+                masses.filter(pl.col("id") == x)
+                .get_column("monoisotopic_mass")
+                .to_list()[0]
+            ),
             return_dtype=pl.Float64,
         )
         .alias("mass")
@@ -201,9 +203,9 @@ def simulate(
     rng: np.random.Generator,
     true_sequence: List[str],
     nucleoside_masses: pl.DataFrame,
-    n_fragments: int,
-    ghost_rate: float,
-    rel_error_rate: float,
+    num_replicates: int,
+    phantom_rate: float,
+    noise_rate: float,
     noise_dist: str,
     extra_mass_dict: dict,
 ) -> pl.DataFrame:
@@ -211,11 +213,11 @@ def simulate(
     seq_len = len(true_sequence)
     frag_sites = [
         select_fragmentation_sites(
-            num_breaks=select_num_breaks(seq_len=seq_len, rng=rng),
+            num_sites=select_num_sites(seq_len=seq_len, rng=rng),
             seq_len=seq_len,
             rng=rng,
         )
-        for _ in range(round(n_fragments * (1 + ghost_rate)))
+        for _ in range(round(num_replicates * (1 + phantom_rate)))
     ]
 
     # Build fragment dataframe
@@ -256,7 +258,7 @@ def simulate(
         pl.struct("left", "right")
         .map_elements(
             lambda x: sum(
-                nucleoside_masses.filter(pl.col("nucleoside") == base)
+                nucleoside_masses.filter(pl.col("id") == base)
                 .select(pl.col("monoisotopic_mass"))
                 .item()
                 for base in true_sequence[x["left"] : x["right"]]
@@ -273,7 +275,7 @@ def simulate(
             lambda x: induce_noise(
                 rng=rng,
                 distribution_method=noise_dist,
-                error_rate=rel_error_rate,
+                noise_rate=noise_rate,
                 mass=x["true_nucleoside_mass"],
             ),
             return_dtype=float,
@@ -303,7 +305,7 @@ def simulate(
             lambda x: induce_noise(
                 rng=rng,
                 distribution_method=noise_dist,
-                error_rate=rel_error_rate,
+                noise_rate=noise_rate,
                 mass=x["true_mass_with_backbone"],
             ),
             return_dtype=float,
@@ -311,31 +313,36 @@ def simulate(
         .alias("observed_mass")
     )
 
-    # Select ghost (i.e. invalid) fragments
+    # Select phantom (i.e. invalid) fragments
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
-            lambda x: True if rng.random() < ghost_rate else False,
+            lambda x: True if rng.random() < phantom_rate else False,
             return_dtype=bool,
         )
-        .alias("is_ghost_fragment")
+        .alias("is_phantom_fragment")
     )
 
-    # Update classification for ghost fragments by setting all to internal
+    # Update classification for phantom fragments by setting all to internal
     fragments = fragments.with_columns(
-        (pl.col("is_start") & ~pl.col("is_ghost_fragment")).alias("is_start"),
-        (pl.col("is_end") & ~pl.col("is_ghost_fragment")).alias("is_end"),
-        (pl.col("is_start_end") & ~pl.col("is_ghost_fragment")).alias("is_start_end"),
-        (pl.col("is_internal") | pl.col("is_ghost_fragment")).alias("is_internal"),
+        (pl.col("is_start") & ~pl.col("is_phantom_fragment")).alias("is_start"),
+        (pl.col("is_end") & ~pl.col("is_phantom_fragment")).alias("is_end"),
+        (pl.col("is_start_end") & ~pl.col("is_phantom_fragment")).alias("is_start_end"),
+        (pl.col("is_internal") | pl.col("is_phantom_fragment")).alias("is_internal"),
     )
 
-    # Update observed mass for ghost fragments by adjusting it randomly
+    # Update observed mass for phantom fragments by adjusting it randomly
     fragments = fragments.with_columns(
         pl.struct("*")
         .map_elements(
-            lambda x: x["observed_mass"]
-            + int(x["is_ghost_fragment"])
-            * (-GHOST_FRAGMENT_MAGNITUDE + 2 * GHOST_FRAGMENT_MAGNITUDE * rng.random()),
+            lambda x: (
+                x["observed_mass"]
+                + int(x["is_phantom_fragment"])
+                * (
+                    -PHANTOM_FRAGMENT_MAGNITUDE
+                    + 2 * PHANTOM_FRAGMENT_MAGNITUDE * rng.random()
+                )
+            ),
             return_dtype=float,
         )
         .alias("observed_mass")
@@ -345,13 +352,13 @@ def simulate(
     return fragments
 
 
-# METHOD: Consider fragments without any breakage, i.e. complete fragments,
-# separately (randomly select based on given probability); if the sequence
-# does break, use a geometric distribution to determine the number of breaks
-# while approximating the true distribution of fragment lengths observed in
-# experimental data (exponential distribution with many small and few larger
-# fragments, which gets sharper with increasing sequence length)
-def select_num_breaks(seq_len: int, rng: np.random.Generator) -> int:
+# METHOD: Consider fragments without any fragmentation, i.e. complete
+# fragments, separately (randomly select based on given probability); if the
+# sequence does fragment, use a geometric distribution to determine the
+# number of sites while approximating the true distribution of fragment lengths
+# observed in experimental data (exponential distribution with many small and
+# few larger fragments, which gets sharper with increasing sequence length)
+def select_num_sites(seq_len: int, rng: np.random.Generator) -> int:
     if rng.random() < NO_FRAGMENTATION_PROBABILITY:
         return 0
     # Note that p = factor/seq_len with factor = seq_len/alpha
@@ -361,26 +368,26 @@ def select_num_breaks(seq_len: int, rng: np.random.Generator) -> int:
 
 # TODO: Implement that in some cases there is no base pair generated, but only the backbone with sugar etc?
 def select_fragmentation_sites(
-    num_breaks: int, seq_len: int, rng: np.random.Generator
+    num_sites: int, seq_len: int, rng: np.random.Generator
 ) -> List[int]:
-    # Ensure there is a positive number of parts (i.e. number of breaks + 1)
-    if num_breaks < 0:
+    # Ensure there is a positive number of parts (i.e. number of sites + 1)
+    if num_sites < 0:
         raise ValueError("The number of parts cannot be less than one!")
 
     # Ensure the number of parts is not greater than the sequence length
-    if num_breaks + 1 > seq_len:
+    if num_sites + 1 > seq_len:
         raise ValueError(
             "The number of parts cannot be greater than the sequence length!"
         )
 
-    # If the sequence has zero breaks, it remains intact
-    if num_breaks == 0:
+    # If the sequence has zero sites, it remains intact
+    if num_sites == 0:
         return [int(0)]
 
-    # Return randomly sampled breakage positions in the sequence
+    # Return randomly sampled fragmentation sites in the sequence
     # Use beta distribution to avoid bias towards small terminal fragments (like e.g. for uniform one)
     return sorted(
-        set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_breaks)])
+        set([round(val * seq_len) for val in rng.beta(a=2, b=2, size=num_sites)])
     )
 
 
@@ -388,25 +395,25 @@ def compute_fragment_tuples(frag_sites, seq_len):
     tuples = []
 
     # Generate tuples of start and end index for each fragments
-    for seq_copy in frag_sites:
-        if seq_copy[0] != 0:
-            seq_copy.insert(0, 0)
-        if seq_copy[-1] != seq_len:
-            seq_copy.append(seq_len)
+    for seq_replicate in frag_sites:
+        if seq_replicate[0] != 0:
+            seq_replicate.insert(0, 0)
+        if seq_replicate[-1] != seq_len:
+            seq_replicate.append(seq_len)
 
-        tuples += list(zip(seq_copy[:-1], seq_copy[1:]))
+        tuples += list(zip(seq_replicate[:-1], seq_replicate[1:]))
 
     return tuples
 
 
 def induce_noise(
-    rng: np.random.Generator, distribution_method: str, error_rate: float, mass: float
+    rng: np.random.Generator, distribution_method: str, noise_rate: float, mass: float
 ) -> float:
     match distribution_method:
         case "normal":
-            noise = rng.normal(scale=error_rate)
+            noise = rng.normal(scale=noise_rate)
         case "uniform":
-            noise = -error_rate + 2 * error_rate * rng.random()
+            noise = -noise_rate + 2 * noise_rate * rng.random()
         case _:
             raise NotImplementedError(
                 f"There is no option for the noise distribution called '{distribution_method}'."

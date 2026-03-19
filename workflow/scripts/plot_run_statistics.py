@@ -29,24 +29,29 @@ if "snakemake" in locals():
 
         sim_results = pl.read_csv(smk.input["sim"], separator="\t")
         sim_results = sim_results.with_columns(pl.lit("simulation").alias("type"))
-        sim_chart = create_scatterplot(data=sim_results,mode=mode)
+        sim_chart = create_scatterplot(data=sim_results, mode=mode)
 
         exp_results = pl.read_csv(smk.input["exp"], separator="\t")
         exp_results = exp_results.with_columns(pl.lit("experiment").alias("type"))
         exp_chart = create_scatterplot(data=exp_results, size=50, mode=mode)
 
-        chart = alt.layer(sim_chart, exp_chart).configure_view(
-            strokeWidth=0).configure_axis(grid=False)
+        chart = (
+            alt.layer(sim_chart, exp_chart)
+            .configure_view(strokeWidth=0)
+            .configure_axis(grid=False)
+        )
 
         chart.save(smk.output[0])
 
 
-def create_scatterplot(data: pl.DataFrame, mode: str, size: int=20):
+def create_scatterplot(data: pl.DataFrame, mode: str, size: int = 20):
     base_chart = (
         alt.Chart(data)
         .encode(
             x=alt.X(
-                "num_frag:Q", title="Number of fragments", scale=alt.Scale(padding=0),
+                "num_frag:Q",
+                title="Number of fragments",
+                scale=alt.Scale(padding=0),
             ),
             y=select_y_axis(mode=mode),
         )
@@ -55,18 +60,21 @@ def create_scatterplot(data: pl.DataFrame, mode: str, size: int=20):
 
     scatterplot = base_chart.mark_circle(size=size).encode(
         # color=alt.value(STATUS_COLORS[kind]),
-        color=alt.Color("type:N",
+        color=alt.Color(
+            "type:N",
             scale=alt.Scale(
                 domain=STATUS_ORDER,
                 range=[
                     STATUS_COLORS[stat] if STATUS_COLORS.get(stat) else stat
                     for stat in STATUS_ORDER
-                ],),
-            legend = alt.Legend(
+                ],
+            ),
+            legend=alt.Legend(
                 **LEGEND_PARAMS,
-                orient="top-left", title="",
+                orient="top-left",
+                title="",
             ),
-            ),
+        ),
         tooltip=select_tooltip(mode=mode),
     )
 

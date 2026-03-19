@@ -4,13 +4,13 @@
 simulation:
   custom:
     - seq: CUA104GU0A
-      n_fragments:
+      num_replicates:
 #        - 10
 #        - 20
         - 50
       name: "testcase_01"
     - seq: GAUUGUCGUG
-      n_fragments:
+      num_replicates:
 #        - 20
 #        - 30
         - 50
@@ -18,14 +18,14 @@ simulation:
 #        - 200
       name: "testcase_02"
 #    - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-#      n_fragments:
+#      num_replicates:
 ##        - 30
 #        - 50
 ##        - 200
 ##        - 400
 #      name: "testcase_06"
 #    - seq: CAGCAAAACGAUCAUAUAGA
-#      n_fragments:
+#      num_replicates:
 ##        - 30
 #        - 100
 ##        - 200

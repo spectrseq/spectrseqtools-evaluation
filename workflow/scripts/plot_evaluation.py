@@ -121,7 +121,8 @@ def create_stacked_barplot(data: pl.DataFrame, param: str) -> alt.Chart:
                 ),
                 legend=alt.Legend(
                     **LEGEND_PARAMS,
-                    orient="left",  title="",# title="Prediction status"
+                    orient="left",
+                    title="",  # title="Prediction status"
                 ),
                 sort=STATUS_ORDER,
             ),
@@ -173,18 +174,18 @@ def create_heatmap(data: pl.DataFrame, param: str) -> alt.Chart:
 
 def select_x_axis(param: str):
     match param:
-        case "mutation_rate":
-            return alt.X("mutation_rate:N", title="Modification Rate")
-        case "num_copies":
-            return alt.X("num_copies:N", title="Number of sequence replicates")
+        case "modification_rate":
+            return alt.X("modification_rate:N", title="Modification rate")
+        case "num_replicates":
+            return alt.X("num_replicates:N", title="Number of sequence replicates")
         case "max_singletons":
             return alt.X(
                 "max_singletons:N", title="Maximum number of false positive singletons"
             )
-        case "ghost_rate":
-            return alt.X("ghost_rate:N", title="Phantom rate")
-        case "rel_error_rate":
-            return alt.X("rel_error_rate:N", title="Relative error rate")
+        case "phantom_rate":
+            return alt.X("phantom_rate:N", title="Phantom rate")
+        case "noise_rate":
+            return alt.X("noise_rate:N", title="Noise rate")
         case "intensity_cutoff":
             return alt.X("intensity_cutoff:N", title="Intensity cutoff percentile")
         case "lp_timeout_long":

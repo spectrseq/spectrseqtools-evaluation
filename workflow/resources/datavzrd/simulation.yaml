@@ -55,7 +55,7 @@ views:
           plot:
             heatmap:
               scale: linear
-        is_ghost_fragment:
+        is_phantom_fragment:
           spell:
             url: v1.1.3/logic/boolean
             with:

@@ -3,11 +3,11 @@ import os
 
 
 wildcard_constraints:
-    n_fragments="[0-9]+",
+    num_replicates="[0-9]+",
 
 
 def generate_random_sequence_and_seed_pair(
-    seq_len, mutation_rate=0, modifications=None
+    seq_len, modification_rate=0, modifications=None
 ):
     # If no modifications are given, simulate over unmodified bases only
     if modifications is None:
@@ -24,9 +24,9 @@ def generate_random_sequence_and_seed_pair(
         if line.split("\t")[0] not in ["U", "A", "G", "C"]
     ]
 
-    # Define probabilities for different bases (using mutation rate)
-    weights = [(1.0 - mutation_rate) / 4] * 4 + [
-        mutation_rate / len(modified_nucleoside_names)
+    # Define probabilities for different bases (using modification rate)
+    weights = [(1.0 - modification_rate) / 4] * 4 + [
+        modification_rate / len(modified_nucleoside_names)
     ] * len(modified_nucleoside_names)
 
     return "".join(
@@ -38,7 +38,7 @@ def generate_random_sequence_and_seed_pair(
     ), random.choice(range(10000))
 
 
-def generate_random_sequences(seq_len, mutation_rate=0, modified_nucleosides=None):
+def generate_random_sequences(seq_len, modification_rate=0, modified_nucleosides=None):
     if modified_nucleosides is not None:
         with open(modified_nucleosides, "r") as file:
             lines = file.readlines()[1:]
@@ -48,9 +48,9 @@ def generate_random_sequences(seq_len, mutation_rate=0, modified_nucleosides=Non
             if line.split("\t")[0] not in ["U", "A", "G", "C"]
         ]
 
-        # Define probabilities for different bases (using mutation rate)
-        weights = [(1.0 - mutation_rate) / 4] * 4 + [
-            mutation_rate / len(modified_nucleoside_names)
+        # Define probabilities for different bases (using modification rate)
+        weights = [(1.0 - modification_rate) / 4] * 4 + [
+            modification_rate / len(modified_nucleoside_names)
         ] * len(modified_nucleoside_names)
 
         return "".join(
@@ -74,10 +74,10 @@ def collect_custom_simulations(*patterns):
         collect(
             patterns,
             seq=item["seq"],
-            n_fragments=n_fragments,
+            num_replicates=num_replicates,
         )
         for item in lookup(dpath="simulation/custom", within=config)
-        for n_fragments in item["n_fragments"]
+        for num_replicates in item["num_replicates"]
     ]
 
 
@@ -93,8 +93,8 @@ def collect_random_simulations(*patterns):
         sequences = [
             generate_random_sequence_and_seed_pair(
                 seq_len=random.choice(range(10, 21)),
-                mutation_rate=lookup(dpath="simulation/random", within=config)[
-                    "mutation_rate"
+                modification_rate=lookup(dpath="simulation/random", within=config)[
+                    "modification_rate"
                 ],
                 modifications=workflow.source_path("../resources/masses.tsv"),
             )
@@ -111,9 +111,9 @@ def collect_random_simulations(*patterns):
                 collect(
                     patterns,
                     seq=seq[0],
-                    n_fragments=n_fragments,
+                    num_replicates=num_replicates,
                 )
-                for n_fragments in sim["n_fragments"]
+                for num_replicates in sim["num_replicates"]
             ]
 
     return retval
@@ -135,19 +135,19 @@ def collect_comparison_studies(param: str, *patterns):
         return []
 
     sim = lookup(dpath=f"comparison/studies/{param}", within=config)
-    for mutation_rate in sim["mutation_rate"]:
+    for modification_rate in sim["modification_rate"]:
         random.seed(lookup(dpath="comparison/seed", within=config))
         sequences = [
             generate_random_sequence_and_seed_pair(
                 seq_len=random.choice(range(10, 21)),
-                mutation_rate=mutation_rate,
+                modification_rate=modification_rate,
                 modifications=workflow.source_path("../resources/masses.tsv"),
             )
             for _ in range(lookup(dpath="comparison/num_sequences", within=config))
         ]
 
         for seq in sequences:
-            values = sim[param] if param != "mutation_rate" else [mutation_rate]
+            values = sim[param] if param != "modification_rate" else [modification_rate]
             for value in values:
                 file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
                 os.makedirs(os.path.dirname(file_name), exist_ok=True)
@@ -182,7 +182,7 @@ def collect_experiments(*patterns):
         collect(
             patterns,
             seq=item["seq"],
-            n_fragments=item["fragments"],
+            num_replicates=item["fragments"],
         )
         for item in lookup(dpath="experiment", within=config)
     ]
@@ -209,7 +209,7 @@ def collect_optimizations(param: str, *patterns):
                 parameter=param,
                 value=value,
                 seq=item["seq"],
-                n_fragments=item["fragments"],
+                num_replicates=item["fragments"],
             )
 
     return retval
