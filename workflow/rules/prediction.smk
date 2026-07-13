@@ -31,6 +31,7 @@ rule predict_experimental_sequence:
         sequence="results/prediction/experiment/{seq}/{num_replicates}.fasta",
     params:
         solver=config["solver"],
+        length_estimator=config["length_estimator"],
     log:
         "logs/prediction/experiment/{seq}/{num_replicates}.log",
     benchmark:
@@ -48,6 +49,7 @@ rule predict_experimental_sequence:
         "--sequence-name 'spectrseqtools_prediction_{wildcards.seq}' "
         "--solver {params.solver} "
         "--threads {threads} "
+        "--length-estimator-metric {params.length_estimator} "
         "2> {log}"
 
 
@@ -62,6 +64,7 @@ rule predict_simulated_sequence:
         sequence="results/prediction/simulation/{seq}/{num_replicates}.fasta",
     params:
         solver=config["solver"],
+        length_estimator=config["length_estimator"],
     log:
         "logs/prediction/simulation/{seq}/{num_replicates}.log",
     benchmark:
@@ -79,6 +82,7 @@ rule predict_simulated_sequence:
         "--sequence-name 'spectrseqtools_prediction_from_sim_{wildcards.seq}' "
         "--solver {params.solver} "
         "--threads {threads} "
+        "--length-estimator-metric {params.length_estimator} "
         "2> {log}"
 
 
@@ -92,6 +96,7 @@ rule predict_sequence_for_comparison_study:
         sequence="results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
     params:
         solver=config["solver"],
+        length_estimator=config["length_estimator"],
     log:
         "logs/comparison_study/{parameter}/{value}/{seq}/prediction.log",
     benchmark:
@@ -109,6 +114,7 @@ rule predict_sequence_for_comparison_study:
         "--sequence-name 'spectrseqtools_prediction_from_sim_{wildcards.seq}' "
         "--solver {params.solver} "
         "--threads {threads} "
+        "--length-estimator-metric {params.length_estimator} "
         "2> {log}"
 
 
@@ -122,6 +128,7 @@ rule predict_sequence_for_optimization_study:
         sequence="results/optimization/{parameter}/{value}/{seq}/sample.fasta",
     params:
         solver=config["solver"],
+        length_estimator=config["length_estimator"],
         intensity_cutoff=lambda wildcards: (
             wildcards.value
             if wildcards.parameter == "intensity_cutoff"
@@ -168,5 +175,6 @@ rule predict_sequence_for_optimization_study:
         "--intensity-cutoff-percentile {params.intensity_cutoff} "
         "--lp-timeout-long {params.lp_timeout_long} "
         "--lp-timeout-short {params.lp_timeout_short} "
+        "--length-estimator-metric {params.length_estimator} "
         "--output-dir {params.dir} "
         "2> {log}"
