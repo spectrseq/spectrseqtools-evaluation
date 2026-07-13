@@ -1,6 +1,7 @@
-# Select solver name; allowed: "gurobi" (license required) or "cbc"
+# Select solver name; allowed: "gurobi" (license required), "highs", or "cbc"
 #solver: "gurobi"
-solver: "cbc"
+#solver: "cbc"
+solver: "highs"
 
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
