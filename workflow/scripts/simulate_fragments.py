@@ -1,13 +1,12 @@
 import sys
-import polars as pl
-import yaml
-import numpy as np
 from pathlib import Path
 from typing import List
 
+import numpy as np
+import polars as pl
+import yaml
 from spectrseqtools.dataclasses import Sequence
 from spectrseqtools.file_settings import load_alphabet
-
 
 PHANTOM_FRAGMENT_MAGNITUDE = 1000
 NO_FRAGMENTATION_PROBABILITY = 0.05

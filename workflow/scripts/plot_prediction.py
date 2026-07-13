@@ -1,8 +1,7 @@
 import sys
 
-from spectrseqtools.dataclasses import Sequence, Prediction
+from spectrseqtools.dataclasses import Prediction, Sequence
 from spectrseqtools.plotting import plot_prediction
-
 
 if "snakemake" in locals():
     smk = snakemake

@@ -1,7 +1,7 @@
-import polars as pl
 import sys
 from typing import List
 
+import polars as pl
 from spectrseqtools.dataclasses import Sequence
 from spectrseqtools.error_calculator import ErrorUnderL1Norm
 from spectrseqtools.nucleotide_alphabet import NucleotideAlphabet
