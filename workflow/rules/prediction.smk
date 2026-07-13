@@ -1,10 +1,31 @@
-rule predict_experimental_sequence:
+rule preprocess_experimental_sequence:
     input:
         fragments="data/experiment/{seq}/{num_replicates}.raw",
         meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
     output:
         fragments="data/experiment/{seq}/{num_replicates}.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
+        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
+    log:
+        "logs/preprocessing/experiment/{seq}/{num_replicates}.log",
+    benchmark:
+        "benchmarks/preprocessing/experiment/{seq}/{num_replicates}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    shell:
+        "spectrseqtools preprocessing "
+        "--input {input.fragments} "
+        "--meta {input.meta} "
+        "2> {log}"
+
+
+rule predict_experimental_sequence:
+    input:
+        fragments="data/experiment/{seq}/{num_replicates}.tsv",
+        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
+        alphabet="data/experiment/{seq}/{num_replicates}.singletons.tsv",
+    output:
         su_fragments="data/experiment/{seq}/{num_replicates}.standard_unit_fragments.tsv",
         predictions="results/prediction/experiment/{seq}/{num_replicates}.tsv",
         sequence="results/prediction/experiment/{seq}/{num_replicates}.fasta",
@@ -18,7 +39,10 @@ rule predict_experimental_sequence:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools prediction "
+        "--fragments {input.fragments} "
+        "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'spectrseqtools_prediction_{wildcards.seq}' "
@@ -31,7 +55,7 @@ rule predict_simulated_sequence:
     input:
         fragments="data/simulation/{seq}/{num_replicates}.tsv",
         meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
-        singletons="data/simulation/{seq}/{num_replicates}.singletons.tsv",
+        alphabet="data/simulation/{seq}/{num_replicates}.singletons.tsv",
     output:
         su_fragments="data/simulation/{seq}/{num_replicates}.standard_unit_fragments.tsv",
         predictions="results/prediction/simulation/{seq}/{num_replicates}.tsv",
@@ -46,7 +70,10 @@ rule predict_simulated_sequence:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools prediction "
+        "--fragments {input.fragments} "
+        "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'spectrseqtools_prediction_from_sim_{wildcards.seq}' "
@@ -59,6 +86,7 @@ rule predict_sequence_for_comparison_study:
     input:
         fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+        alphabet="comparison_study/{parameter}/{value}/{seq}/sample.singletons.tsv",
     output:
         predictions="results/comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         sequence="results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
@@ -72,7 +100,10 @@ rule predict_sequence_for_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools prediction "
+        "--fragments {input.fragments} "
+        "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'spectrseqtools_prediction_from_sim_{wildcards.seq}' "
@@ -83,12 +114,10 @@ rule predict_sequence_for_comparison_study:
 
 rule predict_sequence_for_optimization_study:
     input:
-        fragments="data/experiment/{seq}/0.raw",
+        fragments="data/experiment/{seq}/0.tsv",
         meta="data/experiment/{seq}/0.meta.yaml",
+        alphabet="data/experiment/{seq}/0.singletons.tsv",
     output:
-        meta="results/optimization/{parameter}/{value}/{seq}/0.preprocessed.meta.yaml",
-        fragments="results/optimization/{parameter}/{value}/{seq}/0.tsv",
-        singletons="results/optimization/{parameter}/{value}/{seq}/0.singletons.tsv",
         predictions="results/optimization/{parameter}/{value}/{seq}/sample.tsv",
         sequence="results/optimization/{parameter}/{value}/{seq}/sample.fasta",
     params:
@@ -117,7 +146,7 @@ rule predict_sequence_for_optimization_study:
                 within=config,
             )[0]
         ),
-        dir=subpath(output.fragments, parent=True),
+        dir=subpath(output.predictions, parent=True),
         # dir="results/optimization/{parameter}/{value}/{seq}/",
     log:
         "logs/optimization/{parameter}/{value}/{seq}/sample.log",
@@ -127,13 +156,16 @@ rule predict_sequence_for_optimization_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools --fragments {input.fragments} --meta {input.meta} "
+        "spectrseqtools prediction "
+        "--fragments {input.fragments} "
+        "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "--fragment-predictions {output.predictions} "
         "--sequence-prediction {output.sequence} "
         "--sequence-name 'spectrseqtools_prediction_{wildcards.seq}' "
         "--solver {params.solver} "
         "--threads {threads} "
-        "--cutoff-percentile {params.intensity_cutoff} "
+        "--intensity-cutoff-percentile {params.intensity_cutoff} "
         "--lp-timeout-long {params.lp_timeout_long} "
         "--lp-timeout-short {params.lp_timeout_short} "
         "--output-dir {params.dir} "

@@ -1,8 +1,7 @@
 import sys
 
-from spectrseqtools.common import parse_nucleosides
+from spectrseqtools.dataclasses import Sequence, Prediction
 from spectrseqtools.plotting import plot_prediction
-from spectrseqtools.prediction import Prediction
 
 
 if "snakemake" in locals():
@@ -15,7 +14,7 @@ if "snakemake" in locals():
             fragments_path=smk.input.pred_fragments,
         )
 
-        true_seq = parse_nucleosides(smk.wildcards.seq)
+        true_seq = Sequence.from_str(smk.wildcards.seq)
         # simulation = pl.read_csv(smk.input.sim, separator="\t")
 
         charts = plot_prediction(
