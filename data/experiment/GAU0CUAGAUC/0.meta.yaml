@@ -1,7 +1,4 @@
 identity: 2025-04-16_SJH_10merRNA01_mC_ms2
-intensity_cutoff: 115000
 3_prime_tag: 455.1491
 5_prime_tag: 555.1294
-predicted_sequence: GAU0CUAGAUC
-intact_mass: 4131.724787016552
 true_sequence: GAU0CUAGAUC

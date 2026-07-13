@@ -1,7 +1,4 @@
 identity: 2025-04-15_SJH_25merRNA01_ms2
-intensity_cutoff: 115000
 3_prime_tag: 455.1491
 5_prime_tag: 555.1294
-predicted_sequence: AUAGAUAGCCUUUUAUAAAGAGCUA
-intact_mass: 8944.36398
 true_sequence: AUAGAUAGCCUAAAUCUCAGAGCUA
