@@ -16,25 +16,36 @@ comparison:
   num_sequences: 100
   seed: 1234
   studies:
+    sequence_length:
+      sequence_length: [10, 12, 15, 17, 20, 22, 25, 27, 30, 33]
+      modification_rate: [0.1]
+      num_replicates: [100]
+      max_singletons: [10]
+      phantom_rate: [0.0]
+      noise_rate: [5e-6]
     modification_rate:
+      sequence_length: [-1]
       modification_rate: [0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2, 0.25, 0.5]
       num_replicates: [100]
       max_singletons: [10]
       phantom_rate: [0.0]
       noise_rate: [5e-6]
     num_replicates:
+      sequence_length: [-1]
       modification_rate: [0.1]
       num_replicates: [10, 20, 30, 50, 75, 100, 150, 200, 250, 300]
       max_singletons: [10]
       phantom_rate: [0.0]
       noise_rate: [5e-6]
     max_singletons:
+      sequence_length: [-1]
       modification_rate: [0.1]
       num_replicates: [100]
       max_singletons: [0, 10, 15, 20, 25, 30, 50, 75, 100, 150]
       phantom_rate: [0.0]
       noise_rate: [5e-6]
     phantom_rate:
+      sequence_length: [-1]
       modification_rate: [0.1]
       num_replicates: [100]
       max_singletons: [10]

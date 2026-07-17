@@ -1,16 +1,17 @@
-import polars as pl
 import sys
 from typing import List
 
-from spectrseqtools.common import parse_nucleosides
-from spectrseqtools.masses import NUCLEOTIDE_DF
+import polars as pl
+from spectrseqtools.dataclasses import Sequence
+from spectrseqtools.error_calculator import ErrorUnderL1Norm
+from spectrseqtools.nucleotide_alphabet import NucleotideAlphabet
 
-
+NUCLEOTIDE_DF = NucleotideAlphabet.from_file(error=ErrorUnderL1Norm()).to_dataframe()
 NUC_REPS = {
     **{
-        nuc: row[NUCLEOTIDE_DF.get_column_index("representative")]
+        nuc: row[NUCLEOTIDE_DF.get_column_index("names")][0]
         for row in NUCLEOTIDE_DF.rows()
-        for nuc in row[NUCLEOTIDE_DF.get_column_index("id_list")]
+        for nuc in row[NUCLEOTIDE_DF.get_column_index("names")]
     }
 }
 
@@ -66,22 +67,22 @@ def collect_results(files: List[str]) -> List[str]:
             f.readline()
             pred_seq = f.readline().rstrip("\n")
         print(
-            len(parse_nucleosides(true_seq)),
-            len(parse_nucleosides(pred_seq)),
+            len(Sequence.from_str(true_seq).sequence),
+            len(Sequence.from_str(pred_seq).sequence),
         )
         print("true:", true_seq)
         print("pred:", pred_seq)
         result = compare_sequences(
-            parse_nucleosides(true_seq),
-            parse_nucleosides(pred_seq),
+            Sequence.from_str(true_seq).sequence,
+            Sequence.from_str(pred_seq).sequence,
         )
         print("result:", result)
         print()
         results.append(result)
         true_sequences.append(true_seq)
         pred_sequences.append(pred_seq)
-        true_lengths.append(len(parse_nucleosides(true_seq)))
-        pred_lengths.append(len(parse_nucleosides(pred_seq)))
+        true_lengths.append(len(Sequence.from_str(true_seq).sequence))
+        pred_lengths.append(len(Sequence.from_str(pred_seq).sequence))
         comp_values.append(comp_value)
 
     return pl.DataFrame(

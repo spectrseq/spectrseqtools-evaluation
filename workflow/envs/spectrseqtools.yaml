@@ -23,10 +23,15 @@ dependencies:
   - scikit-learn >=1.7.2,<2.0
   - cython >=3.0.3,<4.0
   - mono >=6.12.0.199,<7
-  - gurobi <13.0
+  - gurobi <14.0
+  - highs >=1.14.0,<1.15
+  - rust >=1.85,<2.0
+  - c-compiler
+  - maturin >=1.11,<2.0
   - pip
   - pip:
 #    - -e /home/laura/Uni/RNA/Git/spectrseqtools
     - git+https://github.com/spectrseq/spectrseqtools.git
     - dbscan1d >=0.2.3,<0.3
     - pulp >=2.3.0,<3.0
+    - ddargparse >=0.3.0,<0.4

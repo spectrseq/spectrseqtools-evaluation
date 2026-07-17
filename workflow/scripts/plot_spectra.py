@@ -1,7 +1,7 @@
-import altair as alt
-import polars as pl
 import sys
 
+import altair as alt
+import polars as pl
 
 STATUS_COLORS = {
     "true": "#990000",

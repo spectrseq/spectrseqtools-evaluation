@@ -1,12 +1,12 @@
 import sys
-import polars as pl
-import yaml
-import numpy as np
 from pathlib import Path
 from typing import List
 
-from spectrseqtools.common import parse_nucleosides
-
+import numpy as np
+import polars as pl
+import yaml
+from spectrseqtools.dataclasses import Sequence
+from spectrseqtools.file_settings import load_alphabet
 
 PHANTOM_FRAGMENT_MAGNITUDE = 1000
 NO_FRAGMENTATION_PROBABILITY = 0.05
@@ -27,7 +27,7 @@ if "snakemake" in locals():
         rng = np.random.default_rng(seed=seed)
 
         # Build meta dict
-        true_sequence = parse_nucleosides(smk.wildcards.seq)
+        true_sequence = Sequence.from_str(smk.wildcards.seq).sequence
         meta = {
             "identity": "simulated data",
             "3_prime_tag": smk.config["fragmentation_params"]["3_prime_tag"],
@@ -44,7 +44,7 @@ if "snakemake" in locals():
         )
 
         # Add sequence mass to meta dict
-        nucleosides = pl.read_csv(smk.input["nucleosides"], separator="\t")
+        nucleosides = load_alphabet()
         meta["intact_mass"] = (
             get_seq_weight(
                 seq=true_sequence,

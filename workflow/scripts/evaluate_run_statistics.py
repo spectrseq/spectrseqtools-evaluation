@@ -1,15 +1,16 @@
-import polars as pl
 import sys
 from typing import List
 
-from spectrseqtools.masses import NUCLEOTIDE_DF
+import polars as pl
+from spectrseqtools.error_calculator import ErrorUnderL1Norm
+from spectrseqtools.nucleotide_alphabet import NucleotideAlphabet
 
-
+NUCLEOTIDE_DF = NucleotideAlphabet.from_file(error=ErrorUnderL1Norm()).to_dataframe()
 NUC_REPS = {
     **{
-        nuc: row[NUCLEOTIDE_DF.get_column_index("representative")]
+        nuc: row[NUCLEOTIDE_DF.get_column_index("names")][0]
         for row in NUCLEOTIDE_DF.rows()
-        for nuc in row[NUCLEOTIDE_DF.get_column_index("id_list")]
+        for nuc in row[NUCLEOTIDE_DF.get_column_index("names")]
     }
 }
 
