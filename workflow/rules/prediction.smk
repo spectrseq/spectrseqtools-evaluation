@@ -121,7 +121,7 @@ rule predict_sequence_for_comparison_study:
 rule predict_sequence_for_optimization_study:
     input:
         fragments="data/experiment/{seq}/0.tsv",
-        meta="data/experiment/{seq}/0.meta.yaml",
+        meta="data/experiment/{seq}/0.preprocessed.meta.yaml",
         alphabet="data/experiment/{seq}/0.singletons.tsv",
     output:
         predictions="results/optimization/{parameter}/{value}/{seq}/sample.tsv",
