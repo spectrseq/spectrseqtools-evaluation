@@ -136,30 +136,36 @@ def collect_comparison_studies(param: str, *patterns):
 
     sim = lookup(dpath=f"comparison/studies/{param}", within=config)
     for modification_rate in sim["modification_rate"]:
-        random.seed(lookup(dpath="comparison/seed", within=config))
-        sequences = [
-            generate_random_sequence_and_seed_pair(
-                seq_len=random.choice(range(10, 21)),
-                modification_rate=modification_rate,
-                modifications=workflow.source_path("../resources/masses.tsv"),
-            )
-            for _ in range(lookup(dpath="comparison/num_sequences", within=config))
-        ]
-
-        for seq in sequences:
-            values = sim[param] if param != "modification_rate" else [modification_rate]
-            for value in values:
-                file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
-                os.makedirs(os.path.dirname(file_name), exist_ok=True)
-                with open(file_name, "w") as f:
-                    f.write(str(seq[1]))
-
-                retval += collect(
-                    patterns,
-                    parameter=param,
-                    value=value,
-                    seq=seq[0],
+        for seq_len in sim["sequence_length"]:
+            random.seed(lookup(dpath="comparison/seed", within=config))
+            sequences = [
+                generate_random_sequence_and_seed_pair(
+                    seq_len=random.choice(range(10, 21)) if seq_len == -1 else seq_len,
+                    modification_rate=modification_rate,
+                    modifications=workflow.source_path("../resources/masses.tsv"),
                 )
+                for _ in range(lookup(dpath="comparison/num_sequences", within=config))
+            ]
+
+            for seq in sequences:
+                if param == "modification_rate":
+                    values = [modification_rate]
+                elif param == "sequence_length":
+                    values = [seq_len]
+                else:
+                    values = sim[param]
+                for value in values:
+                    file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
+                    os.makedirs(os.path.dirname(file_name), exist_ok=True)
+                    with open(file_name, "w") as f:
+                        f.write(str(seq[1]))
+
+                    retval += collect(
+                        patterns,
+                        parameter=param,
+                        value=value,
+                        seq=seq[0],
+                    )
 
     return retval
 
