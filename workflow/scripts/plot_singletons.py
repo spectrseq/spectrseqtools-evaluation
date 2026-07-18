@@ -1,9 +1,8 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from spectrseqtools.parsers import PreprocessingOptions
 from spectrseqtools.plotting.plot_singletons import plot_singletons
-
 
 if "snakemake" in locals():
     smk = snakemake
@@ -14,7 +13,7 @@ if "snakemake" in locals():
             preprocessing_options=PreprocessingOptions(
                 input=Path(smk.input["raw_data"]),
                 meta=Path(smk.input["meta"]),
-                alphabet=Path(smk.input["alphabet"])
+                alphabet=Path(smk.input["alphabet"]),
             ),
             scan_dir=Path(smk.params["scan_dir"]),
         )
