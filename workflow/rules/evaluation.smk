@@ -262,6 +262,38 @@ rule plot_spectra:
         "../scripts/plot_spectra.py"
 
 
+rule plot_singletons:
+    input:
+        raw_data="data/experiment/{seq}/{num_replicates}.raw",
+        meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
+        alphabet="workflow/resources/masses.tsv",
+        singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
+    output:
+        all=report(
+          "results/plots/singletons/{seq}/{num_replicates}.html",
+          htmlindex="index.html",
+          category="Quality control",
+          subcategory="experiment data",
+          labels={
+              "sequence": "{seq}",
+              "type": "singletons",
+          },
+          caption="../report/quality_control.singleton.rst",
+        ),
+        single="results/plots/singletons/{seq}/{num_replicates}_single/scan_0.html",
+    params:
+        scan_dir="results/plots/singletons/{seq}/{num_replicates}_single"
+    log:
+        "logs/plots/singletons/{seq}/{num_replicates}.log",
+    benchmark:
+        "benchmarks/plots/singletons/{seq}/{num_replicates}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    script:
+        "../scripts/plot_singletons.py"
+
+
 rule evaluate_run_statistics_for_simulations:
     input:
         benchmarks=collect_comparison_studies(
