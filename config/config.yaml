@@ -4,8 +4,8 @@
 solver: "highs"
 
 # Select metric for length estimation; allowed: "lp" or "jaccard"
-length_estimator: "lp"
-#length_estimator: "jaccard"
+#length_estimator: "lp"
+length_estimator: "jaccard"
 
 # Select parameter for fragmentation during data simulation
 fragmentation_params:
