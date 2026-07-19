@@ -22,7 +22,7 @@ rule all_experiments:
         "results/plots/evaluation/experiment.bar.html",
 
 
-rule all_plots:
+rule all_experiment_plots:
     input:
         collect_experiments(
             "results/plots/spectra/experiment/{seq}/{num_replicates}.html"
@@ -31,6 +31,13 @@ rule all_plots:
             "results/plots/prediction/experiment/{seq}/{num_replicates}.html"
         ),
         collect_experiments("results/plots/singletons/{seq}/{num_replicates}.html"),
+        collect_custom_simulations(
+            "results/plots/prediction/simulation/{seq}/{num_replicates}.html"
+        ),
+
+
+rule all_simulation_plots:
+    input:
         collect_custom_simulations(
             "results/plots/prediction/simulation/{seq}/{num_replicates}.html"
         ),
@@ -52,14 +59,33 @@ rule all_optimizations:
         ),
 
 
+rule all_runs_stats:
+    input:
+        "results/plots/evaluation/runtime.html",
+        "results/plots/evaluation/memory.html",
+
+
 rule all:
     input:
-        rules.all_custom_simulation.input,
-        # rules.all_random_simulation.input,
-        rules.all_experiments.input,
-        # rules.all_plots.input,
-        # rules.all_comparisons.input,
-        # rules.all_optimizations.input,
-        # "results/plots/evaluation/runtime.html",
-        # "results/plots/evaluation/memory.html",
+        branch(
+            condition=config["enable_simulation"],
+            then=rules.all_custom_simulation.input),
+        branch(
+            condition=config["enable_experiment"],
+            then=rules.all_experiments.input),
+        branch(
+            condition=config["enable_experiment"] & config["enable_plotting"],
+            then=rules.all_experiment_plots.input),
+        branch(
+            condition=config["enable_simulation"] & config["enable_plotting"],
+            then=rules.all_simulation_plots.input),
+        branch(
+            condition=config["enable_comparison_study"],
+            then=rules.all_comparisons.input),
+        branch(
+            condition=config["enable_optimization_study"],
+            then=rules.all_optimizations.input),
+        branch(
+            condition=config["enable_run_statistics"],
+            then=rules.all_run_stats.input),
     default_target: True

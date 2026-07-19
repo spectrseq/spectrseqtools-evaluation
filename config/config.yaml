@@ -1,3 +1,11 @@
+# Select which runs to perform
+enable_experiments: True
+enable_simulations: True
+enable_plotting: False
+enable_comparison_study: False
+enable_optimization_study: False
+enable_run_statistics: False
+
 # Select solver name; allowed: "gurobi" (license required), "highs", or "cbc"
 #solver: "gurobi"
 #solver: "cbc"
