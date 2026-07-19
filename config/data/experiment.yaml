@@ -2,10 +2,10 @@
 
 experiment:
 ## 10mers
-  - seq: GAUUGUCGUG
-    fragments: "0"
-    meta: "meta.yaml"
-    name: "10mer-01"
+#  - seq: GAUUGUCGUG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "10mer-01"
 #  - seq: GAU0CUAGAUC
 #    fragments: "0"
 #    meta: "meta.yaml"
@@ -91,11 +91,29 @@ experiment:
 #    name: "20mer-10 (2FluoroA)"
 #    percentile: 65
 
-##  Longer sequences (>20mer)
+##  25mers
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_25mer_01"
+#    name: "25mer-01"
+#  - seq: CAGUAUGGUAGAUAGAACAACGAAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-02"
+#  - seq: AGGGCCAAUGCUGAAAACUAGAUAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-03"
+#  - seq: CUCAGUCGGCUAUCUACCCUAACCC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-04"
+#  - seq: CUCAGCUUCAAGAACGACCUCGAAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-05"
+
+## 30mers
 #  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
 #    fragments: "0"
 #    meta: "meta.yaml"
