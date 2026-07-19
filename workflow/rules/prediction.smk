@@ -1,3 +1,6 @@
+include: "common.smk"
+
+
 rule preprocess_experimental_sequence:
     input:
         fragments="data/experiment/{seq}/{num_replicates}.raw",
@@ -34,6 +37,11 @@ rule predict_experimental_sequence:
     params:
         solver=config["solver"],
         length_estimator=config["length_estimator"],
+        percentile=branch(
+            has_custom_percentile,
+            then=get_custom_percentile,
+            otherwise=80,
+        ),
     log:
         "logs/prediction/experiment/{seq}/{num_replicates}.log",
     benchmark:
@@ -52,6 +60,7 @@ rule predict_experimental_sequence:
         "--solver {params.solver} "
         "--threads {threads} "
         "--length-estimator-metric {params.length_estimator} "
+        "--intensity-cutoff-percentile {params.percentile} "
         "2> {log}"
 
 

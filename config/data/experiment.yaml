@@ -66,6 +66,7 @@ experiment:
 #    fragments: "0"
 #    meta: "meta.yaml"
 #    name: "20mer-05 (isobaric_03)"
+#    percentile: 40
 
 ## 20mers (unmodified)
 #  - seq: GGUU0CUUCGGAUAUCGGCGG
@@ -88,6 +89,7 @@ experiment:
 #    fragments: "0"
 #    meta: "meta.yaml"
 #    name: "20mer-10 (2FluoroA)"
+#    percentile: 65
 
 ##  Longer sequences (>20mer)
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
