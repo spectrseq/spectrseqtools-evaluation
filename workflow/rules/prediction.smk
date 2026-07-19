@@ -2,6 +2,7 @@ rule preprocess_experimental_sequence:
     input:
         fragments="data/experiment/{seq}/{num_replicates}.raw",
         meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
+        alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
         fragments="data/experiment/{seq}/{num_replicates}.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
@@ -17,6 +18,7 @@ rule preprocess_experimental_sequence:
         "spectrseqtools preprocessing "
         "--input {input.fragments} "
         "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "2> {log}"
 
 

@@ -17,10 +17,10 @@ if "snakemake" in locals():
         # simulation = pl.read_csv(smk.input.sim, separator="\t")
 
         charts = plot_prediction(
-            prediction,
-            true_seq,
+            prediction=prediction,
+            true_seq=true_seq,
+            alphabet_path=smk.input["alphabet"],
             # simulation if smk.wildcards.modus == "simulation" else None,
-            None,
         )
 
         charts[0].save(smk.output["start"])

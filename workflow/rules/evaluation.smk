@@ -6,6 +6,7 @@ rule plot_prediction:
         pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
         pred_seq="results/prediction/{modus}/{seq}/{num_replicates}.fasta",
         sim="data/{modus}/{seq}/{num_replicates}.tsv",
+        alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
         any="results/plots/prediction/{modus}/{seq}/{num_replicates}.html",
         start="results/plots/prediction/{modus}/{seq}/{num_replicates}.start.html",
@@ -266,7 +267,7 @@ rule plot_singletons:
     input:
         raw_data="data/experiment/{seq}/{num_replicates}.raw",
         meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
-        alphabet="workflow/resources/masses.tsv",
+        alphabet="workflow/resources/masses.including_synthetic.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
     output:
         all=report(
