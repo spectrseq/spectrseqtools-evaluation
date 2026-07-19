@@ -69,23 +69,26 @@ rule all:
     input:
         branch(
             condition=config["enable_simulation"],
-            then=rules.all_custom_simulation.input),
-        branch(
-            condition=config["enable_experiment"],
-            then=rules.all_experiments.input),
+            then=rules.all_custom_simulation.input,
+        ),
+        branch(condition=config["enable_experiment"], then=rules.all_experiments.input),
         branch(
             condition=config["enable_experiment"] & config["enable_plotting"],
-            then=rules.all_experiment_plots.input),
+            then=rules.all_experiment_plots.input,
+        ),
         branch(
             condition=config["enable_simulation"] & config["enable_plotting"],
-            then=rules.all_simulation_plots.input),
+            then=rules.all_simulation_plots.input,
+        ),
         branch(
             condition=config["enable_comparison_study"],
-            then=rules.all_comparisons.input),
+            then=rules.all_comparisons.input,
+        ),
         branch(
             condition=config["enable_optimization_study"],
-            then=rules.all_optimizations.input),
+            then=rules.all_optimizations.input,
+        ),
         branch(
-            condition=config["enable_run_statistics"],
-            then=rules.all_run_stats.input),
+            condition=config["enable_run_statistics"], then=rules.all_run_stats.input
+        ),
     default_target: True

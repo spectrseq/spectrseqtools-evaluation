@@ -12,6 +12,7 @@ def has_custom_percentile(wildcards):
             return "percentile" in item.keys()
     return False
 
+
 def get_custom_percentile(wildcards):
     for item in lookup(dpath="experiment", within=config):
         if item["seq"] == wildcards.seq:

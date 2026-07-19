@@ -165,7 +165,6 @@ rule predict_sequence_for_optimization_study:
             )[0]
         ),
         dir=subpath(output.predictions, parent=True),
-        # dir="results/optimization/{parameter}/{value}/{seq}/",
     log:
         "logs/optimization/{parameter}/{value}/{seq}/sample.log",
     benchmark:
