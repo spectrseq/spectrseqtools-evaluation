@@ -1,53 +1,136 @@
 # Sequence convention is 5' to 3'
 
 experiment:
+## 10mers
   - seq: GAUUGUCGUG
     fragments: "0"
     meta: "meta.yaml"
-    name: "testcase_03"
-#  - seq: CAACAAGCGAGAGGUUCGAA
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "testcase_04"
-#  - seq: AGAGGCUAAUAGUAAGUUAA
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "testcase_05"
+    name: "10mer-01"
 #  - seq: GAU0CUAGAUC
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_01"
+#    name: "10mer-02"
 #  - seq: UUAGCCCG0GA
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_02"
+#    name: "10mer-03"
 #  - seq: UAAAUC9AGGU
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_03"
+#    name: "10mer-04"
 #  - seq: UCGA9AUUGAG
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_04"
+#    name: "10mer-05"
+
+## 15mers
+#  - seq: UAGCGUUUGAUGAUC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-01"
+#  - seq: GCCGCCUGAUGAGCG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-02"
+#  - seq: AAGAGACCUAAAGCC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-03"
+#  - seq: UAAAGUACAUUAACA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-04"
+#  - seq: UGCCAUUAUACAUGA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-05"
+
+## 20mers (unmodified)
+#  - seq: CAACAAGCGAGAGGUUCGAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-01"
+#  - seq: AGAGGCUAAUAGUAAGUUAA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-02"
+#  - seq: CCGAUGUGGGGGGUAUCUCG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-03 (isobaric_01)"
+#  - seq: CCUGGCUCGAUGAGGUGUGG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-04 (isobaric_02)"
+#  - seq: GUAGGCGUGAUGCCCGUGUG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-05 (isobaric_03)"
+#    percentile: 40
+
+## 20mers (unmodified)
 #  - seq: GGUU0CUUCGGAUAUCGGCGG
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_05"
+#    name: "20mer-06"
 #  - seq: CCA0AGUGCUAA0UAAAUUGCC
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_06"
+#    name: "20mer-07"
 #  - seq: UGCCUCACCAC9AUCAUCCUG
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_mod_07"
+#    name: "20mer-08"
+#  - seq: AACGAUGUAU000CGGGACGUGA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-09 (i2MOErC)"
+#  - seq: UCCCGAACGUCCACCA000AUUA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "20mer-10 (2FluoroA)"
+#    percentile: 65
 
-#  Longer sequences (>20mer)
+##  25mers
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_25mer_01"
+#    name: "25mer-01"
+#  - seq: CAGUAUGGUAGAUAGAACAACGAAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-02"
+#  - seq: AGGGCCAAUGCUGAAAACUAGAUAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-03"
+#  - seq: CUCAGUCGGCUAUCUACCCUAACCC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-04"
+#  - seq: CUCAGCUUCAAGAACGACCUCGAAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "25mer-05"
+
+## 30mers
 #  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_08"
+#    name: "30mer-01"
+#  - seq: CUCCACGAUUAGCACUAUUGCCUGCGGGAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-02"
+#  - seq: AAACUAGUAAGUGGUUGGAAACAACUCGUA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-03"
+#  - seq: AGGUCGGAAGGCUGGGUCCUGGCCUCAAAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-04"
+#  - seq: ACUCUACAGGACCGCGUGGCCCUUUAGCAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-05"

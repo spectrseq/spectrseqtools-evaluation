@@ -1,3 +1,11 @@
+# Select which parts of the workflow to enable
+enable_experiments: True
+enable_simulations: True
+enable_plotting: False
+enable_comparison_studies: False
+enable_optimization_studies: False
+enable_run_statistics: False
+
 # Select solver name; allowed: "gurobi" (license required), "highs", or "cbc"
 #solver: "gurobi"
 #solver: "cbc"

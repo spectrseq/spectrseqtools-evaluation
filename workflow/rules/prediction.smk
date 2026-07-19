@@ -1,7 +1,11 @@
+include: "common.smk"
+
+
 rule preprocess_experimental_sequence:
     input:
         fragments="data/experiment/{seq}/{num_replicates}.raw",
         meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
+        alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
         fragments="data/experiment/{seq}/{num_replicates}.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
@@ -17,6 +21,7 @@ rule preprocess_experimental_sequence:
         "spectrseqtools preprocessing "
         "--input {input.fragments} "
         "--meta {input.meta} "
+        "--alphabet {input.alphabet} "
         "2> {log}"
 
 
@@ -32,6 +37,11 @@ rule predict_experimental_sequence:
     params:
         solver=config["solver"],
         length_estimator=config["length_estimator"],
+        percentile=branch(
+            has_custom_percentile,
+            then=get_custom_percentile,
+            otherwise=80,
+        ),
     log:
         "logs/prediction/experiment/{seq}/{num_replicates}.log",
     benchmark:
@@ -50,6 +60,7 @@ rule predict_experimental_sequence:
         "--solver {params.solver} "
         "--threads {threads} "
         "--length-estimator-metric {params.length_estimator} "
+        "--intensity-cutoff-percentile {params.percentile} "
         "2> {log}"
 
 
@@ -154,7 +165,6 @@ rule predict_sequence_for_optimization_study:
             )[0]
         ),
         dir=subpath(output.predictions, parent=True),
-        # dir="results/optimization/{parameter}/{value}/{seq}/",
     log:
         "logs/optimization/{parameter}/{value}/{seq}/sample.log",
     benchmark:

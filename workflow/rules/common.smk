@@ -6,6 +6,20 @@ wildcard_constraints:
     num_replicates="[0-9]+",
 
 
+def has_custom_percentile(wildcards):
+    for item in lookup(dpath="experiment", within=config):
+        if item["seq"] == wildcards.seq:
+            return "percentile" in item.keys()
+    return False
+
+
+def get_custom_percentile(wildcards):
+    for item in lookup(dpath="experiment", within=config):
+        if item["seq"] == wildcards.seq:
+            return item["percentile"]
+    return None
+
+
 def generate_random_sequence_and_seed_pair(
     seq_len, modification_rate=0, modifications=None
 ):
