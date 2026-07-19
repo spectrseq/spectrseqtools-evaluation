@@ -41,6 +41,26 @@ experiment:
 #    fragments: "0"
 #    meta: "meta.yaml"
 #    name: "testcase_mod_07"
+#  - seq: UAGCGUUUGAUGAUC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-01"
+#  - seq: GCCGCCUGAUGAGCG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-02"
+#  - seq: AAGAGACCUAAAGCC
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-03"
+#  - seq: UAAAGUACAUUAACA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-04"
+#  - seq: UGCCAUUAUACAUGA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "15mer-05"
 
 #  Longer sequences (>20mer)
 #  - seq: AUAGAUAGCCUAAAUCUCAGAGCUA
