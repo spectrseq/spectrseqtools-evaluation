@@ -59,7 +59,7 @@ rule all_optimizations:
         ),
 
 
-rule all_runs_stats:
+rule all_run_stats:
     input:
         "results/plots/evaluation/runtime.html",
         "results/plots/evaluation/memory.html",
@@ -68,24 +68,24 @@ rule all_runs_stats:
 rule all:
     input:
         branch(
-            condition=config["enable_simulation"],
+            condition=config["enable_simulations"],
             then=rules.all_custom_simulation.input,
         ),
-        branch(condition=config["enable_experiment"], then=rules.all_experiments.input),
+        branch(condition=config["enable_experiments"], then=rules.all_experiments.input),
         branch(
-            condition=config["enable_experiment"] & config["enable_plotting"],
+            condition=config["enable_experiments"] & config["enable_plotting"],
             then=rules.all_experiment_plots.input,
         ),
         branch(
-            condition=config["enable_simulation"] & config["enable_plotting"],
+            condition=config["enable_simulations"] & config["enable_plotting"],
             then=rules.all_simulation_plots.input,
         ),
         branch(
-            condition=config["enable_comparison_study"],
+            condition=config["enable_comparison_studies"],
             then=rules.all_comparisons.input,
         ),
         branch(
-            condition=config["enable_optimization_study"],
+            condition=config["enable_optimization_studies"],
             then=rules.all_optimizations.input,
         ),
         branch(
