@@ -2,10 +2,10 @@
 
 experiment:
 ## 10mers
-#  - seq: GAUUGUCGUG
-#    fragments: "0"
-#    meta: "meta.yaml"
-#    name: "10mer-01"
+  - seq: GAUUGUCGUG
+    fragments: "0"
+    meta: "meta.yaml"
+    name: "10mer-01"
 #  - seq: GAU0CUAGAUC
 #    fragments: "0"
 #    meta: "meta.yaml"
@@ -117,4 +117,20 @@ experiment:
 #  - seq: CAGCCCACCACGUGUAGUGGGCCUAGCAGU
 #    fragments: "0"
 #    meta: "meta.yaml"
-#    name: "testcase_08"
+#    name: "30mer-01"
+#  - seq: CUCCACGAUUAGCACUAUUGCCUGCGGGAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-02"
+#  - seq: AAACUAGUAAGUGGUUGGAAACAACUCGUA
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-03"
+#  - seq: AGGUCGGAAGGCUGGGUCCUGGCCUCAAAU
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-04"
+#  - seq: ACUCUACAGGACCGCGUGGCCCUUUAGCAG
+#    fragments: "0"
+#    meta: "meta.yaml"
+#    name: "30mer-05"
