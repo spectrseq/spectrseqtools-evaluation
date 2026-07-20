@@ -283,7 +283,7 @@ rule plot_singletons:
         ),
         single="results/plots/singletons/{seq}/{num_replicates}_single/scan_0.html",
     params:
-        scan_dir="results/plots/singletons/{seq}/{num_replicates}_single",
+        scan_dir=subpath(output.single, parent=True),
     log:
         "logs/plots/singletons/{seq}/{num_replicates}.log",
     benchmark:
