@@ -279,7 +279,7 @@ rule plot_singletons:
                 "sequence": "{seq}",
                 "type": "singletons",
             },
-            caption="../report/quality_control.singleton.rst",
+            caption="../report/quality_control.singletons.rst",
         ),
         single="results/plots/singletons/{seq}/{num_replicates}_single/scan_0.html",
     params:
