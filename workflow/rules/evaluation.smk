@@ -327,7 +327,7 @@ rule evaluate_run_statistics_for_experiments:
             "data/experiment/{seq}/{num_replicates}.tsv",
         ),
     output:
-        "results/comparison_study/experients.stats.tsv",
+        "results/comparison_study/experiments.stats.tsv",
     log:
         "logs/comparison_study/experiments.stats.log",
     benchmark:
@@ -342,7 +342,7 @@ rule evaluate_run_statistics_for_experiments:
 rule plot_runtime:
     input:
         sim="results/comparison_study/stats.tsv",
-        exp="results/comparison_study/experients.stats.tsv",
+        exp="results/comparison_study/experiments.stats.tsv",
     output:
         report(
             "results/plots/evaluation/runtime.html",
@@ -367,7 +367,7 @@ rule plot_runtime:
 rule plot_memory:
     input:
         sim="results/comparison_study/stats.tsv",
-        exp="results/comparison_study/experients.stats.tsv",
+        exp="results/comparison_study/experiments.stats.tsv",
     output:
         report(
             "results/plots/evaluation/memory.html",
