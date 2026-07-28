@@ -13,7 +13,7 @@ jobs:
   formatting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
@@ -30,7 +30,7 @@ jobs:
   # linting:
   #   runs-on: ubuntu-latest
   #   steps:
-  #   - uses: actions/checkout@v4
+  #   - uses: actions/checkout@v6
   #     with:
   #       fetch-depth: 0
   #   - name: Lint workflow
@@ -46,7 +46,7 @@ jobs:
       # - linting
       - formatting
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1
