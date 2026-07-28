@@ -13,7 +13,7 @@ jobs:
   formatting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
@@ -26,19 +26,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_SNAKEMAKE_SNAKEFMT: true
 
-  # TODO activate linting once spectrseqtools is a proper package
-  # linting:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       fetch-depth: 0
-  #   - name: Lint workflow
-  #     uses: snakemake/snakemake-github-action@v1
-  #     with:
-  #       directory: .
-  #       snakefile: workflow/Snakefile
-  #       args: "--lint"
+#  # TODO: Enable linting after reworking setup for random simulations
+#  linting:
+#   runs-on: ubuntu-latest
+#   steps:
+#   - uses: actions/checkout@v6
+#     with:
+#       fetch-depth: 0
+#   - name: Lint workflow
+#     uses: snakemake/snakemake-github-action@v1
+#     with:
+#       directory: .
+#       snakefile: workflow/Snakefile
+#       args: "--lint"
 
   tests:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       # - linting
       - formatting
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1
