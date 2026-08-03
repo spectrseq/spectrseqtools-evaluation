@@ -271,8 +271,12 @@ rule plot_spectra:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/plot_spectra.py"
+    shell:
+        "spectrseqtools plot-spectrum "
+        "--raw-fragments {input.raw_fragments} "
+        "--predicted-fragments {input.pred_fragments} "
+        "--output-path {output[0]} "
+        "2> {log}"
 
 
 rule plot_singletons:
