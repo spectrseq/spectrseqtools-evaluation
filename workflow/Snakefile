@@ -31,9 +31,6 @@ rule all_experiment_plots:
             "results/plots/prediction/experiment/{seq}/{num_replicates}.html"
         ),
         collect_experiments("results/plots/singletons/{seq}/{num_replicates}.html"),
-        collect_custom_simulations(
-            "results/plots/prediction/simulation/{seq}/{num_replicates}.html"
-        ),
 
 
 rule all_simulation_plots:
