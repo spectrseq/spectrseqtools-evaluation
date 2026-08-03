@@ -291,8 +291,14 @@ rule plot_singletons:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/plot_singletons.py"
+    shell:
+        "spectrseqtools plot-singletons "
+        "--input {input.raw_data} "
+        "--meta {input.meta} "
+        "--scan-dir {params.scan_dir} "
+        "--output-path {output.all} "
+        "--alphabet {input.alphabet} "
+        "2> {log}"
 
 
 rule evaluate_run_statistics_for_simulations:
