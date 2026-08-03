@@ -5,6 +5,7 @@ rule plot_prediction:
     input:
         pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
         pred_seq="results/prediction/{modus}/{seq}/{num_replicates}.fasta",
+        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
         sim="data/{modus}/{seq}/{num_replicates}.tsv",
         alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
@@ -27,8 +28,19 @@ rule plot_prediction:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/plot_prediction.py"
+    shell:
+        "spectrseqtools plot-fragments "
+        "--fragments {input.pred_fragments} "
+        "--prediction {input.pred_seq} "
+        "--meta {input.meta} "
+        "--mixed-fragment-plot {output.any} "
+        "--start-fragment-plot {output.start} "
+        "--end-fragment-plot {output.end} "
+        "--internal-fragment-plot {output.internal} "
+        "--combined-plot {output.all} "
+        # "--simulation {input.sim} "
+        "--alphabet {input.alphabet} "
+        "2> {log}"
 
 
 rule evaluate_custom_simulation:
