@@ -96,8 +96,6 @@ rule evaluate_comparison_study:
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
-    params:
-        mode="simulation",
     log:
         "logs/comparison_study/{parameter}/evaluation.log",
     benchmark:
@@ -105,6 +103,8 @@ rule evaluate_comparison_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="simulation",
     script:
         "../scripts/evaluate_prediction.py"
 
@@ -121,8 +121,6 @@ rule plot_evaluation_for_comparison_study:
             labels={"type": "comparison", "parameter": "{parameter}"},
             caption="../report/robustness.comparison.rst",
         ),
-    params:
-        criterion="{parameter}",
     log:
         "logs/plots/comparison_study/{parameter}.log",
     benchmark:
@@ -130,6 +128,8 @@ rule plot_evaluation_for_comparison_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        criterion="{parameter}",
     shell:
         "spectrseqtools plot-evaluation "
         "--input {input[0]} "
@@ -147,8 +147,6 @@ rule evaluate_optimization_study:
         ),
     output:
         "results/optimization/{parameter}/evaluation.tsv",
-    params:
-        mode="optimization",
     log:
         "logs/optimization/{parameter}/evaluation.log",
     benchmark:
@@ -156,6 +154,8 @@ rule evaluate_optimization_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="optimization",
     script:
         "../scripts/evaluate_prediction.py"
 
@@ -172,8 +172,6 @@ rule plot_evaluation_for_optimization_study:
             labels={"type": "optimization", "parameter": "{parameter}"},
             caption="../report/robustness.optimization.rst",
         ),
-    params:
-        criterion="{parameter}",
     log:
         "logs/plots/optimization/{parameter}.log",
     benchmark:
@@ -181,6 +179,8 @@ rule plot_evaluation_for_optimization_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        criterion="{parameter}",
     shell:
         "spectrseqtools plot-evaluation "
         "--input {input[0]} "
@@ -324,8 +324,6 @@ rule plot_singletons:
             caption="../report/quality_control.singletons.rst",
         ),
         single="results/plots/singletons/{seq}/{num_replicates}_single/scan_0.html",
-    params:
-        scan_dir=subpath(output.single, parent=True),
     log:
         "logs/plots/singletons/{seq}/{num_replicates}.log",
     benchmark:
@@ -333,6 +331,8 @@ rule plot_singletons:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        scan_dir=subpath(output.single, parent=True),
     shell:
         "spectrseqtools plot-singletons "
         "--input {input.raw_data} "
@@ -399,8 +399,6 @@ rule plot_runtime:
             labels={"type": "runtime"},
             # caption="../report/robustness.data.rst",
         ),
-    params:
-        mode="runtime",
     log:
         "logs/plots/evaluation/runtime.log",
     benchmark:
@@ -408,6 +406,8 @@ rule plot_runtime:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="runtime",
     shell:
         "spectrseqtools plot-run-statistics "
         "--simulation {input.sim} "
@@ -429,8 +429,6 @@ rule plot_memory:
             labels={"type": "memory"},
             # caption="../report/robustness.data.rst",
         ),
-    params:
-        mode="memory",
     log:
         "logs/plots/evaluation/memory.log",
     benchmark:
@@ -438,6 +436,8 @@ rule plot_memory:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="memory",
     shell:
         "spectrseqtools plot-run-statistics "
         "--simulation {input.sim} "

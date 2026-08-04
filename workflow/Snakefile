@@ -63,6 +63,7 @@ rule all_run_stats:
 
 
 rule all:
+    default_target: True
     input:
         branch(
             condition=config["enable_simulations"],
@@ -88,4 +89,3 @@ rule all:
         branch(
             condition=config["enable_run_statistics"], then=rules.all_run_stats.input
         ),
-    default_target: True
