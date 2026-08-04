@@ -408,8 +408,13 @@ rule plot_runtime:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/plot_run_statistics.py"
+    shell:
+        "spectrseqtools plot-run-statistics "
+        "--simulation {input.sim} "
+        "--experiment {input.exp} "
+        "--output-path {output[0]} "
+        "--statistic-criterion {params.mode} "
+        "2> {log}"
 
 
 rule plot_memory:
@@ -433,5 +438,10 @@ rule plot_memory:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/plot_run_statistics.py"
+    shell:
+        "spectrseqtools plot-run-statistics "
+        "--simulation {input.sim} "
+        "--experiment {input.exp} "
+        "--output-path {output[0]} "
+        "--statistic-criterion {params.mode} "
+        "2> {log}"
