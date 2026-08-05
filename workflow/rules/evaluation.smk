@@ -29,7 +29,7 @@ rule plot_prediction:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-fragments "
+        "spectrseqtools plotting fragments "
         "--fragments {input.pred_fragments} "
         "--prediction {input.pred_seq} "
         "--meta {input.meta} "
@@ -81,7 +81,7 @@ rule plot_evaluation_for_custom_simulation:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
+        "spectrseqtools plotting evaluation "
         "--input {input[0]} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
@@ -131,7 +131,7 @@ rule plot_evaluation_for_comparison_study:
     params:
         criterion="{parameter}",
     shell:
-        "spectrseqtools plot-evaluation "
+        "spectrseqtools plotting evaluation "
         "--input {input[0]} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
@@ -182,7 +182,7 @@ rule plot_evaluation_for_optimization_study:
     params:
         criterion="{parameter}",
     shell:
-        "spectrseqtools plot-evaluation "
+        "spectrseqtools plotting evaluation "
         "--input {input[0]} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
@@ -222,7 +222,7 @@ rule plot_evaluation_for_random_simulation:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
+        "spectrseqtools plotting evaluation "
         "--input {input[0]} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
@@ -267,7 +267,7 @@ rule plot_evaluation_for_experiment:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
+        "spectrseqtools plotting evaluation "
         "--input {input[0]} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
@@ -298,7 +298,7 @@ rule plot_spectra:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-spectrum "
+        "spectrseqtools plotting spectrum "
         "--raw-fragments {input.raw_fragments} "
         "--predicted-fragments {input.pred_fragments} "
         "--output-path {output[0]} "
@@ -334,7 +334,7 @@ rule plot_singletons:
     params:
         scan_dir=subpath(output.single, parent=True),
     shell:
-        "spectrseqtools plot-singletons "
+        "spectrseqtools plotting singletons "
         "--input {input.raw_data} "
         "--meta {input.meta} "
         "--scan-dir {params.scan_dir} "
@@ -409,7 +409,7 @@ rule plot_runtime:
     params:
         mode="runtime",
     shell:
-        "spectrseqtools plot-run-statistics "
+        "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
         "--output-path {output[0]} "
@@ -439,7 +439,7 @@ rule plot_memory:
     params:
         mode="memory",
     shell:
-        "spectrseqtools plot-run-statistics "
+        "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
         "--output-path {output[0]} "
