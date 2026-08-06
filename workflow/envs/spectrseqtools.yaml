@@ -34,4 +34,4 @@ dependencies:
     - git+https://github.com/spectrseq/spectrseqtools.git
     - dbscan1d >=0.2.3,<0.3
     - pulp >=2.3.0,<3.0
-    - ddargparse >=0.3.0,<0.4
+    - ddargparse >=1.0.1,<1.1

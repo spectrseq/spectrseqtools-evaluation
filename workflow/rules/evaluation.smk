@@ -29,7 +29,7 @@ rule plot_prediction:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-fragments "
+        "spectrseqtools plotting fragments "
         "--fragments {input.pred_fragments} "
         "--prediction {input.pred_seq} "
         "--meta {input.meta} "
@@ -38,15 +38,17 @@ rule plot_prediction:
         "--end-fragment-plot {output.end} "
         "--internal-fragment-plot {output.internal} "
         "--combined-plot {output.all} "
-        # "--simulation {input.sim} "
         "--alphabet {input.alphabet} "
         "2> {log}"
 
 
 rule evaluate_custom_simulation:
     input:
-        collect_custom_simulations(
+        pred=collect_custom_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
+        ),
+        meta=collect_custom_simulations(
+            "data/simulation/{seq}/{num_replicates}.meta.yaml"
         ),
     output:
         "results/evaluation/custom_simulation.tsv",
@@ -57,8 +59,13 @@ rule evaluate_custom_simulation:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion simulation "
+        "2> {log}"
 
 
 rule plot_evaluation_for_custom_simulation:
@@ -81,8 +88,8 @@ rule plot_evaluation_for_custom_simulation:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
-        "--input {input[0]} "
+        "spectrseqtools plotting evaluation "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -90,14 +97,16 @@ rule plot_evaluation_for_custom_simulation:
 
 rule evaluate_comparison_study:
     input:
-        lambda wildcards: collect_comparison_studies(
+        pred=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
             "results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
         ),
+        meta=lambda wildcards: collect_comparison_studies(
+            wildcards.parameter,
+            "data/simulation/{seq}/{num_replicates}.meta.yaml",
+        ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
-    params:
-        mode="simulation",
     log:
         "logs/comparison_study/{parameter}/evaluation.log",
     benchmark:
@@ -105,8 +114,17 @@ rule evaluate_comparison_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    params:
+        param="{parameter}",
+        config=lookup(dpath="comparison/studies/{parameter}", within=config),
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion {params.param} "
+        '--config "{params.config}" '
+        "2> {log}"
 
 
 rule plot_evaluation_for_comparison_study:
@@ -121,8 +139,6 @@ rule plot_evaluation_for_comparison_study:
             labels={"type": "comparison", "parameter": "{parameter}"},
             caption="../report/robustness.comparison.rst",
         ),
-    params:
-        criterion="{parameter}",
     log:
         "logs/plots/comparison_study/{parameter}.log",
     benchmark:
@@ -130,9 +146,11 @@ rule plot_evaluation_for_comparison_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        criterion="{parameter}",
     shell:
-        "spectrseqtools plot-evaluation "
-        "--input {input[0]} "
+        "spectrseqtools plotting evaluation "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "--evaluation-criterion {params.criterion} "
@@ -141,14 +159,16 @@ rule plot_evaluation_for_comparison_study:
 
 rule evaluate_optimization_study:
     input:
-        lambda wildcards: collect_optimizations(
+        pred=lambda wildcards: collect_optimizations(
             wildcards.parameter,
             "results/optimization/{parameter}/{value}/{seq}/sample.fasta",
         ),
+        meta=lambda wildcards: collect_optimizations(
+            wildcards.parameter,
+            "data/experiment/{seq}/{num_replicates}.meta.yaml",
+        ),
     output:
         "results/optimization/{parameter}/evaluation.tsv",
-    params:
-        mode="optimization",
     log:
         "logs/optimization/{parameter}/evaluation.log",
     benchmark:
@@ -156,8 +176,17 @@ rule evaluate_optimization_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    params:
+        param="{parameter}",
+        config=lookup(dpath="optimization/{parameter}", within=config),
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion {params.param} "
+        '--config "{params.config}" '
+        "2> {log}"
 
 
 rule plot_evaluation_for_optimization_study:
@@ -172,8 +201,6 @@ rule plot_evaluation_for_optimization_study:
             labels={"type": "optimization", "parameter": "{parameter}"},
             caption="../report/robustness.optimization.rst",
         ),
-    params:
-        criterion="{parameter}",
     log:
         "logs/plots/optimization/{parameter}.log",
     benchmark:
@@ -181,9 +208,11 @@ rule plot_evaluation_for_optimization_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        criterion="{parameter}",
     shell:
-        "spectrseqtools plot-evaluation "
-        "--input {input[0]} "
+        "spectrseqtools plotting evaluation "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "--evaluation-criterion {params.criterion} "
@@ -192,8 +221,11 @@ rule plot_evaluation_for_optimization_study:
 
 rule evaluate_random_simulation:
     input:
-        collect_random_simulations(
+        pred=collect_random_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
+        ),
+        meta=collect_random_simulations(
+            "data/simulation/{seq}/{num_replicates}.meta.yaml"
         ),
     output:
         "results/evaluation/random_simulation.tsv",
@@ -204,8 +236,13 @@ rule evaluate_random_simulation:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion simulation "
+        "2> {log}"
 
 
 rule plot_evaluation_for_random_simulation:
@@ -222,8 +259,8 @@ rule plot_evaluation_for_random_simulation:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
-        "--input {input[0]} "
+        "spectrseqtools plotting evaluation "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -231,9 +268,10 @@ rule plot_evaluation_for_random_simulation:
 
 rule evaluate_experiment:
     input:
-        collect_experiments(
+        pred=collect_experiments(
             "results/prediction/experiment/{seq}/{num_replicates}.fasta"
         ),
+        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.meta.yaml"),
     output:
         "results/evaluation/experiment.tsv",
     log:
@@ -243,8 +281,13 @@ rule evaluate_experiment:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion experiment "
+        "2> {log}"
 
 
 rule plot_evaluation_for_experiment:
@@ -267,8 +310,8 @@ rule plot_evaluation_for_experiment:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-evaluation "
-        "--input {input[0]} "
+        "spectrseqtools plotting evaluation "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -298,10 +341,10 @@ rule plot_spectra:
         "../envs/spectrseqtools.yaml"
     threads: 1
     shell:
-        "spectrseqtools plot-spectrum "
+        "spectrseqtools plotting spectrum "
         "--raw-fragments {input.raw_fragments} "
         "--predicted-fragments {input.pred_fragments} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "2> {log}"
 
 
@@ -324,8 +367,6 @@ rule plot_singletons:
             caption="../report/quality_control.singletons.rst",
         ),
         single="results/plots/singletons/{seq}/{num_replicates}_single/scan_0.html",
-    params:
-        scan_dir=subpath(output.single, parent=True),
     log:
         "logs/plots/singletons/{seq}/{num_replicates}.log",
     benchmark:
@@ -333,8 +374,10 @@ rule plot_singletons:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        scan_dir=subpath(output.single, parent=True),
     shell:
-        "spectrseqtools plot-singletons "
+        "spectrseqtools plotting singletons "
         "--input {input.raw_data} "
         "--meta {input.meta} "
         "--scan-dir {params.scan_dir} "
@@ -362,8 +405,12 @@ rule evaluate_run_statistics_for_simulations:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_run_statistics.py"
+    shell:
+        "spectrseqtools postprocessing run-statistics "
+        "--benchmarks {input.benchmarks} "
+        "--fragments {input.fragments} "
+        "--output-path {output} "
+        "2> {log}"
 
 
 rule evaluate_run_statistics_for_experiments:
@@ -383,8 +430,12 @@ rule evaluate_run_statistics_for_experiments:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_run_statistics.py"
+    shell:
+        "spectrseqtools postprocessing run-statistics "
+        "--benchmarks {input.benchmarks} "
+        "--fragments {input.fragments} "
+        "--output-path {output} "
+        "2> {log}"
 
 
 rule plot_runtime:
@@ -397,10 +448,7 @@ rule plot_runtime:
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "runtime"},
-            # caption="../report/robustness.data.rst",
         ),
-    params:
-        mode="runtime",
     log:
         "logs/plots/evaluation/runtime.log",
     benchmark:
@@ -408,11 +456,13 @@ rule plot_runtime:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="runtime",
     shell:
-        "spectrseqtools plot-run-statistics "
+        "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "--statistic-criterion {params.mode} "
         "2> {log}"
 
@@ -427,10 +477,7 @@ rule plot_memory:
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "memory"},
-            # caption="../report/robustness.data.rst",
         ),
-    params:
-        mode="memory",
     log:
         "logs/plots/evaluation/memory.log",
     benchmark:
@@ -438,10 +485,12 @@ rule plot_memory:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        mode="memory",
     shell:
-        "spectrseqtools plot-run-statistics "
+        "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "--statistic-criterion {params.mode} "
         "2> {log}"

@@ -34,6 +34,13 @@ rule predict_experimental_sequence:
         su_fragments="data/experiment/{seq}/{num_replicates}.standard_unit_fragments.tsv",
         predictions="results/prediction/experiment/{seq}/{num_replicates}.tsv",
         sequence="results/prediction/experiment/{seq}/{num_replicates}.fasta",
+    log:
+        "logs/prediction/experiment/{seq}/{num_replicates}.log",
+    benchmark:
+        "benchmarks/prediction/experiment/{seq}/{num_replicates}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
     params:
         solver=config["solver"],
         length_estimator=config["length_estimator"],
@@ -42,13 +49,6 @@ rule predict_experimental_sequence:
             then=get_custom_percentile,
             otherwise=80,
         ),
-    log:
-        "logs/prediction/experiment/{seq}/{num_replicates}.log",
-    benchmark:
-        "benchmarks/prediction/experiment/{seq}/{num_replicates}.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
     shell:
         "spectrseqtools prediction "
         "--fragments {input.fragments} "
@@ -73,9 +73,6 @@ rule predict_simulated_sequence:
         su_fragments="data/simulation/{seq}/{num_replicates}.standard_unit_fragments.tsv",
         predictions="results/prediction/simulation/{seq}/{num_replicates}.tsv",
         sequence="results/prediction/simulation/{seq}/{num_replicates}.fasta",
-    params:
-        solver=config["solver"],
-        length_estimator=config["length_estimator"],
     log:
         "logs/prediction/simulation/{seq}/{num_replicates}.log",
     benchmark:
@@ -83,6 +80,9 @@ rule predict_simulated_sequence:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        solver=config["solver"],
+        length_estimator=config["length_estimator"],
     shell:
         "spectrseqtools prediction "
         "--fragments {input.fragments} "
@@ -105,9 +105,6 @@ rule predict_sequence_for_comparison_study:
     output:
         predictions="results/comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         sequence="results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
-    params:
-        solver=config["solver"],
-        length_estimator=config["length_estimator"],
     log:
         "logs/comparison_study/{parameter}/{value}/{seq}/prediction.log",
     benchmark:
@@ -115,6 +112,9 @@ rule predict_sequence_for_comparison_study:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
+    params:
+        solver=config["solver"],
+        length_estimator=config["length_estimator"],
     shell:
         "spectrseqtools prediction "
         "--fragments {input.fragments} "
@@ -137,6 +137,13 @@ rule predict_sequence_for_optimization_study:
     output:
         predictions="results/optimization/{parameter}/{value}/{seq}/sample.tsv",
         sequence="results/optimization/{parameter}/{value}/{seq}/sample.fasta",
+    log:
+        "logs/optimization/{parameter}/{value}/{seq}/sample.log",
+    benchmark:
+        "benchmarks/optimization/{parameter}/{value}/{seq}/sample.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
     params:
         solver=config["solver"],
         length_estimator=config["length_estimator"],
@@ -165,13 +172,6 @@ rule predict_sequence_for_optimization_study:
             )[0]
         ),
         dir=subpath(output.predictions, parent=True),
-    log:
-        "logs/optimization/{parameter}/{value}/{seq}/sample.log",
-    benchmark:
-        "benchmarks/optimization/{parameter}/{value}/{seq}/sample.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
     shell:
         "spectrseqtools prediction "
         "--fragments {input.fragments} "

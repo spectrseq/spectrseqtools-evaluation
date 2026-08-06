@@ -5,6 +5,13 @@ rule simulate_for_comparison_study:
         fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         singletons="comparison_study/{parameter}/{value}/{seq}/sample.singletons.tsv",
         meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+    log:
+        "logs/comparison_study/{parameter}/{value}/{seq}/simulation.log",
+    benchmark:
+        "benchmarks/comparison_study/{parameter}/{value}/{seq}/simulation.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
     params:
         dir="comparison_study/{parameter}/{value}/{seq}",
         num_replicates=lambda wildcards: (
@@ -39,13 +46,6 @@ rule simulate_for_comparison_study:
                 within=config,
             )[0]
         ),
-    log:
-        "logs/comparison_study/{parameter}/{value}/{seq}/simulation.log",
-    benchmark:
-        "benchmarks/comparison_study/{parameter}/{value}/{seq}/simulation.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
     script:
         "../scripts/simulate_fragments.py"
 
@@ -57,6 +57,13 @@ rule simulate_custom_fragments:
         fragments="data/simulation/{seq}/{num_replicates}.tsv",
         singletons="data/simulation/{seq}/{num_replicates}.singletons.tsv",
         meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
+    log:
+        "logs/simulation/{seq}/{num_replicates}.log",
+    benchmark:
+        "benchmarks/simulation/{seq}/{num_replicates}.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
     params:
         dir=None,
         num_replicates=lambda wildcards: wildcards.num_replicates,
@@ -72,13 +79,6 @@ rule simulate_custom_fragments:
             dpath="fragmentation_params/noise_rate",
             within=config,
         ),
-    log:
-        "logs/simulation/{seq}/{num_replicates}.log",
-    benchmark:
-        "benchmarks/simulation/{seq}/{num_replicates}.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
     script:
         "../scripts/simulate_fragments.py"
 
