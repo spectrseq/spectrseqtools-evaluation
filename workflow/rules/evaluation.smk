@@ -45,8 +45,11 @@ rule plot_prediction:
 
 rule evaluate_custom_simulation:
     input:
-        collect_custom_simulations(
+        pred=collect_custom_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
+        ),
+        meta=collect_custom_simulations(
+            "data/simulation/{seq}/{num_replicates}.meta.yaml"
         ),
     output:
         "results/evaluation/custom_simulation.tsv",
@@ -57,8 +60,13 @@ rule evaluate_custom_simulation:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion simulation "
+        "2> {log}"
 
 
 rule plot_evaluation_for_custom_simulation:
@@ -90,9 +98,13 @@ rule plot_evaluation_for_custom_simulation:
 
 rule evaluate_comparison_study:
     input:
-        lambda wildcards: collect_comparison_studies(
+        pred=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
             "results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
+        ),
+        meta=lambda wildcards: collect_comparison_studies(
+            wildcards.parameter,
+            "data/simulation/{seq}/{num_replicates}.meta.yaml",
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
@@ -104,9 +116,16 @@ rule evaluate_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        mode="simulation",
-    script:
-        "../scripts/evaluate_prediction.py"
+        param="{parameter}",
+        config=lookup(dpath="comparison/studies/{parameter}", within=config),
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion {params.param} "
+        '--config "{params.config}" '
+        "2> {log}"
 
 
 rule plot_evaluation_for_comparison_study:
@@ -141,9 +160,13 @@ rule plot_evaluation_for_comparison_study:
 
 rule evaluate_optimization_study:
     input:
-        lambda wildcards: collect_optimizations(
+        pred=lambda wildcards: collect_optimizations(
             wildcards.parameter,
             "results/optimization/{parameter}/{value}/{seq}/sample.fasta",
+        ),
+        meta=lambda wildcards: collect_optimizations(
+            wildcards.parameter,
+            "data/experiment/{seq}/{num_replicates}.meta.yaml",
         ),
     output:
         "results/optimization/{parameter}/evaluation.tsv",
@@ -155,9 +178,16 @@ rule evaluate_optimization_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        mode="optimization",
-    script:
-        "../scripts/evaluate_prediction.py"
+        param="{parameter}",
+        config=lookup(dpath="optimization/{parameter}", within=config),
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion {params.param} "
+        '--config "{params.config}" '
+        "2> {log}"
 
 
 rule plot_evaluation_for_optimization_study:
@@ -192,8 +222,11 @@ rule plot_evaluation_for_optimization_study:
 
 rule evaluate_random_simulation:
     input:
-        collect_random_simulations(
+        pred=collect_random_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
+        ),
+        meta=collect_random_simulations(
+            "data/simulation/{seq}/{num_replicates}.meta.yaml"
         ),
     output:
         "results/evaluation/random_simulation.tsv",
@@ -204,8 +237,13 @@ rule evaluate_random_simulation:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion simulation "
+        "2> {log}"
 
 
 rule plot_evaluation_for_random_simulation:
@@ -231,9 +269,10 @@ rule plot_evaluation_for_random_simulation:
 
 rule evaluate_experiment:
     input:
-        collect_experiments(
+        pred=collect_experiments(
             "results/prediction/experiment/{seq}/{num_replicates}.fasta"
         ),
+        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.meta.yaml"),
     output:
         "results/evaluation/experiment.tsv",
     log:
@@ -243,8 +282,13 @@ rule evaluate_experiment:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_prediction.py"
+    shell:
+        "spectrseqtools postprocessing prediction "
+        "--prediction {input.pred} "
+        "--meta {input.meta} "
+        "--output-path {output} "
+        "--evaluation-criterion experiment "
+        "2> {log}"
 
 
 rule plot_evaluation_for_experiment:
