@@ -38,7 +38,6 @@ rule plot_prediction:
         "--end-fragment-plot {output.end} "
         "--internal-fragment-plot {output.internal} "
         "--combined-plot {output.all} "
-        # "--simulation {input.sim} "
         "--alphabet {input.alphabet} "
         "2> {log}"
 
@@ -90,7 +89,7 @@ rule plot_evaluation_for_custom_simulation:
     threads: 1
     shell:
         "spectrseqtools plotting evaluation "
-        "--input {input[0]} "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -151,7 +150,7 @@ rule plot_evaluation_for_comparison_study:
         criterion="{parameter}",
     shell:
         "spectrseqtools plotting evaluation "
-        "--input {input[0]} "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "--evaluation-criterion {params.criterion} "
@@ -213,7 +212,7 @@ rule plot_evaluation_for_optimization_study:
         criterion="{parameter}",
     shell:
         "spectrseqtools plotting evaluation "
-        "--input {input[0]} "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "--evaluation-criterion {params.criterion} "
@@ -261,7 +260,7 @@ rule plot_evaluation_for_random_simulation:
     threads: 1
     shell:
         "spectrseqtools plotting evaluation "
-        "--input {input[0]} "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -312,7 +311,7 @@ rule plot_evaluation_for_experiment:
     threads: 1
     shell:
         "spectrseqtools plotting evaluation "
-        "--input {input[0]} "
+        "--input {input} "
         "--bar-path {output.bar} "
         "--donut-path {output.donut} "
         "2> {log}"
@@ -345,7 +344,7 @@ rule plot_spectra:
         "spectrseqtools plotting spectrum "
         "--raw-fragments {input.raw_fragments} "
         "--predicted-fragments {input.pred_fragments} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "2> {log}"
 
 
@@ -449,7 +448,6 @@ rule plot_runtime:
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "runtime"},
-            # caption="../report/robustness.data.rst",
         ),
     log:
         "logs/plots/evaluation/runtime.log",
@@ -464,7 +462,7 @@ rule plot_runtime:
         "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "--statistic-criterion {params.mode} "
         "2> {log}"
 
@@ -479,7 +477,6 @@ rule plot_memory:
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "memory"},
-            # caption="../report/robustness.data.rst",
         ),
     log:
         "logs/plots/evaluation/memory.log",
@@ -494,6 +491,6 @@ rule plot_memory:
         "spectrseqtools plotting run-statistics "
         "--simulation {input.sim} "
         "--experiment {input.exp} "
-        "--output-path {output[0]} "
+        "--output-path {output} "
         "--statistic-criterion {params.mode} "
         "2> {log}"
