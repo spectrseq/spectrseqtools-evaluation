@@ -406,8 +406,12 @@ rule evaluate_run_statistics_for_simulations:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_run_statistics.py"
+    shell:
+        "spectrseqtools postprocessing run-statistics "
+        "--benchmarks {input.benchmarks} "
+        "--fragments {input.fragments} "
+        "--output-path {output} "
+        "2> {log}"
 
 
 rule evaluate_run_statistics_for_experiments:
@@ -427,8 +431,12 @@ rule evaluate_run_statistics_for_experiments:
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
-    script:
-        "../scripts/evaluate_run_statistics.py"
+    shell:
+        "spectrseqtools postprocessing run-statistics "
+        "--benchmarks {input.benchmarks} "
+        "--fragments {input.fragments} "
+        "--output-path {output} "
+        "2> {log}"
 
 
 rule plot_runtime:
