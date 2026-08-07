@@ -14,6 +14,7 @@ rule simulate_for_comparison_study:
     threads: 1
     params:
         dir="comparison_study/{parameter}/{value}/{seq}",
+        true_seq="{seq}",
         num_replicates=lambda wildcards: (
             wildcards.value
             if wildcards.parameter == "num_replicates"
@@ -46,8 +47,24 @@ rule simulate_for_comparison_study:
                 within=config,
             )[0]
         ),
-    script:
-        "../scripts/simulate_fragments.py"
+        config=lookup(
+            dpath="fragmentation_params",
+            within=config,
+        ),
+    shell:
+        "spectrseqtools simulation fragments "
+        "--elements {input.elements} "
+        "--fragments {output.fragments} "
+        "--singletons {output.singletons} "
+        "--meta {output.meta} "
+        "--true-seq {params.true_seq} "
+        "--num-replicates {params.num_replicates} "
+        "--max-singletons {params.max_singletons} "
+        "--phantom-rate {params.phantom_rate} "
+        "--noise-rate {params.noise_rate} "
+        '--config "{params.config}" '
+        "--output-dir {params.dir} "
+        "2> {log}"
 
 
 rule simulate_custom_fragments:
@@ -65,8 +82,8 @@ rule simulate_custom_fragments:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        dir=None,
-        num_replicates=lambda wildcards: wildcards.num_replicates,
+        true_seq="{seq}",
+        num_replicates="{num_replicates}",
         max_singletons=lookup(
             dpath="fragmentation_params/max_singletons",
             within=config,
@@ -79,8 +96,23 @@ rule simulate_custom_fragments:
             dpath="fragmentation_params/noise_rate",
             within=config,
         ),
-    script:
-        "../scripts/simulate_fragments.py"
+        config=lookup(
+            dpath="fragmentation_params",
+            within=config,
+        ),
+    shell:
+        "spectrseqtools simulation fragments "
+        "--elements {input.elements} "
+        "--fragments {output.fragments} "
+        "--singletons {output.singletons} "
+        "--meta {output.meta} "
+        "--true-seq {params.true_seq} "
+        "--num-replicates {params.num_replicates} "
+        "--max-singletons {params.max_singletons} "
+        "--phantom-rate {params.phantom_rate} "
+        "--noise-rate {params.noise_rate} "
+        '--config "{params.config}" '
+        "2> {log}"
 
 
 rule plot_simulated_fragments:
