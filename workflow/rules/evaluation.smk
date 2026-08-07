@@ -103,7 +103,7 @@ rule evaluate_comparison_study:
         ),
         meta=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "data/simulation/{seq}/{num_replicates}.meta.yaml",
+            "comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
