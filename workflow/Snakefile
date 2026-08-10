@@ -7,14 +7,9 @@ include: "rules/evaluation.smk"
 report: "report/general.rst"
 
 
-rule all_custom_simulation:
+rule all_simulations:
     input:
         "results/plots/evaluation/custom_simulation.bar.html",
-
-
-rule all_random_simulation:
-    input:
-        "results/plots/evaluation/random_simulation.bar.html",
 
 
 rule all_experiments:
@@ -35,7 +30,7 @@ rule all_experiment_plots:
 
 rule all_simulation_plots:
     input:
-        collect_custom_simulations(
+        collect_simulations(
             "results/plots/prediction/simulation/{seq}/{num_replicates}.html"
         ),
 
@@ -67,7 +62,7 @@ rule all:
     input:
         branch(
             condition=config["enable_simulations"],
-            then=rules.all_custom_simulation.input,
+            then=rules.all_simulations.input,
         ),
         branch(condition=config["enable_experiments"], then=rules.all_experiments.input),
         branch(

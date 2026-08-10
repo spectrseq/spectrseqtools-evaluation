@@ -219,53 +219,6 @@ rule plot_evaluation_for_optimization_study:
         "2> {log}"
 
 
-rule evaluate_random_simulation:
-    input:
-        pred=collect_random_simulations(
-            "results/prediction/simulation/{seq}/{num_replicates}.fasta"
-        ),
-        meta=collect_random_simulations(
-            "data/simulation/{seq}/{num_replicates}.meta.yaml"
-        ),
-    output:
-        "results/evaluation/random_simulation.tsv",
-    log:
-        "logs/evaluation/random_simulation.log",
-    benchmark:
-        "benchmarks/evaluation/random_simulation.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
-    shell:
-        "spectrseqtools postprocessing prediction "
-        "--prediction {input.pred} "
-        "--meta {input.meta} "
-        "--output-path {output} "
-        "--evaluation-criterion simulation "
-        "2> {log}"
-
-
-rule plot_evaluation_for_random_simulation:
-    input:
-        "results/evaluation/random_simulation.tsv",
-    output:
-        donut="results/plots/evaluation/random_simulation.donut.html",
-        bar="results/plots/evaluation/random_simulation.bar.html",
-    log:
-        "logs/plots/evaluation/random_simulation.log",
-    benchmark:
-        "benchmarks/plots/evaluation/random_simulation.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
-    shell:
-        "spectrseqtools plotting evaluation "
-        "--input {input} "
-        "--bar-path {output.bar} "
-        "--donut-path {output.donut} "
-        "2> {log}"
-
-
 rule evaluate_experiment:
     input:
         pred=collect_experiments(
