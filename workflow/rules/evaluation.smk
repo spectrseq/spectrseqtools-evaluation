@@ -42,20 +42,20 @@ rule plot_prediction:
         "2> {log}"
 
 
-rule evaluate_custom_simulation:
+rule evaluate_simulation:
     input:
-        pred=collect_custom_simulations(
+        pred=collect_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
         ),
-        meta=collect_custom_simulations(
+        meta=collect_simulations(
             "data/simulation/{seq}/{num_replicates}.meta.yaml"
         ),
     output:
-        "results/evaluation/custom_simulation.tsv",
+        "results/evaluation/simulation.tsv",
     log:
-        "logs/evaluation/custom_simulation.log",
+        "logs/evaluation/simulation.log",
     benchmark:
-        "benchmarks/evaluation/custom_simulation.tsv"
+        "benchmarks/evaluation/simulation.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -68,22 +68,22 @@ rule evaluate_custom_simulation:
         "2> {log}"
 
 
-rule plot_evaluation_for_custom_simulation:
+rule plot_evaluation_for_simulation:
     input:
-        "results/evaluation/custom_simulation.tsv",
+        "results/evaluation/simulation.tsv",
     output:
-        donut="results/plots/evaluation/custom_simulation.donut.html",
+        donut="results/plots/evaluation/simulation.donut.html",
         bar=report(
-            "results/plots/evaluation/custom_simulation.bar.html",
+            "results/plots/evaluation/simulation.bar.html",
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "simulation data"},
             caption="../report/robustness.data.rst",
         ),
     log:
-        "logs/plots/evaluation/custom_simulation.log",
+        "logs/plots/evaluation/simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/custom_simulation.tsv"
+        "benchmarks/plots/evaluation/simulation.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1

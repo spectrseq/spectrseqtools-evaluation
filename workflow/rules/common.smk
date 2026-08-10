@@ -53,7 +53,7 @@ def generate_random_sequence_and_seed_pair(
 
 
 def collect_simulations(*patterns):
-    if lookup(dpath="simulation/custom", within=config) is None:
+    if lookup(dpath="simulation", within=config) is None:
         print("No custom simulation data given.")
         return []
 
@@ -63,7 +63,7 @@ def collect_simulations(*patterns):
             seq=item["seq"],
             num_replicates=num_replicates,
         )
-        for item in lookup(dpath="simulation/custom", within=config)
+        for item in lookup(dpath="simulation", within=config)
         for num_replicates in item["num_replicates"]
     ]
 
