@@ -2,10 +2,6 @@ import random
 import os
 
 
-wildcard_constraints:
-    num_replicates="[0-9]+",
-
-
 def has_custom_percentile(wildcards):
     for item in lookup(dpath="experiment", within=config):
         if item["seq"] == wildcards.seq:
@@ -57,15 +53,15 @@ def collect_simulations(*patterns):
         print("No custom simulation data given.")
         return []
 
-    return [
-        collect(
+    retval = []
+    for item in lookup(dpath="simulation", within=config):
+        retval += collect(
             patterns,
-            seq=item["seq"],
-            num_replicates=num_replicates,
+            # seq=lookup(dpath=f"simulation/{item}/seq", within=config),
+            seq=item,
+            num_replicates="sample",
         )
-        for item in lookup(dpath="simulation", within=config)
-        for num_replicates in item["num_replicates"]
-    ]
+    return retval
 
 
 def collect_comparison_studies(param: str, *patterns):

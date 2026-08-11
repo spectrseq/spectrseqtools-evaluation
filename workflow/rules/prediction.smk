@@ -67,7 +67,7 @@ rule predict_experimental_sequence:
 rule predict_simulated_sequence:
     input:
         fragments="data/simulation/{seq}/{num_replicates}.tsv",
-        meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
+        meta="data/simulation/{seq}/{num_replicates}.preprocessed.meta.yaml",
         alphabet="data/simulation/{seq}/{num_replicates}.singletons.tsv",
     output:
         su_fragments="data/simulation/{seq}/{num_replicates}.standard_unit_fragments.tsv",
@@ -100,7 +100,7 @@ rule predict_simulated_sequence:
 rule predict_sequence_for_comparison_study:
     input:
         fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
-        meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+        meta="comparison_study/{parameter}/{value}/{seq}/sample.preprocessed.meta.yaml",
         alphabet="comparison_study/{parameter}/{value}/{seq}/sample.singletons.tsv",
     output:
         predictions="results/comparison_study/{parameter}/{value}/{seq}/sample.tsv",

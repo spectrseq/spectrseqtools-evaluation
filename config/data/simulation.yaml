@@ -2,31 +2,19 @@
 # Sequence convention is 5' to 3'
 
 simulation:
-  - seq: CUA104GU0A
-    num_replicates:
-#      - 10
-#      - 20
-      - 50
+  CUA104GU0A:
+    seq: CUA104GU0A
+    num_replicates: 50
     name: "testcase_01"
-  - seq: GAUUGUCGUG
-    num_replicates:
-#      - 20
-#      - 30
-      - 50
-#      - 100
-#      - 200
+  GAUUGUCGUG:
+    seq: GAUUGUCGUG
+    num_replicates: 50
     name: "testcase_02"
-#  - seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
-#    num_replicates:
-##      - 30
-#      - 50
-##      - 200
-##      - 400
+#  CAGCAAAACGAUCAUAUAGAGAUCCGCAGU:
+#    seq: CAGCAAAACGAUCAUAUAGAGAUCCGCAGU
+#    num_replicates: 150
 #    name: "testcase_06"
-#  - seq: CAGCAAAACGAUCAUAUAGA
-#    num_replicates:
-##      - 30
-#      - 100
-##      - 200
-##      - 400
+#  CAGCAAAACGAUCAUAUAGA:
+#    seq: CAGCAAAACGAUCAUAUAGA
+#    num_replicates: 100
 #    name: "testcase_07"

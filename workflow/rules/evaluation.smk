@@ -48,7 +48,7 @@ rule evaluate_simulation:
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
         ),
         meta=collect_simulations(
-            "data/simulation/{seq}/{num_replicates}.meta.yaml"
+            "data/simulation/{seq}/{num_replicates}.preprocessed.meta.yaml"
         ),
     output:
         "results/evaluation/simulation.tsv",
@@ -103,7 +103,7 @@ rule evaluate_comparison_study:
         ),
         meta=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+            "comparison_study/{parameter}/{value}/{seq}/sample.preprocessed.meta.yaml",
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
@@ -165,7 +165,7 @@ rule evaluate_optimization_study:
         ),
         meta=lambda wildcards: collect_optimizations(
             wildcards.parameter,
-            "data/experiment/{seq}/{num_replicates}.meta.yaml",
+            "data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
         ),
     output:
         "results/optimization/{parameter}/evaluation.tsv",
@@ -224,7 +224,7 @@ rule evaluate_experiment:
         pred=collect_experiments(
             "results/prediction/experiment/{seq}/{num_replicates}.fasta"
         ),
-        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.meta.yaml"),
+        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml"),
     output:
         "results/evaluation/experiment.tsv",
     log:
@@ -304,7 +304,7 @@ rule plot_spectra:
 rule plot_singletons:
     input:
         raw_data="data/experiment/{seq}/{num_replicates}.raw",
-        meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
+        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
         alphabet="workflow/resources/masses.including_synthetic.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
     output:

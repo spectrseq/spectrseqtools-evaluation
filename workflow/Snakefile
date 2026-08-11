@@ -9,7 +9,7 @@ report: "report/general.rst"
 
 rule all_simulations:
     input:
-        "results/plots/evaluation/custom_simulation.bar.html",
+        "results/plots/evaluation/simulation.bar.html",
 
 
 rule all_experiments:

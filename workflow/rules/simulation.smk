@@ -1,10 +1,11 @@
 rule simulate_for_comparison_study:
     input:
         elements=workflow.source_path("../resources/element_masses.tsv"),
+        meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
     output:
         fragments="comparison_study/{parameter}/{value}/{seq}/sample.tsv",
         singletons="comparison_study/{parameter}/{value}/{seq}/sample.singletons.tsv",
-        meta="comparison_study/{parameter}/{value}/{seq}/sample.meta.yaml",
+        meta="comparison_study/{parameter}/{value}/{seq}/sample.preprocessed.meta.yaml",
     log:
         "logs/comparison_study/{parameter}/{value}/{seq}/simulation.log",
     benchmark:
@@ -13,7 +14,7 @@ rule simulate_for_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        dir="comparison_study/{parameter}/{value}/{seq}",
+        dir=subpath(output.meta, parent=True),
         true_seq="{seq}",
         num_replicates=lambda wildcards: (
             wildcards.value
@@ -54,6 +55,7 @@ rule simulate_for_comparison_study:
     shell:
         "spectrseqtools simulation fragments "
         "--elements {input.elements} "
+        "--input {input.meta} "
         "--fragments {output.fragments} "
         "--singletons {output.singletons} "
         "--meta {output.meta} "
@@ -67,13 +69,40 @@ rule simulate_for_comparison_study:
         "2> {log}"
 
 
+rule simulate_metadata_for_simulation:
+    input:
+        alphabet=workflow.source_path("../resources/masses.tsv"),
+    output:
+        meta="data/simulation/{seq}/sample.meta.yaml",
+    log:
+        "logs/simulation/{seq}/metadata_simulation.log",
+    benchmark:
+        "benchmarks/simulation/{seq}/metadata_simulation.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    params:
+        dir=subpath(output.meta, parent=True),
+        start_tag=config["fragmentation_params"]["5_prime_tag"],
+        end_tag=config["fragmentation_params"]["3_prime_tag"],
+        seq=lookup(dpath="simulation/{seq}/seq", within=config),
+    shell:
+        "spectrseqtools simulation custom "
+        "--sequence {params.seq} "
+        "--output-dir {params.dir} "
+        "--start-tag {params.start_tag} "
+        "--end-tag {params.end_tag} "
+        "2> {log}"
+
+
 rule simulate_custom_fragments:
     input:
         elements=workflow.source_path("../resources/element_masses.tsv"),
+        meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
     output:
         fragments="data/simulation/{seq}/{num_replicates}.tsv",
         singletons="data/simulation/{seq}/{num_replicates}.singletons.tsv",
-        meta="data/simulation/{seq}/{num_replicates}.meta.yaml",
+        meta="data/simulation/{seq}/{num_replicates}.preprocessed.meta.yaml",
     log:
         "logs/simulation/{seq}/{num_replicates}.log",
     benchmark:
@@ -83,7 +112,10 @@ rule simulate_custom_fragments:
     threads: 1
     params:
         true_seq="{seq}",
-        num_replicates="{num_replicates}",
+        num_replicates=lookup(
+            dpath="simulation/{seq}/num_replicates",
+            within=config,
+        ),
         max_singletons=lookup(
             dpath="fragmentation_params/max_singletons",
             within=config,
@@ -103,6 +135,7 @@ rule simulate_custom_fragments:
     shell:
         "spectrseqtools simulation fragments "
         "--elements {input.elements} "
+        "--input {input.meta} "
         "--fragments {output.fragments} "
         "--singletons {output.singletons} "
         "--meta {output.meta} "
