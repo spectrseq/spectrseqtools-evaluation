@@ -5,7 +5,7 @@ rule plot_prediction:
     input:
         pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
         pred_seq="results/prediction/{modus}/{seq}/{num_replicates}.fasta",
-        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
+        meta="data/{modus}/{seq}/{num_replicates}.preprocessed.meta.yaml",
         sim="data/{modus}/{seq}/{num_replicates}.tsv",
         alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
@@ -99,11 +99,11 @@ rule evaluate_comparison_study:
     input:
         pred=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
+            "results/comparison_study/{parameter}/{value}/sim_{id}/sample.fasta",
         ),
         meta=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "comparison_study/{parameter}/{value}/{seq}/sample.preprocessed.meta.yaml",
+            "comparison_study/{parameter}/{value}/sim_{id}/sample.preprocessed.meta.yaml",
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
@@ -343,11 +343,11 @@ rule evaluate_run_statistics_for_simulations:
     input:
         benchmarks=collect_comparison_studies(
             "num_replicates",
-            "benchmarks/comparison_study/num_replicates/{value}/{seq}/prediction.tsv",
+            "benchmarks/comparison_study/num_replicates/{value}/sim_{id}/prediction.tsv",
         ),
         fragments=collect_comparison_studies(
             "num_replicates",
-            "comparison_study/num_replicates/{value}/{seq}/sample.tsv",
+            "comparison_study/num_replicates/{value}/sim_{id}/sample.tsv",
         ),
     output:
         "results/comparison_study/stats.tsv",

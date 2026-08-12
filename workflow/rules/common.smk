@@ -16,38 +16,6 @@ def get_custom_percentile(wildcards):
     return None
 
 
-def generate_random_sequence_and_seed_pair(
-    seq_len, modification_rate=0, modifications=None
-):
-    # If no modifications are given, simulate over unmodified bases only
-    if modifications is None:
-        return "".join(
-            [random.choice(["A", "U", "G", "C"]) for _ in range(seq_len)]
-        ), random.choice(range(10000))
-
-    # Read modifications from file
-    with open(modifications, "r") as file:
-        lines = file.readlines()[1:]
-    modified_nucleoside_names = [
-        line.split("\t")[0]
-        for line in lines
-        if line.split("\t")[0] not in ["U", "A", "G", "C"]
-    ]
-
-    # Define probabilities for different bases (using modification rate)
-    weights = [(1.0 - modification_rate) / 4] * 4 + [
-        modification_rate / len(modified_nucleoside_names)
-    ] * len(modified_nucleoside_names)
-
-    return "".join(
-        random.choices(
-            ["A", "U", "G", "C"] + modified_nucleoside_names,
-            weights=weights,
-            k=seq_len,
-        )
-    ), random.choice(range(10000))
-
-
 def collect_simulations(*patterns):
     if lookup(dpath="simulation", within=config) is None:
         print("No custom simulation data given.")
@@ -65,53 +33,37 @@ def collect_simulations(*patterns):
 
 
 def collect_comparison_studies(param: str, *patterns):
-    retval = []
-
     if lookup(dpath="comparison/studies", within=config) is None:
         print("No random simulation data given.")
-        return retval
+        return []
 
     if param not in lookup(dpath="comparison/studies", within=config):
         print(f"No data for {param} given.")
-        return retval
+        return []
 
     if lookup(dpath=f"comparison/studies/{param}", within=config) is None:
         print("No comparison studies given.")
         return []
 
+    retval = []
     sim = lookup(dpath=f"comparison/studies/{param}", within=config)
     for modification_rate in sim["modification_rate"]:
         for seq_len in sim["sequence_length"]:
-            random.seed(lookup(dpath="comparison/seed", within=config))
-            sequences = [
-                generate_random_sequence_and_seed_pair(
-                    seq_len=random.choice(range(10, 21)) if seq_len == -1 else seq_len,
-                    modification_rate=modification_rate,
-                    modifications=workflow.source_path("../resources/masses.tsv"),
-                )
-                for _ in range(lookup(dpath="comparison/num_sequences", within=config))
-            ]
-
-            for seq in sequences:
+            for id in range(lookup(dpath="comparison/num_sequences", within=config)):
                 if param == "modification_rate":
                     values = [modification_rate]
                 elif param == "sequence_length":
                     values = [seq_len]
                 else:
                     values = sim[param]
-                for value in values:
-                    file_name = f"comparison_study/{param}/{value}/{seq[0]}/seed.txt"
-                    os.makedirs(os.path.dirname(file_name), exist_ok=True)
-                    with open(file_name, "w") as f:
-                        f.write(str(seq[1]))
 
+                for value in values:
                     retval += collect(
                         patterns,
                         parameter=param,
                         value=value,
-                        seq=seq[0],
+                        id=id+1,
                     )
-
     return retval
 
 

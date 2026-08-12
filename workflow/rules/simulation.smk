@@ -1,3 +1,64 @@
+wildcard_constraints:
+    value="[0-9]+",
+
+
+rule simulate_metadata_for_comparison_study:
+    input:
+        alphabet=workflow.source_path("../resources/masses.tsv"),
+    output:
+        dir=directory("comparison_study/{parameter}/{value}/"),
+        meta=expand("comparison_study/{{parameter}}/{{value}}/sim_{id}/sample.meta.yaml",
+        id=range(1, lookup(
+            dpath="comparison/num_sequences",
+            within=config,
+        )+1)),
+    log:
+        "logs/comparison_study/{parameter}/{value}/metadata_simulation.log",
+    benchmark:
+        "benchmarks/comparison_study/{parameter}/{value}/metadata_simulation.tsv"
+    conda:
+        "../envs/spectrseqtools.yaml"
+    threads: 1
+    params:
+        start_tag=config["fragmentation_params"]["5_prime_tag"],
+        end_tag=config["fragmentation_params"]["3_prime_tag"],
+        num_seqs=lookup(
+            dpath="comparison/num_sequences",
+            within=config,
+        ),
+        seq_len=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "sequence_length"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/sequence_length",
+                within=config,
+            )[0]
+        ),
+        mod_rate=lambda wildcards: (
+            wildcards.value
+            if wildcards.parameter == "modification_rate"
+            else lookup(
+                dpath=f"comparison/studies/{wildcards.parameter}/modification_rate",
+                within=config,
+            )[0]
+        ),
+        seed=lookup(
+            dpath="comparison/seed",
+            within=config,
+        ),
+    shell:
+        "spectrseqtools simulation random "
+        "--num-sequences {params.num_seqs} "
+        "--output-dir {output.dir} "
+        "--start-tag {params.start_tag} "
+        "--end-tag {params.end_tag} "
+        "--sequence-length {params.seq_len} "
+        "--modification-rate {params.mod_rate} "
+        "--alphabet {input.alphabet} "
+        "--global-seed {params.seed} "
+        "2> {log}"
+
+
 rule simulate_for_comparison_study:
     input:
         elements=workflow.source_path("../resources/element_masses.tsv"),
@@ -14,8 +75,6 @@ rule simulate_for_comparison_study:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        dir=subpath(output.meta, parent=True),
-        true_seq="{seq}",
         num_replicates=lambda wildcards: (
             wildcards.value
             if wildcards.parameter == "num_replicates"
@@ -59,13 +118,11 @@ rule simulate_for_comparison_study:
         "--fragments {output.fragments} "
         "--singletons {output.singletons} "
         "--meta {output.meta} "
-        "--true-seq {params.true_seq} "
         "--num-replicates {params.num_replicates} "
         "--max-singletons {params.max_singletons} "
         "--phantom-rate {params.phantom_rate} "
         "--noise-rate {params.noise_rate} "
         '--config "{params.config}" '
-        "--output-dir {params.dir} "
         "2> {log}"
 
 
@@ -111,7 +168,6 @@ rule simulate_custom_fragments:
         "../envs/spectrseqtools.yaml"
     threads: 1
     params:
-        true_seq="{seq}",
         num_replicates=lookup(
             dpath="simulation/{seq}/num_replicates",
             within=config,
@@ -139,7 +195,6 @@ rule simulate_custom_fragments:
         "--fragments {output.fragments} "
         "--singletons {output.singletons} "
         "--meta {output.meta} "
-        "--true-seq {params.true_seq} "
         "--num-replicates {params.num_replicates} "
         "--max-singletons {params.max_singletons} "
         "--phantom-rate {params.phantom_rate} "
