@@ -62,7 +62,7 @@ def collect_comparison_studies(param: str, *patterns):
                         patterns,
                         parameter=param,
                         value=value,
-                        id=id+1,
+                        id=id + 1,
                     )
     return retval
 

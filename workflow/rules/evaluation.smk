@@ -224,7 +224,9 @@ rule evaluate_experiment:
         pred=collect_experiments(
             "results/prediction/experiment/{seq}/{num_replicates}.fasta"
         ),
-        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml"),
+        meta=collect_experiments(
+            "data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml"
+        ),
     output:
         "results/evaluation/experiment.tsv",
     log:

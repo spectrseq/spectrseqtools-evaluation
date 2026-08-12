@@ -7,11 +7,17 @@ rule simulate_metadata_for_comparison_study:
         alphabet=workflow.source_path("../resources/masses.tsv"),
     output:
         dir=directory("comparison_study/{parameter}/{value}/"),
-        meta=expand("comparison_study/{{parameter}}/{{value}}/sim_{id}/sample.meta.yaml",
-        id=range(1, lookup(
-            dpath="comparison/num_sequences",
-            within=config,
-        )+1)),
+        meta=expand(
+            "comparison_study/{{parameter}}/{{value}}/sim_{id}/sample.meta.yaml",
+            id=range(
+                1,
+                lookup(
+                    dpath="comparison/num_sequences",
+                    within=config,
+                )
+                + 1,
+            ),
+        ),
     log:
         "logs/comparison_study/{parameter}/{value}/metadata_simulation.log",
     benchmark:
