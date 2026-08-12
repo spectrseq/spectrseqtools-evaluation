@@ -5,7 +5,7 @@ rule plot_prediction:
     input:
         pred_fragments="results/prediction/{modus}/{seq}/{num_replicates}.tsv",
         pred_seq="results/prediction/{modus}/{seq}/{num_replicates}.fasta",
-        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
+        meta="data/{modus}/{seq}/{num_replicates}.preprocessed.meta.yaml",
         sim="data/{modus}/{seq}/{num_replicates}.tsv",
         alphabet="workflow/resources/masses.including_synthetic.tsv",
     output:
@@ -42,20 +42,20 @@ rule plot_prediction:
         "2> {log}"
 
 
-rule evaluate_custom_simulation:
+rule evaluate_simulation:
     input:
-        pred=collect_custom_simulations(
+        pred=collect_simulations(
             "results/prediction/simulation/{seq}/{num_replicates}.fasta"
         ),
-        meta=collect_custom_simulations(
-            "data/simulation/{seq}/{num_replicates}.meta.yaml"
+        meta=collect_simulations(
+            "data/simulation/{seq}/{num_replicates}.preprocessed.meta.yaml"
         ),
     output:
-        "results/evaluation/custom_simulation.tsv",
+        "results/evaluation/simulation.tsv",
     log:
-        "logs/evaluation/custom_simulation.log",
+        "logs/evaluation/simulation.log",
     benchmark:
-        "benchmarks/evaluation/custom_simulation.tsv"
+        "benchmarks/evaluation/simulation.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -68,22 +68,22 @@ rule evaluate_custom_simulation:
         "2> {log}"
 
 
-rule plot_evaluation_for_custom_simulation:
+rule plot_evaluation_for_simulation:
     input:
-        "results/evaluation/custom_simulation.tsv",
+        "results/evaluation/simulation.tsv",
     output:
-        donut="results/plots/evaluation/custom_simulation.donut.html",
+        donut="results/plots/evaluation/simulation.donut.html",
         bar=report(
-            "results/plots/evaluation/custom_simulation.bar.html",
+            "results/plots/evaluation/simulation.bar.html",
             htmlindex="index.html",
             category="Robustness",
             labels={"type": "simulation data"},
             caption="../report/robustness.data.rst",
         ),
     log:
-        "logs/plots/evaluation/custom_simulation.log",
+        "logs/plots/evaluation/simulation.log",
     benchmark:
-        "benchmarks/plots/evaluation/custom_simulation.tsv"
+        "benchmarks/plots/evaluation/simulation.tsv"
     conda:
         "../envs/spectrseqtools.yaml"
     threads: 1
@@ -99,11 +99,11 @@ rule evaluate_comparison_study:
     input:
         pred=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "results/comparison_study/{parameter}/{value}/{seq}/sample.fasta",
+            "results/comparison_study/{parameter}/{value}/sim_{id}/sample.fasta",
         ),
         meta=lambda wildcards: collect_comparison_studies(
             wildcards.parameter,
-            "data/simulation/{seq}/{num_replicates}.meta.yaml",
+            "comparison_study/{parameter}/{value}/sim_{id}/sample.preprocessed.meta.yaml",
         ),
     output:
         "results/comparison_study/{parameter}/evaluation.tsv",
@@ -165,7 +165,7 @@ rule evaluate_optimization_study:
         ),
         meta=lambda wildcards: collect_optimizations(
             wildcards.parameter,
-            "data/experiment/{seq}/{num_replicates}.meta.yaml",
+            "data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
         ),
     output:
         "results/optimization/{parameter}/evaluation.tsv",
@@ -219,59 +219,14 @@ rule plot_evaluation_for_optimization_study:
         "2> {log}"
 
 
-rule evaluate_random_simulation:
-    input:
-        pred=collect_random_simulations(
-            "results/prediction/simulation/{seq}/{num_replicates}.fasta"
-        ),
-        meta=collect_random_simulations(
-            "data/simulation/{seq}/{num_replicates}.meta.yaml"
-        ),
-    output:
-        "results/evaluation/random_simulation.tsv",
-    log:
-        "logs/evaluation/random_simulation.log",
-    benchmark:
-        "benchmarks/evaluation/random_simulation.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
-    shell:
-        "spectrseqtools postprocessing prediction "
-        "--prediction {input.pred} "
-        "--meta {input.meta} "
-        "--output-path {output} "
-        "--evaluation-criterion simulation "
-        "2> {log}"
-
-
-rule plot_evaluation_for_random_simulation:
-    input:
-        "results/evaluation/random_simulation.tsv",
-    output:
-        donut="results/plots/evaluation/random_simulation.donut.html",
-        bar="results/plots/evaluation/random_simulation.bar.html",
-    log:
-        "logs/plots/evaluation/random_simulation.log",
-    benchmark:
-        "benchmarks/plots/evaluation/random_simulation.tsv"
-    conda:
-        "../envs/spectrseqtools.yaml"
-    threads: 1
-    shell:
-        "spectrseqtools plotting evaluation "
-        "--input {input} "
-        "--bar-path {output.bar} "
-        "--donut-path {output.donut} "
-        "2> {log}"
-
-
 rule evaluate_experiment:
     input:
         pred=collect_experiments(
             "results/prediction/experiment/{seq}/{num_replicates}.fasta"
         ),
-        meta=collect_experiments("data/experiment/{seq}/{num_replicates}.meta.yaml"),
+        meta=collect_experiments(
+            "data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml"
+        ),
     output:
         "results/evaluation/experiment.tsv",
     log:
@@ -351,7 +306,7 @@ rule plot_spectra:
 rule plot_singletons:
     input:
         raw_data="data/experiment/{seq}/{num_replicates}.raw",
-        meta="data/experiment/{seq}/{num_replicates}.meta.yaml",
+        meta="data/experiment/{seq}/{num_replicates}.preprocessed.meta.yaml",
         alphabet="workflow/resources/masses.including_synthetic.tsv",
         singletons="data/experiment/{seq}/{num_replicates}.singletons.tsv",
     output:
@@ -390,11 +345,11 @@ rule evaluate_run_statistics_for_simulations:
     input:
         benchmarks=collect_comparison_studies(
             "num_replicates",
-            "benchmarks/comparison_study/num_replicates/{value}/{seq}/prediction.tsv",
+            "benchmarks/comparison_study/num_replicates/{value}/sim_{id}/prediction.tsv",
         ),
         fragments=collect_comparison_studies(
             "num_replicates",
-            "comparison_study/num_replicates/{value}/{seq}/sample.tsv",
+            "comparison_study/num_replicates/{value}/sim_{id}/sample.tsv",
         ),
     output:
         "results/comparison_study/stats.tsv",
